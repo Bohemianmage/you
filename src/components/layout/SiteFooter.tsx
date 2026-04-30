@@ -1,46 +1,41 @@
 import Link from "next/link";
 
 /**
- * Closing band with brand line, legal-style contact block, and jump-to-nav.
+ * Footer matches Wix SITE_FOOTER: white background (#color_11), dark border/text (#color_15).
  */
 export function SiteFooter() {
   return (
-    <footer id="contact" className="border-t border-brand-muted/15 bg-brand-white">
+    <footer id="contact" className="relative border-t border-brand-border bg-brand-bg text-brand-text">
       <div className="mx-auto max-w-6xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-xl space-y-4">
-            <p className="text-lg font-medium leading-relaxed text-brand-text">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-xl space-y-5">
+            <p className="font-heading text-xl font-semibold leading-snug text-brand-text sm:text-2xl">
               Comienza a escribir una nueva historia con nosotros.
             </p>
-            <address className="not-italic text-sm leading-relaxed text-brand-muted">
-              Roberto Gayol 82-4 Int. 2, Cd. Satélite, 53100 Naucalpan de Juárez,
-              Méx.
+            <address className="not-italic text-sm font-medium leading-relaxed text-brand-muted">
+              Roberto Gayol 82-4 Int. 2, Cd. Satélite, 53100 Naucalpan de Juárez, Méx.
             </address>
             <p className="text-sm text-brand-muted">
-              Teléfono:{" "}
-              <a
-                href="tel:+525592217328"
-                className="font-medium text-brand-accent hover:underline"
-              >
+              Tel.{" "}
+              <a href="tel:+525592217328" className="font-semibold text-brand-accent hover:text-brand-accent-strong">
                 55-92-21-73-28
               </a>
             </p>
           </div>
-          <div className="flex flex-wrap gap-4 text-sm font-medium text-brand-text">
-            <Link href="#about" className="hover:text-brand-accent">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-8">
+            <Link href="#about" className="text-[13px] font-bold uppercase tracking-[0.12em] hover:text-brand-accent">
               Nosotros
             </Link>
-            <Link href="#featured-properties" className="hover:text-brand-accent">
+            <Link href="#featured-properties" className="text-[13px] font-bold uppercase tracking-[0.12em] hover:text-brand-accent">
               Propiedades
             </Link>
-            <Link href="#downloadables" className="hover:text-brand-accent">
+            <Link href="#downloadables" className="text-[13px] font-bold uppercase tracking-[0.12em] hover:text-brand-accent">
               Descargables
             </Link>
           </div>
         </div>
-        <p className="text-xs text-brand-muted">
-          © {new Date().getFullYear()} YOU Soluciones Inmobiliarias. Todos los
-          derechos reservados.
+        <p className="border-t border-brand-border pt-8 text-[11px] uppercase tracking-[0.14em] text-brand-subtle">
+          © {new Date().getFullYear()} YOU Soluciones Inmobiliarias. Todos los derechos reservados.
         </p>
       </div>
     </footer>

@@ -1,25 +1,39 @@
 @import "tailwindcss";
 
+/**
+ * Theme tokens validated from inline `:root` color/font definitions in the Wix viewer
+ * snapshot for eberumenalonso.wixsite.com (color_11–15, accent rgb(97,110,137), etc.).
+ */
 :root {
-  --background: #f8f7f4;
-  --foreground: #1f2933;
+  --background: #ffffff;
+  --foreground: #2f2e2e;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-brand-bg: #f8f7f4;
-  --color-brand-text: #1f2933;
-  --color-brand-muted: #5b6470;
-  --color-brand-accent: #b08d57;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-bg: #ffffff;
+  --color-brand-surface: #f7f7f7;
+  --color-brand-text: #2f2e2e;
+  --color-brand-muted: #605e5e;
+  --color-brand-subtle: #a0a09f;
+  --color-brand-border: #cccccc;
+  --color-brand-accent: #616e89;
+  --color-brand-accent-hover: #8e99b1;
+  --color-brand-accent-strong: #283b62;
   --color-brand-white: #ffffff;
-  --color-brand-ink: #111827;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background-color: rgba(97, 110, 137, 0.28);
+  color: #2f2e2e;
 }

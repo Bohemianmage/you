@@ -1,36 +1,28 @@
 import Link from "next/link";
 
 /**
- * Promotional strip for Matterport-style 3D experiences.
+ * 3D tours block — same typography scale as Wix small caps headings (`font_6`-style treatment).
  */
 export function VirtualToursSection() {
   return (
-    <section
-      id="virtual-tours"
-      className="border-b border-brand-muted/10 bg-brand-bg py-16 sm:py-20"
-      aria-labelledby="tours-heading"
-    >
+    <section id="virtual-tours" className="border-b border-brand-border bg-brand-surface py-16 sm:py-20" aria-labelledby="tours-heading">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-10 overflow-hidden rounded-2xl border border-brand-muted/15 bg-brand-white p-8 shadow-sm lg:flex-row lg:items-center lg:justify-between lg:p-12">
+        <div className="flex flex-col gap-10 rounded-sm border border-brand-border bg-brand-bg p-8 shadow-[0_1px_4px_rgba(0,0,0,0.12)] lg:flex-row lg:items-center lg:justify-between lg:p-10">
           <div className="max-w-xl space-y-4">
-            <h2
-              id="tours-heading"
-              className="text-2xl font-semibold tracking-tight text-brand-ink sm:text-3xl"
-            >
+            <h2 id="tours-heading" className="font-heading text-lg font-semibold uppercase tracking-[0.12em] text-brand-muted sm:text-xl">
               Descubre nuestras experiencias 3D
             </h2>
-            <p className="text-base leading-relaxed text-brand-muted">
-              Recorre propiedades seleccionadas con recorridos virtuales de alta
-              calidad, disponibles para ti cuando quieras explorarlas.
+            <p className="text-sm leading-relaxed text-brand-muted">
+              Recorridos virtuales para conocer propiedades con mayor detalle antes de visitarlas.
             </p>
             <Link
               href="#contact"
-              className="inline-flex w-fit items-center justify-center rounded-xl bg-brand-ink px-6 py-3 text-sm font-semibold text-brand-white transition hover:bg-brand-ink/90"
+              className="inline-flex w-fit items-center justify-center rounded-sm bg-brand-accent px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong"
             >
               Ver tours virtuales
             </Link>
           </div>
-          <div className="aspect-video w-full max-w-md shrink-0 rounded-xl bg-gradient-to-tr from-brand-accent/30 via-brand-bg to-brand-muted/20 lg:max-w-sm" />
+          <div className="aspect-video w-full max-w-md shrink-0 rounded-sm border border-brand-border bg-brand-surface lg:max-w-sm" />
         </div>
       </div>
     </section>

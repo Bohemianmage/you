@@ -16,55 +16,51 @@ const SOCIAL_PLACEHOLDERS = [
 ] as const;
 
 /**
- * Sticky site header with brand mark, in-page navigation, and social links.
+ * Sticky header — Wix uses white (#color_11), dark nav text (#color_15), hover toward #color_17.
  */
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-brand-muted/15 bg-brand-white/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-bg/95 shadow-[0_1px_4px_rgba(0,0,0,0.06)] backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-lg font-semibold tracking-tight text-brand-ink"
-        >
+        <Link href="/" className="group flex items-center gap-3 font-semibold tracking-tight text-brand-text">
           <span
-            className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-accent/15 text-sm font-bold text-brand-accent"
+            className="flex h-11 w-11 items-center justify-center rounded-sm border border-brand-border bg-brand-white text-xs font-bold uppercase tracking-wide text-brand-accent shadow-sm transition group-hover:border-brand-accent"
             aria-hidden
           >
             YOU
           </span>
           <span className="hidden leading-tight sm:block">
-            <span className="block text-brand-ink">Soluciones</span>
-            <span className="block text-xs font-normal text-brand-muted">
+            <span className="block font-heading text-lg text-brand-text">Soluciones</span>
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-muted">
               Inmobiliarias
             </span>
           </span>
         </Link>
 
         <nav
-          className="order-last flex w-full justify-center gap-6 text-sm font-medium text-brand-text md:order-none md:w-auto md:justify-end"
+          className="order-last flex w-full justify-center gap-6 text-xs font-bold uppercase tracking-[0.14em] text-brand-text md:order-none md:w-auto md:justify-end md:gap-8 md:text-[13px]"
           aria-label="Principal"
         >
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="transition-colors hover:text-brand-accent"
+              className="transition hover:text-brand-accent-hover"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-3 text-xs font-medium text-brand-muted">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-muted">
           {SOCIAL_PLACEHOLDERS.map((s, i) => (
-            <span key={s.label} className="flex items-center gap-3">
-              {i > 0 ? <span className="text-brand-muted/40" aria-hidden>|</span> : null}
-              <a
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors hover:text-brand-accent"
-              >
+            <span key={s.label} className="flex items-center gap-2">
+              {i > 0 ? (
+                <span className="select-none text-brand-border" aria-hidden>
+                  ·
+                </span>
+              ) : null}
+              <a href={s.href} target="_blank" rel="noopener noreferrer" className="hover:text-brand-accent">
                 {s.label}
               </a>
             </span>

@@ -12,9 +12,7 @@ export interface FeaturedProperty {
 }
 
 /**
- * Hardcoded featured listings migrated from the legacy site inventory.
- * Property 3 price inferred from incomplete source (“,900,000.00” → USD).
- * Property 4 rent amount was missing in source; marked as consult.
+ * Hardcoded featured listings — amounts aligned with live Wix reference where shown (MXN).
  */
 export const FEATURED_PROPERTIES: readonly FeaturedProperty[] = [
   {
@@ -24,7 +22,7 @@ export const FEATURED_PROPERTIES: readonly FeaturedProperty[] = [
     address:
       "Campos Elíseos, Polanco, Polanco II Secc, Miguel Hidalgo, 11550 Ciudad de México, CDMX, México",
     status: "En Renta",
-    ctaLabel: "Tours virtuales",
+    ctaLabel: "Tours Virtuales",
   },
   {
     id: "bosques-sale-ph-golf",
@@ -32,22 +30,22 @@ export const FEATURED_PROPERTIES: readonly FeaturedProperty[] = [
     price: "US$ 4,300,000.00",
     address: "Canadá 77, Parque San Andrés, Cuajimalpa de Morelos, 05600 CDMX, México",
     status: "En Venta",
-    ctaLabel: "Tours virtuales",
+    ctaLabel: "Tours Virtuales",
   },
   {
     id: "miyana-sale-ph-colibri",
     title: "Venta PH con Terraza en Miyana Torre Colibrí",
-    price: "US$ 900,000.00",
+    price: "$58,900,000.00 MXN",
     address: "Avenida Ejército Nacional, Granada, Ciudad de México, CDMX, México",
     status: "En Venta",
-    ctaLabel: "Tours virtuales",
+    ctaLabel: "Tours Virtuales",
   },
   {
     id: "polanco-rent-ph-terraces",
     title: "Renta PH con Terrazas y Balcones en Polanco",
-    price: "Consultar",
+    price: "$110,000.00 MXN",
     address: "Eugenio Sue, Polanco IV Secc, Ciudad de México, CDMX, México",
     status: "En Renta",
-    ctaLabel: "Tours virtuales",
+    ctaLabel: "Tours Virtuales",
   },
 ] as const;
