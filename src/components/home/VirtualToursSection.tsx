@@ -1,25 +1,29 @@
 import Link from "next/link";
 
+import type { HomeCopy } from "@/i18n/home";
+
+interface VirtualToursSectionProps {
+  copy: HomeCopy["virtualTours"];
+}
+
 /**
  * 3D tours block — same typography scale as Wix small caps headings (`font_6`-style treatment).
  */
-export function VirtualToursSection() {
+export function VirtualToursSection({ copy }: VirtualToursSectionProps) {
   return (
     <section id="virtual-tours" className="border-b border-brand-border bg-brand-surface py-16 sm:py-20" aria-labelledby="tours-heading">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-10 rounded-sm border border-brand-border bg-brand-bg p-8 shadow-[0_1px_4px_rgba(0,0,0,0.12)] lg:flex-row lg:items-center lg:justify-between lg:p-10">
           <div className="max-w-xl space-y-4">
             <h2 id="tours-heading" className="font-heading text-lg font-semibold uppercase tracking-[0.12em] text-brand-muted sm:text-xl">
-              Descubre nuestras experiencias 3D
+              {copy.title}
             </h2>
-            <p className="text-sm leading-relaxed text-brand-muted">
-              Recorridos virtuales para conocer propiedades con mayor detalle antes de visitarlas.
-            </p>
+            <p className="text-sm leading-relaxed text-brand-muted">{copy.description}</p>
             <Link
               href="#contact"
               className="inline-flex w-fit items-center justify-center rounded-sm bg-brand-accent px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong"
             >
-              Ver tours virtuales
+              {copy.cta}
             </Link>
           </div>
           <div className="aspect-video w-full max-w-md shrink-0 rounded-sm border border-brand-border bg-brand-surface lg:max-w-sm" />
