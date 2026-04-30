@@ -36,9 +36,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# CMS local (opcional: quitá esta línea si querés versionar el JSON en git)
-/content/site-content.json
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts

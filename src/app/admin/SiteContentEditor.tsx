@@ -6,6 +6,7 @@ import { saveSiteContent } from "@/app/actions/site-content";
 import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
+import type { AdminGithubPublishSummary } from "@/lib/site-content/publish-summary";
 
 type TabId = "general" | "team" | "featured";
 
@@ -45,7 +46,13 @@ const labelClass = "block text-xs font-bold uppercase tracking-[0.12em] text-bra
 const inputClass =
   "mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm outline-none ring-brand-accent focus:border-brand-accent focus:ring-1";
 
-export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
+export function SiteContentEditor({
+  seed,
+  publishSummary,
+}: {
+  seed: AdminEditorSeed;
+  publishSummary: AdminGithubPublishSummary;
+}) {
   const [tab, setTab] = useState<TabId>("general");
   const [featuredLocale, setFeaturedLocale] = useState<"es" | "en">("es");
 
@@ -371,14 +378,39 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
       ) : null}
 
       <div className="border-t border-brand-border pt-8">
-        <button
-          type="button"
-          disabled={pending}
-          className="rounded-sm bg-brand-accent px-8 py-3 text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong disabled:cursor-not-allowed disabled:opacity-45"
-          onClick={() => startTransition(() => void saveSiteContent(payloadJson))}
-        >
-          {pending ? "Guardando…" : "Guardar todo"}
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <button
+            type="button"
+            disabled={pending}
+            className="rounded-sm bg-brand-accent px-8 py-3 text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong disabled:cursor-not-allowed disabled:opacity-45"
+            onClick={() => {
+              const message = publishSummary.enabled
+                ? `¿Publicar cambios en GitHub?\n\nSe creará un commit en ${publishSummary.repo ?? "el repositorio"} (rama «${publishSummary.branch}», archivo ${publishSummary.contentPath}). Esto puede disparar un deploy si el repo está conectado a Vercel u otro servicio.`
+                : `¿Guardar en archivo local?\n\nSe escribirá ${publishSummary.contentPath} en este entorno (no crea commit en GitHub).`;
+              if (!window.confirm(message)) return;
+              startTransition(() => void saveSiteContent(payloadJson));
+            }}
+          >
+            {pending
+              ? publishSummary.enabled
+                ? "Publicando…"
+                : "Guardando…"
+              : publishSummary.enabled
+                ? "Publicar cambios"
+                : "Guardar en archivo"}
+          </button>
+          <p className="max-w-md text-xs leading-relaxed text-brand-muted">
+            {publishSummary.enabled ? (
+              <>
+                Se creará un commit en{" "}
+                <span className="font-mono text-[0.7rem] text-brand-text">{publishSummary.repo}</span> ({publishSummary.branch} →{" "}
+                {publishSummary.contentPath}).
+              </>
+            ) : (
+              <>Sin GitHub, escribe en disco; en producción serverless usá las variables del panel «Publicación».</>
+            )}
+          </p>
+        </div>
       </div>
     </div>
   );
