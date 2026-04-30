@@ -1,18 +1,19 @@
 import Link from "next/link";
 
-import { SITE_CONTACT } from "@/constants/site-contact";
+import type { SiteContact } from "@/constants/site-contact";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import type { HomeCopy, NavItem } from "@/i18n/home";
 
 interface SiteFooterProps {
   navItems: readonly NavItem[];
   footerCopy: HomeCopy["footer"];
+  contact: SiteContact;
 }
 
 /**
  * Footer matches Wix SITE_FOOTER: white background (#color_11), dark border/text (#color_15).
  */
-export function SiteFooter({ navItems, footerCopy }: SiteFooterProps) {
+export function SiteFooter({ navItems, footerCopy, contact }: SiteFooterProps) {
   return (
     <footer className="relative border-t border-brand-border bg-brand-bg text-brand-text">
       <div className="mx-auto max-w-6xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
@@ -21,11 +22,11 @@ export function SiteFooter({ navItems, footerCopy }: SiteFooterProps) {
             <p className="font-heading text-xl font-semibold leading-snug text-brand-text sm:text-2xl">
               {footerCopy.tagline}
             </p>
-            <address className="not-italic text-sm font-medium leading-relaxed text-brand-muted">{SITE_CONTACT.addressLine}</address>
+            <address className="not-italic text-sm font-medium leading-relaxed text-brand-muted">{contact.addressLine}</address>
             <p className="text-sm text-brand-muted">
               {footerCopy.phoneLabel}{" "}
-              <a href={SITE_CONTACT.phoneHref} className={TEXT_LINK_INLINE}>
-                {SITE_CONTACT.phoneDisplay}
+              <a href={contact.phoneHref} className={TEXT_LINK_INLINE}>
+                {contact.phoneDisplay}
               </a>
             </p>
           </div>

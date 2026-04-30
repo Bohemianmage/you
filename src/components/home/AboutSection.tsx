@@ -7,10 +7,9 @@ import {
   IconTwitter,
   iconClasses,
 } from "@/components/icons/SocialIcons";
-import { SITE_CONTACT } from "@/constants/site-contact";
+import type { SiteContact } from "@/constants/site-contact";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import type { TeamMember } from "@/data/team";
-import { TEAM_MEMBERS } from "@/data/team";
 import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 
@@ -18,7 +17,9 @@ interface AboutSectionProps {
   locale: Locale;
   copy: HomeCopy["about"];
   footerCopy: HomeCopy["footer"];
+  contact: SiteContact;
   contactHref: string;
+  teamMembers: readonly TeamMember[];
 }
 
 function memberInitials(name: string): string {
@@ -102,7 +103,7 @@ function TeamMemberCard({ member, locale }: { member: TeamMember; locale: Locale
 /**
  * Nosotros — contenido alineado con Wix about-1 (misión, historia, equipo, clientes + contacto).
  */
-export function AboutSection({ locale, copy, footerCopy, contactHref }: AboutSectionProps) {
+export function AboutSection({ locale, copy, footerCopy, contact, contactHref, teamMembers }: AboutSectionProps) {
   return (
     <section id="about" className="border-b border-brand-border bg-brand-bg py-16 sm:py-24" aria-labelledby="about-heading">
       <div className="mx-auto max-w-6xl space-y-16 px-4 sm:px-6 lg:px-8">
@@ -132,7 +133,7 @@ export function AboutSection({ locale, copy, footerCopy, contactHref }: AboutSec
             {copy.teamTitle}
           </h3>
           <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {TEAM_MEMBERS.map((member) => (
+            {teamMembers.map((member) => (
               <TeamMemberCard key={member.id} member={member} locale={locale} />
             ))}
           </ul>
@@ -145,11 +146,11 @@ export function AboutSection({ locale, copy, footerCopy, contactHref }: AboutSec
           </div>
           <aside className="rounded-sm border border-brand-border bg-brand-surface p-6 shadow-[0_1px_4px_rgba(0,0,0,0.08)] ring-1 ring-brand-border/40">
             <h4 className="font-heading text-sm font-semibold uppercase tracking-[0.14em] text-brand-accent">{copy.contactTitle}</h4>
-            <address className="mt-4 text-sm font-medium leading-relaxed text-brand-muted not-italic">{SITE_CONTACT.addressLine}</address>
+            <address className="mt-4 text-sm font-medium leading-relaxed text-brand-muted not-italic">{contact.addressLine}</address>
             <p className="mt-4 text-sm text-brand-muted">
               {footerCopy.phoneLabel}{" "}
-              <a href={SITE_CONTACT.phoneHref} className={TEXT_LINK_INLINE}>
-                {SITE_CONTACT.phoneDisplay}
+              <a href={contact.phoneHref} className={TEXT_LINK_INLINE}>
+                {contact.phoneDisplay}
               </a>
             </p>
             <Link

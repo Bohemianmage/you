@@ -10,9 +10,9 @@ import { ZonesSection } from "@/components/home/ZonesSection";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { DOWNLOADABLE_ITEMS_BY_LOCALE } from "@/data/downloadables";
-import { FEATURED_PROPERTIES_BY_LOCALE } from "@/data/properties";
 import { ZONES_BY_LOCALE } from "@/data/zones";
-import { HOME_COPY, localeQuery, marketingNav, resolveLocale } from "@/i18n/home";
+import { localeQuery, marketingNav, resolveLocale } from "@/i18n/home";
+import { getMergedFeaturedForLocale, getMergedSiteContext, getMergedTeamMembers } from "@/lib/site-settings/merge";
 import { CONTACT_FORM_COPY } from "@/i18n/marketing-pages";
 
 interface HomePageProps {
@@ -25,7 +25,11 @@ interface HomePageProps {
 export default async function Home({ searchParams }: HomePageProps) {
   const params = searchParams ? await searchParams : undefined;
   const locale = resolveLocale(params?.lang);
-  const copy = HOME_COPY[locale];
+  const [{ homeCopy: copy, contact }, teamMembers, featuredProperties] = await Promise.all([
+    getMergedSiteContext(locale),
+    getMergedTeamMembers(),
+    getMergedFeaturedForLocale(locale),
+  ]);
   const q = localeQuery(locale);
   const catalogHref = `/propiedades${q}`;
   const contactHref = `/contacto${q}`;
@@ -37,11 +41,18 @@ export default async function Home({ searchParams }: HomePageProps) {
       <SiteHeader locale={locale} navItems={marketingNav(locale)} />
       <main className="flex-1">
         <HeroSection copy={copy.hero} modalCopy={copy.modal} catalogHref={catalogHref} contactHref={contactHref} />
-        <AboutSection locale={locale} copy={copy.about} footerCopy={copy.footer} contactHref={contactHref} />
+        <AboutSection
+          locale={locale}
+          copy={copy.about}
+          footerCopy={copy.footer}
+          contact={contact}
+          contactHref={contactHref}
+          teamMembers={teamMembers}
+        />
         <ZonesSection title={copy.zones.title} zones={ZONES_BY_LOCALE[locale]} />
         <FeaturedPropertiesSection
           copy={copy.featured}
-          properties={FEATURED_PROPERTIES_BY_LOCALE[locale]}
+          properties={featuredProperties}
           catalogHref={catalogHref}
           contactHref={contactHref}
         />
@@ -55,7 +66,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         />
         <ContactSection copy={CONTACT_FORM_COPY[locale]} />
       </main>
-      <SiteFooter navItems={marketingNav(locale)} footerCopy={copy.footer} />
+      <SiteFooter navItems={marketingNav(locale)} footerCopy={copy.footer} contact={contact} />
     </>
   );
 }
