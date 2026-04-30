@@ -1,6 +1,5 @@
 import "server-only";
 
-import type { AdminGithubPublishSummary } from "./publish-summary";
 import type { SiteContentFile } from "./types";
 
 export type GithubPublishConfig = {
@@ -59,22 +58,6 @@ export function getGithubPublishConfig(): GithubPublishConfig | null {
   const path = process.env.GITHUB_SITE_CONTENT_PATH?.trim() || "content/site-content.json";
   const commitPrefix = process.env.GITHUB_COMMIT_PREFIX?.trim() || "chore(site): actualizar contenido (admin)";
   return { token, owner, repo, branch, path, commitPrefix };
-}
-
-/** Resumen seguro para la UI (sin secretos). */
-export function getAdminGithubPublishSummary(): AdminGithubPublishSummary {
-  const token = !!process.env.GITHUB_TOKEN?.trim();
-  const repoFull = process.env.GITHUB_REPO?.trim();
-  const parts = repoFull?.split("/").filter(Boolean) ?? [];
-  const hasRepo = parts.length === 2;
-  return {
-    hasToken: token,
-    hasRepo,
-    enabled: token && hasRepo,
-    repo: hasRepo ? `${parts[0]}/${parts[1]}` : null,
-    branch: process.env.GITHUB_BRANCH?.trim() || "main",
-    contentPath: process.env.GITHUB_SITE_CONTENT_PATH?.trim() || "content/site-content.json",
-  };
 }
 
 function contentsUrl(cfg: GithubPublishConfig): string {

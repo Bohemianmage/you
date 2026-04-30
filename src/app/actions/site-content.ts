@@ -42,12 +42,9 @@ export async function saveSiteContent(json: string) {
   }
 
   const gh = getGithubPublishConfig();
-  let viaGithub = false;
-
   if (gh) {
     try {
       await publishSiteContentToGithub(file, gh);
-      viaGithub = true;
     } catch (e) {
       if (e instanceof GithubPublishError) {
         redirect(`/admin?error=github_${e.code}`);
@@ -55,23 +52,20 @@ export async function saveSiteContent(json: string) {
       console.error("[site-content] github", e);
       redirect("/admin?error=github_unknown");
     }
-  }
-
-  if (!viaGithub) {
+    try {
+      await writeSiteContentFile(file);
+    } catch {
+      /* copia local opcional tras commit */
+    }
+  } else {
     try {
       await writeSiteContentFile(file);
     } catch (err) {
       console.error("[site-content] write", err);
       redirect("/admin?error=write_failed");
     }
-  } else {
-    try {
-      await writeSiteContentFile(file);
-    } catch {
-      /* alinear copia local en dev; en serverless puede fallar */
-    }
   }
 
   updateTag("site-content");
-  redirect(viaGithub ? "/admin?saved=1&via=github" : "/admin?saved=1");
+  redirect("/admin?saved=1");
 }

@@ -58,23 +58,17 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:gap-6 lg:px-8">
         <Link
           href={homePath(locale)}
-          className="group flex shrink-0 items-center gap-3 font-semibold tracking-tight text-brand-text"
+          className="group flex shrink-0 items-center font-semibold tracking-tight text-brand-text"
         >
           <Image
-            src="/logo-you.svg"
-            width={44}
-            height={44}
-            alt="YOU Soluciones Inmobiliarias"
-            className="h-10 w-10 rounded-sm border border-brand-border/80 bg-brand-white shadow-sm transition group-hover:border-brand-accent group-hover:shadow-[0_2px_8px_rgba(97,110,137,0.2)] sm:h-11 sm:w-11"
+            src="/logo-you-full.png"
+            width={280}
+            height={88}
+            sizes="(max-width: 640px) 160px, 220px"
+            alt="YOU. Soluciones inmobiliarias"
+            className="h-9 w-auto max-w-[10.5rem] object-contain object-left transition-opacity group-hover:opacity-[0.92] sm:h-11 sm:max-w-[13.75rem]"
+            priority
           />
-          <span className="hidden leading-tight sm:block">
-            <span className="block font-heading text-[1.05rem] text-brand-text transition group-hover:text-brand-accent-strong sm:text-lg">
-              Soluciones
-            </span>
-            <span className="block text-[9px] font-semibold uppercase tracking-[0.22em] text-brand-muted">
-              Inmobiliarias
-            </span>
-          </span>
         </Link>
 
         <nav className="hidden lg:flex lg:flex-1 lg:justify-center" aria-label="Principal">
