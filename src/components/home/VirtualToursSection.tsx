@@ -4,12 +4,15 @@ import type { HomeCopy } from "@/i18n/home";
 
 interface VirtualToursSectionProps {
   copy: HomeCopy["virtualTours"];
+  contactHref: string;
+  /** Optional Matterport or iframe embed URL (e.g. `NEXT_PUBLIC_VIRTUAL_TOUR_EMBED_URL`). */
+  embedUrl?: string;
 }
 
 /**
  * 3D tours block — same typography scale as Wix small caps headings (`font_6`-style treatment).
  */
-export function VirtualToursSection({ copy }: VirtualToursSectionProps) {
+export function VirtualToursSection({ copy, contactHref, embedUrl }: VirtualToursSectionProps) {
   return (
     <section id="virtual-tours" className="border-b border-brand-border bg-brand-surface py-16 sm:py-20" aria-labelledby="tours-heading">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -20,13 +23,17 @@ export function VirtualToursSection({ copy }: VirtualToursSectionProps) {
             </h2>
             <p className="text-sm leading-relaxed text-brand-muted">{copy.description}</p>
             <Link
-              href="#contact"
+              href={contactHref}
               className="inline-flex w-fit items-center justify-center rounded-sm bg-brand-accent px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong"
             >
               {copy.cta}
             </Link>
           </div>
-          <div className="aspect-video w-full max-w-md shrink-0 rounded-sm border border-brand-border bg-brand-surface lg:max-w-sm" />
+          <div className="aspect-video w-full max-w-md shrink-0 overflow-hidden rounded-sm border border-brand-border bg-brand-surface lg:max-w-sm">
+            {embedUrl ? (
+              <iframe title={copy.title} src={embedUrl} className="h-full w-full border-0" allowFullScreen loading="lazy" />
+            ) : null}
+          </div>
         </div>
       </div>
     </section>

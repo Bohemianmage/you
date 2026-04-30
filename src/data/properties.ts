@@ -8,6 +8,10 @@ export interface FeaturedProperty {
   address: string;
   status: string;
   ctaLabel: string;
+  /** Matterport / external tour — when absent, CTA scrolls to `#virtual-tours`. */
+  tourUrl?: string;
+  /** Optional hero image under `/public`. */
+  imageSrc?: string;
 }
 
 /**

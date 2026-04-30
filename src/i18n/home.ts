@@ -9,7 +9,6 @@ export interface NavItem {
 /** UI copy dictionary for the full home experience. */
 export interface HomeCopy {
   localeName: string;
-  nav: readonly NavItem[];
   languageLabel: string;
   hero: {
     announcement: string;
@@ -18,12 +17,6 @@ export interface HomeCopy {
     primaryCta: string;
     secondaryCta: string;
     imageBadge: string;
-  };
-  modal: {
-    title: string;
-    message: string;
-    close: string;
-    closeA11y: string;
   };
   about: {
     title: string;
@@ -36,6 +29,7 @@ export interface HomeCopy {
     title: string;
     subtitle: string;
     visitCta: string;
+    catalogCta: string;
   };
   virtualTours: {
     title: string;
@@ -57,6 +51,7 @@ export interface HomeCopy {
     title: string;
     description: string;
     cta: string;
+    requestItemCta: string;
   };
   footer: {
     tagline: string;
@@ -66,16 +61,36 @@ export interface HomeCopy {
 }
 
 /** Bilingual homepage dictionaries keyed by locale. */
+/** Marketing navigation — hashes resolved against localized home (`/` vs `/?lang=en`). */
+export function localeQuery(locale: Locale): "" | "?lang=en" {
+  return locale === "en" ? "?lang=en" : "";
+}
+
+/** Root URL including locale query when English is selected. */
+export function homePath(locale: Locale): string {
+  return locale === "en" ? "/?lang=en" : "/";
+}
+
+export function marketingNav(locale: Locale): NavItem[] {
+  const q = localeQuery(locale);
+  const home = homePath(locale);
+  const labels =
+    locale === "es"
+      ? (["Nosotros", "Propiedades", "Descargables", "Contacto"] as const)
+      : (["About", "Properties", "Downloads", "Contact"] as const);
+
+  return [
+    { href: `${home}#about`, label: labels[0] },
+    { href: `/propiedades${q}`, label: labels[1] },
+    { href: `${home}#downloadables`, label: labels[2] },
+    { href: `/contacto${q}`, label: labels[3] },
+  ];
+}
+
 export const HOME_COPY: Record<Locale, HomeCopy> = {
   es: {
     localeName: "Español",
     languageLabel: "Idioma",
-    nav: [
-      { href: "#about", label: "Nosotros" },
-      { href: "#featured-properties", label: "Propiedades" },
-      { href: "#downloadables", label: "Descargables" },
-      { href: "#contact", label: "Contacto" },
-    ],
     hero: {
       announcement:
         "Looking for accommodation or your next real estate investment in México? Click here",
@@ -84,13 +99,6 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       primaryCta: "Ver propiedades",
       secondaryCta: "Contactar asesor",
       imageBadge: "Venta y renta · CDMX",
-    },
-    modal: {
-      title: "Sitio en desarrollo",
-      message:
-        "Estamos migrando YOU Soluciones Inmobiliarias a una nueva experiencia. Algunas secciones pueden cambiar; gracias por tu paciencia.",
-      close: "Entendido",
-      closeA11y: "Cerrar aviso",
     },
     about: {
       title: "Nosotros",
@@ -105,6 +113,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       title: "Propiedades destacadas",
       subtitle: "Selección actual del portafolio YOU.",
       visitCta: "Agenda una visita",
+      catalogCta: "Catálogo completo",
     },
     virtualTours: {
       title: "Descubre nuestras experiencias 3D",
@@ -129,7 +138,8 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       title: "Descargables",
       description:
         "Solicita brochures, fichas técnicas y material comercial. Te lo enviamos personalizado según tu zona y tipo de operación.",
-      cta: "Solicitar por contacto",
+      cta: "Ir al contacto",
+      requestItemCta: "Solicitar",
     },
     footer: {
       tagline: "Comienza a escribir una nueva historia con nosotros.",
@@ -140,12 +150,6 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
   en: {
     localeName: "English",
     languageLabel: "Language",
-    nav: [
-      { href: "#about", label: "About" },
-      { href: "#featured-properties", label: "Properties" },
-      { href: "#downloadables", label: "Downloads" },
-      { href: "#contact", label: "Contact" },
-    ],
     hero: {
       announcement:
         "Looking for accommodation or your next real estate investment in México? Click here",
@@ -154,13 +158,6 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       primaryCta: "View properties",
       secondaryCta: "Contact an advisor",
       imageBadge: "Sales and rentals · Mexico City",
-    },
-    modal: {
-      title: "Site in progress",
-      message:
-        "We are migrating YOU Soluciones Inmobiliarias to a new experience. Some sections may change; thank you for your patience.",
-      close: "Understood",
-      closeA11y: "Close notice",
     },
     about: {
       title: "About",
@@ -175,6 +172,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       title: "Featured properties",
       subtitle: "Current selection from the YOU portfolio.",
       visitCta: "Schedule a visit",
+      catalogCta: "Full catalog",
     },
     virtualTours: {
       title: "Discover our 3D experiences",
@@ -198,7 +196,8 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       title: "Downloadables",
       description:
         "Request brochures, data sheets, and commercial assets tailored to your zone and operation type.",
-      cta: "Request via contact",
+      cta: "Go to contact",
+      requestItemCta: "Request",
     },
     footer: {
       tagline: "Start writing a new story with us.",

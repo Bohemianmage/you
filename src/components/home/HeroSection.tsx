@@ -1,23 +1,22 @@
 import Link from "next/link";
 
-import { HeroDevelopmentModal } from "@/components/home/HeroDevelopmentModal";
 import type { HomeCopy } from "@/i18n/home";
 
 interface HeroSectionProps {
   copy: HomeCopy["hero"];
-  modalCopy: HomeCopy["modal"];
+  catalogHref: string;
+  contactHref: string;
 }
 
 /**
  * Hero aligned with Wix: white canvas, charcoal copy, slate accent (#616E89), Avenir-like headline weight.
  */
-export function HeroSection({ copy, modalCopy }: HeroSectionProps) {
+export function HeroSection({ copy, catalogHref, contactHref }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden border-b border-brand-border bg-brand-bg" aria-labelledby="hero-heading">
-      <HeroDevelopmentModal copy={modalCopy} />
       <div className="border-b border-brand-border bg-brand-surface px-4 py-3 text-center sm:px-6">
         <p className="text-[13px] font-semibold leading-snug text-brand-text sm:text-sm">
-          <Link href="#featured-properties" className="text-brand-accent underline-offset-2 hover:text-brand-accent-strong hover:underline">
+          <Link href={catalogHref} className="text-brand-accent underline-offset-2 hover:text-brand-accent-strong hover:underline">
             {copy.announcement}
           </Link>
         </p>
@@ -38,13 +37,13 @@ export function HeroSection({ copy, modalCopy }: HeroSectionProps) {
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
-              href="#featured-properties"
+              href={catalogHref}
               className="inline-flex items-center justify-center rounded-sm bg-brand-accent px-7 py-3.5 text-center text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong"
             >
               {copy.primaryCta}
             </Link>
             <Link
-              href="#contact"
+              href={contactHref}
               className="inline-flex items-center justify-center rounded-sm border border-brand-accent bg-transparent px-7 py-3.5 text-center text-sm font-semibold text-brand-accent transition hover:bg-[rgba(97,110,137,0.08)]"
             >
               {copy.secondaryCta}

@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-import type { HomeCopy } from "@/i18n/home";
+import type { HomeCopy, NavItem } from "@/i18n/home";
 
 interface SiteFooterProps {
-  navItems: HomeCopy["nav"];
+  navItems: readonly NavItem[];
   footerCopy: HomeCopy["footer"];
 }
 
@@ -12,7 +12,7 @@ interface SiteFooterProps {
  */
 export function SiteFooter({ navItems, footerCopy }: SiteFooterProps) {
   return (
-    <footer id="contact" className="relative border-t border-brand-border bg-brand-bg text-brand-text">
+    <footer className="relative border-t border-brand-border bg-brand-bg text-brand-text">
       <div className="mx-auto max-w-6xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-xl space-y-5">
@@ -30,7 +30,7 @@ export function SiteFooter({ navItems, footerCopy }: SiteFooterProps) {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-8">
-            {navItems.slice(0, 3).map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

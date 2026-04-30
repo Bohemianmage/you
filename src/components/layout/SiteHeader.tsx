@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 
-import type { HomeCopy } from "@/i18n/home";
+import { homePath } from "@/i18n/home";
+import type { NavItem } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 
 /** Official YOU Soluciones Inmobiliarias social profiles. */
@@ -18,7 +20,7 @@ const SOCIAL_LINKS = [
 
 interface SiteHeaderProps {
   locale: Locale;
-  navItems: HomeCopy["nav"];
+  navItems: readonly NavItem[];
   languageLabel: string;
 }
 
@@ -29,13 +31,14 @@ export function SiteHeader({ locale, navItems, languageLabel }: SiteHeaderProps)
   return (
     <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-bg/95 shadow-[0_1px_4px_rgba(0,0,0,0.06)] backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group flex items-center gap-3 font-semibold tracking-tight text-brand-text">
-          <span
-            className="flex h-11 w-11 items-center justify-center rounded-sm border border-brand-border bg-brand-white text-xs font-bold uppercase tracking-wide text-brand-accent shadow-sm transition group-hover:border-brand-accent"
-            aria-hidden
-          >
-            YOU
-          </span>
+        <Link href={homePath(locale)} className="group flex items-center gap-3 font-semibold tracking-tight text-brand-text">
+          <Image
+            src="/logo-you.svg"
+            width={44}
+            height={44}
+            alt="YOU Soluciones Inmobiliarias"
+            className="h-11 w-11 rounded-sm border border-brand-border bg-brand-white shadow-sm transition group-hover:border-brand-accent"
+          />
           <span className="hidden leading-tight sm:block">
             <span className="block font-heading text-lg text-brand-text">Soluciones</span>
             <span className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-muted">
