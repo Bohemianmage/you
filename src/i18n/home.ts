@@ -18,9 +18,24 @@ export interface HomeCopy {
     secondaryCta: string;
     imageBadge: string;
   };
+  modal: {
+    title: string;
+    message: string;
+    close: string;
+    closeA11y: string;
+    contactHeading: string;
+  };
   about: {
     title: string;
-    description: string;
+    tagline: string;
+    intro: readonly string[];
+    historyTitle: string;
+    history: readonly string[];
+    teamTitle: string;
+    clientsTitle: string;
+    clientsSubtitle: string;
+    contactTitle: string;
+    contactFormCta: string;
   };
   zones: {
     title: string;
@@ -60,7 +75,6 @@ export interface HomeCopy {
   };
 }
 
-/** Bilingual homepage dictionaries keyed by locale. */
 /** Marketing navigation — hashes resolved against localized home (`/` vs `/?lang=en`). */
 export function localeQuery(locale: Locale): "" | "?lang=en" {
   return locale === "en" ? "?lang=en" : "";
@@ -100,10 +114,33 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       secondaryCta: "Contactar asesor",
       imageBadge: "Venta y renta · CDMX",
     },
+    modal: {
+      title: "Sitio en desarrollo",
+      message:
+        "Estamos migrando YOU Soluciones Inmobiliarias a una nueva experiencia. Mientras tanto puedes contactarnos por teléfono o visitarnos en nuestras oficinas.",
+      close: "Entendido",
+      closeA11y: "Cerrar aviso",
+      contactHeading: "Contacto",
+    },
     about: {
-      title: "Nosotros",
-      description:
-        "En YOU Soluciones Inmobiliarias combinamos criterio de mercado, acompañamiento cercano y procesos claros para ayudarte a rentar, comprar o invertir con confianza en Ciudad de México y zonas corporativas clave.",
+      title: "Sobre nosotros",
+      tagline: "Redefinir el sector inmobiliario",
+      intro: [
+        "Con la experiencia de asesorar y acompañar a nuestros clientes durante los últimos 15 años, en YOU nos hemos empeñado en hacer tu experiencia lo más segura y eficiente posible.",
+        "Nuestra principal misión: cuidar tu patrimonio y el de los tuyos.",
+      ],
+      historyTitle: "La historia",
+      history: [
+        "En 2019, con la firme convicción de ofrecer nuestros servicios a más clientes, nace YOU Soluciones Inmobiliarias.",
+        "Con miras puestas en ayudar a quienes nos proporcionan su confianza para vender, rentar o encontrar un nuevo espacio para su hogar, oficina o negocio, en YOU simplificamos procesos y asesoramos a nuestros clientes de forma humana y responsable.",
+        "Nuestro compromiso es ofrecerte los mejores recursos tecnológicos, mercadológicos y legales disponibles para lograr tus objetivos de manera eficiente.",
+        "Somos tu equipo, somos tus aliados, somos YOU.",
+      ],
+      teamTitle: "Nuestro equipo",
+      clientsTitle: "Clientes",
+      clientsSubtitle: "Estamos para acompañarte; agenda una llamada o escríbenos cuando lo necesites.",
+      contactTitle: "Contacto",
+      contactFormCta: "Ir al formulario de contacto",
     },
     zones: {
       title:
@@ -159,10 +196,33 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       secondaryCta: "Contact an advisor",
       imageBadge: "Sales and rentals · Mexico City",
     },
+    modal: {
+      title: "Site in progress",
+      message:
+        "We are migrating YOU Soluciones Inmobiliarias to a new experience. In the meantime you can call us or visit our office.",
+      close: "Got it",
+      closeA11y: "Close notice",
+      contactHeading: "Contact",
+    },
     about: {
-      title: "About",
-      description:
-        "At YOU Soluciones Inmobiliarias we combine market insight, close guidance, and clear processes to help you lease, buy, or invest with confidence in Mexico City and key corporate districts.",
+      title: "About us",
+      tagline: "Redefining real estate",
+      intro: [
+        "Drawing on more than 15 years advising and guiding clients, at YOU we strive to make your experience as safe and efficient as possible.",
+        "Our core mission: protecting your assets and those of your family.",
+      ],
+      historyTitle: "Our story",
+      history: [
+        "In 2019, with a firm commitment to serve more clients, YOU Soluciones Inmobiliarias was born.",
+        "Focused on helping everyone who trusts us to sell, lease, or find a new space for home, office, or business, we simplify processes and advise with a human, responsible approach.",
+        "We commit to bringing you the best technological, market, and legal resources available to achieve your goals efficiently.",
+        "We are your team, we are your allies, we are YOU.",
+      ],
+      teamTitle: "Our team",
+      clientsTitle: "Clients",
+      clientsSubtitle: "We are here to guide you — schedule a call or write to us anytime.",
+      contactTitle: "Contact",
+      contactFormCta: "Go to contact form",
     },
     zones: {
       title:

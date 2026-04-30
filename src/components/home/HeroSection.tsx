@@ -1,9 +1,12 @@
 import Link from "next/link";
 
+import { HeroDevelopmentModal } from "@/components/home/HeroDevelopmentModal";
 import type { HomeCopy } from "@/i18n/home";
 
 interface HeroSectionProps {
   copy: HomeCopy["hero"];
+  modalCopy: HomeCopy["modal"];
+  phoneLabel: string;
   catalogHref: string;
   contactHref: string;
 }
@@ -11,9 +14,10 @@ interface HeroSectionProps {
 /**
  * Hero aligned with Wix: white canvas, charcoal copy, slate accent (#616E89), Avenir-like headline weight.
  */
-export function HeroSection({ copy, catalogHref, contactHref }: HeroSectionProps) {
+export function HeroSection({ copy, modalCopy, phoneLabel, catalogHref, contactHref }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden border-b border-brand-border bg-brand-bg" aria-labelledby="hero-heading">
+      <HeroDevelopmentModal copy={modalCopy} phoneLabel={phoneLabel} />
       <div className="border-b border-brand-border bg-brand-surface px-4 py-3 text-center sm:px-6">
         <p className="text-[13px] font-semibold leading-snug text-brand-text sm:text-sm">
           <Link href={catalogHref} className="text-brand-accent underline-offset-2 hover:text-brand-accent-strong hover:underline">

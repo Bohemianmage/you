@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { SITE_CONTACT } from "@/constants/site-contact";
 import type { HomeCopy, NavItem } from "@/i18n/home";
 
 interface SiteFooterProps {
@@ -19,13 +20,11 @@ export function SiteFooter({ navItems, footerCopy }: SiteFooterProps) {
             <p className="font-heading text-xl font-semibold leading-snug text-brand-text sm:text-2xl">
               {footerCopy.tagline}
             </p>
-            <address className="not-italic text-sm font-medium leading-relaxed text-brand-muted">
-              Roberto Gayol 82-4 Int. 2, Cd. Satélite, 53100 Naucalpan de Juárez, Méx.
-            </address>
+            <address className="not-italic text-sm font-medium leading-relaxed text-brand-muted">{SITE_CONTACT.addressLine}</address>
             <p className="text-sm text-brand-muted">
               {footerCopy.phoneLabel}{" "}
-              <a href="tel:+525592217328" className="font-semibold text-brand-accent hover:text-brand-accent-strong">
-                55-92-21-73-28
+              <a href={SITE_CONTACT.phoneHref} className="font-semibold text-brand-accent hover:text-brand-accent-strong">
+                {SITE_CONTACT.phoneDisplay}
               </a>
             </p>
           </div>

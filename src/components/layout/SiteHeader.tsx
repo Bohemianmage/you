@@ -1,20 +1,26 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense, useEffect, useState } from "react";
 
+import { IconFacebook, IconInstagram, IconYoutube, iconClasses } from "@/components/icons/SocialIcons";
+import { LangSwitcher, LangSwitcherFallback } from "@/components/layout/LangSwitcher";
 import { homePath } from "@/i18n/home";
 import type { NavItem } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 
-/** Official YOU Soluciones Inmobiliarias social profiles. */
-const SOCIAL_LINKS = [
-  { label: "Facebook", href: "https://www.facebook.com/yousimx" },
+const HEADER_SOCIAL = [
+  { label: "Facebook", href: "https://www.facebook.com/yousimx", Icon: IconFacebook },
   {
     label: "YouTube",
     href: "https://www.youtube.com/channel/UCpehP2_hvHX0WPcLQK-ki3Q",
+    Icon: IconYoutube,
   },
   {
     label: "Instagram",
     href: "https://www.instagram.com/yousolucionesinmobiliarias/",
+    Icon: IconInstagram,
   },
 ] as const;
 
@@ -25,73 +31,146 @@ interface SiteHeaderProps {
 }
 
 /**
- * Sticky header — Wix uses white (#color_11), dark nav text (#color_15), hover toward #color_17.
+ * Sticky header — refined chrome: pill nav on desktop, drawer on small screens, blurred surface.
  */
 export function SiteHeader({ locale, navItems, languageLabel }: SiteHeaderProps) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onResize = () => {
+      if (window.matchMedia("(min-width: 1024px)").matches) setMobileOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-brand-border bg-brand-bg/95 shadow-[0_1px_4px_rgba(0,0,0,0.06)] backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <Link href={homePath(locale)} className="group flex items-center gap-3 font-semibold tracking-tight text-brand-text">
+    <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_8px_30px_-12px_rgba(47,46,46,0.12)] backdrop-blur-md">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:gap-6 lg:px-8">
+        <Link
+          href={homePath(locale)}
+          className="group flex shrink-0 items-center gap-3 font-semibold tracking-tight text-brand-text"
+        >
           <Image
             src="/logo-you.svg"
             width={44}
             height={44}
             alt="YOU Soluciones Inmobiliarias"
-            className="h-11 w-11 rounded-sm border border-brand-border bg-brand-white shadow-sm transition group-hover:border-brand-accent"
+            className="h-10 w-10 rounded-sm border border-brand-border/80 bg-brand-white shadow-sm transition group-hover:border-brand-accent group-hover:shadow-[0_2px_8px_rgba(97,110,137,0.2)] sm:h-11 sm:w-11"
           />
           <span className="hidden leading-tight sm:block">
-            <span className="block font-heading text-lg text-brand-text">Soluciones</span>
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-muted">
+            <span className="block font-heading text-[1.05rem] text-brand-text transition group-hover:text-brand-accent-strong sm:text-lg">
+              Soluciones
+            </span>
+            <span className="block text-[9px] font-semibold uppercase tracking-[0.22em] text-brand-muted">
               Inmobiliarias
             </span>
           </span>
         </Link>
 
-        <nav
-          className="order-last flex w-full justify-center gap-6 text-xs font-bold uppercase tracking-[0.14em] text-brand-text md:order-none md:w-auto md:justify-end md:gap-8 md:text-[13px]"
-          aria-label="Principal"
-        >
+        <nav className="hidden lg:flex lg:flex-1 lg:justify-center" aria-label="Principal">
+          <ul className="flex items-center gap-0.5 rounded-full bg-brand-surface/95 px-1 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-brand-border/55">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="block rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-brand-text transition hover:bg-brand-bg hover:text-brand-accent-strong hover:shadow-sm"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden items-center gap-1.5 md:flex">
+            {HEADER_SOCIAL.map(({ label, href, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={label}
+                className="group flex h-9 w-9 items-center justify-center rounded-full bg-brand-surface/90 text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white hover:ring-brand-accent"
+              >
+                <span className="sr-only">{label}</span>
+                <Icon className={iconClasses()} />
+              </a>
+            ))}
+          </div>
+
+          <Suspense fallback={<LangSwitcherFallback locale={locale} languageLabel={languageLabel} />}>
+            <LangSwitcher locale={locale} languageLabel={languageLabel} />
+          </Suspense>
+
+          <button
+            type="button"
+            className="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text lg:hidden"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav"
+            aria-label={
+              mobileOpen
+                ? locale === "en"
+                  ? "Close menu"
+                  : "Cerrar menú"
+                : locale === "en"
+                  ? "Open menu"
+                  : "Abrir menú"
+            }
+            onClick={() => setMobileOpen((o) => !o)}
+          >
+            <span
+              className={`block h-0.5 w-5 rounded-full bg-current transition ${mobileOpen ? "translate-y-1.5 rotate-45" : ""}`}
+            />
+            <span className={`block h-0.5 w-5 rounded-full bg-current transition ${mobileOpen ? "opacity-0" : ""}`} />
+            <span
+              className={`block h-0.5 w-5 rounded-full bg-current transition ${mobileOpen ? "-translate-y-1.5 -rotate-45" : ""}`}
+            />
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="mobile-nav"
+        className={`border-t border-brand-border/60 bg-brand-bg/98 lg:hidden ${mobileOpen ? "block" : "hidden"}`}
+      >
+        <nav className="mx-auto max-w-6xl space-y-1 px-4 py-4 sm:px-6" aria-label="Principal móvil">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="transition hover:text-brand-accent-hover"
+              className="block rounded-md px-3 py-3 text-[13px] font-bold uppercase tracking-[0.12em] text-brand-text transition hover:bg-brand-surface hover:text-brand-accent-strong"
+              onClick={() => setMobileOpen(false)}
             >
               {item.label}
             </Link>
           ))}
-        </nav>
-
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-muted">
-          {SOCIAL_LINKS.map((s, i) => (
-            <span key={s.label} className="flex items-center gap-2">
-              {i > 0 ? (
-                <span className="select-none text-brand-border" aria-hidden>
-                  ·
-                </span>
-              ) : null}
-              <a href={s.href} target="_blank" rel="noopener noreferrer" className="hover:text-brand-accent">
-                {s.label}
+          <div className="flex items-center justify-center gap-3 border-t border-brand-border/60 pt-4">
+            {HEADER_SOCIAL.map(({ label, href, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-surface text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white"
+                aria-label={label}
+              >
+                <Icon className={iconClasses()} />
               </a>
-            </span>
-          ))}
-        </div>
-        <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">
-          <span>{languageLabel}:</span>
-          <Link
-            href="/?lang=es"
-            className={locale === "es" ? "text-brand-accent" : "hover:text-brand-accent"}
-          >
-            ES
-          </Link>
-          <span className="text-brand-border">/</span>
-          <Link
-            href="/?lang=en"
-            className={locale === "en" ? "text-brand-accent" : "hover:text-brand-accent"}
-          >
-            EN
-          </Link>
-        </div>
+            ))}
+          </div>
+        </nav>
       </div>
     </header>
   );
