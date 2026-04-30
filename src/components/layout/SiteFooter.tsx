@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { SITE_CONTACT } from "@/constants/site-contact";
+import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import type { HomeCopy, NavItem } from "@/i18n/home";
 
 interface SiteFooterProps {
@@ -23,7 +24,7 @@ export function SiteFooter({ navItems, footerCopy }: SiteFooterProps) {
             <address className="not-italic text-sm font-medium leading-relaxed text-brand-muted">{SITE_CONTACT.addressLine}</address>
             <p className="text-sm text-brand-muted">
               {footerCopy.phoneLabel}{" "}
-              <a href={SITE_CONTACT.phoneHref} className="font-semibold text-brand-accent hover:text-brand-accent-strong">
+              <a href={SITE_CONTACT.phoneHref} className={TEXT_LINK_INLINE}>
                 {SITE_CONTACT.phoneDisplay}
               </a>
             </p>
@@ -33,7 +34,7 @@ export function SiteFooter({ navItems, footerCopy }: SiteFooterProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-[13px] font-bold uppercase tracking-[0.12em] hover:text-brand-accent"
+                className="text-[13px] font-bold uppercase tracking-[0.12em] text-brand-text no-underline transition hover:text-brand-accent"
               >
                 {item.label}
               </Link>

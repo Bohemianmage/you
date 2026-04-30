@@ -36,13 +36,7 @@ export default async function Home({ searchParams }: HomePageProps) {
     <>
       <SiteHeader locale={locale} navItems={marketingNav(locale)} languageLabel={copy.languageLabel} />
       <main className="flex-1">
-        <HeroSection
-          copy={copy.hero}
-          modalCopy={copy.modal}
-          phoneLabel={copy.footer.phoneLabel}
-          catalogHref={catalogHref}
-          contactHref={contactHref}
-        />
+        <HeroSection copy={copy.hero} modalCopy={copy.modal} catalogHref={catalogHref} contactHref={contactHref} />
         <AboutSection locale={locale} copy={copy.about} footerCopy={copy.footer} contactHref={contactHref} />
         <ZonesSection title={copy.zones.title} zones={ZONES_BY_LOCALE[locale]} />
         <FeaturedPropertiesSection

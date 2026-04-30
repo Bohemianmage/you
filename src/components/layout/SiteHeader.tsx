@@ -84,7 +84,7 @@ export function SiteHeader({ locale, navItems, languageLabel }: SiteHeaderProps)
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="block rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-brand-text transition hover:bg-brand-bg hover:text-brand-accent-strong hover:shadow-sm"
+                  className="block rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-brand-text no-underline transition hover:bg-brand-bg hover:text-brand-accent-strong hover:shadow-sm"
                 >
                   {item.label}
                 </Link>
@@ -150,7 +150,7 @@ export function SiteHeader({ locale, navItems, languageLabel }: SiteHeaderProps)
             <Link
               key={item.href}
               href={item.href}
-              className="block rounded-md px-3 py-3 text-[13px] font-bold uppercase tracking-[0.12em] text-brand-text transition hover:bg-brand-surface hover:text-brand-accent-strong"
+              className="block rounded-md px-3 py-3 text-[13px] font-bold uppercase tracking-[0.12em] text-brand-text no-underline transition hover:bg-brand-surface hover:text-brand-accent-strong"
               onClick={() => setMobileOpen(false)}
             >
               {item.label}

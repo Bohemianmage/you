@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { FeaturedProperty } from "@/data/properties";
+import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import type { HomeCopy } from "@/i18n/home";
 
 interface FeaturedPropertiesSectionProps {
@@ -31,13 +32,13 @@ export function FeaturedPropertiesSection({
             <p className="max-w-xl text-sm text-brand-muted">{copy.subtitle}</p>
           </div>
           <div className="flex flex-wrap gap-4 text-sm font-semibold">
-            <Link href={catalogHref} className="text-brand-accent hover:text-brand-accent-strong hover:underline">
+            <Link href={catalogHref} className={TEXT_LINK_INLINE}>
               {copy.catalogCta}
             </Link>
             <span className="hidden text-brand-border sm:inline" aria-hidden>
               ·
             </span>
-            <Link href={contactHref} className="text-brand-accent hover:text-brand-accent-strong hover:underline">
+            <Link href={contactHref} className={TEXT_LINK_INLINE}>
               {copy.visitCta}
             </Link>
           </div>

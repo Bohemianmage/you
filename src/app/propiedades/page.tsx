@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
+import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import { CATALOG_PROPERTIES } from "@/data/catalog-properties";
 import { localeQuery, resolveLocale } from "@/i18n/home";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
@@ -41,13 +42,13 @@ export default async function PropiedadesPage({ searchParams }: PropiedadesPageP
               <p className="max-w-2xl text-sm text-brand-muted">{copy.subtitle}</p>
             </div>
             <div className="flex flex-wrap gap-4 text-sm font-semibold">
-              <Link href={homeHref} className="text-brand-accent hover:text-brand-accent-strong hover:underline">
+              <Link href={homeHref} className={TEXT_LINK_INLINE}>
                 {copy.backHome}
               </Link>
               <span className="text-brand-border" aria-hidden>
                 ·
               </span>
-              <Link href={contactHref} className="text-brand-accent hover:text-brand-accent-strong hover:underline">
+              <Link href={contactHref} className={TEXT_LINK_INLINE}>
                 {copy.contactCta}
               </Link>
             </div>

@@ -23,7 +23,6 @@ export interface HomeCopy {
     message: string;
     close: string;
     closeA11y: string;
-    contactHeading: string;
   };
   about: {
     title: string;
@@ -117,10 +116,9 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     modal: {
       title: "Sitio en desarrollo",
       message:
-        "Estamos migrando YOU Soluciones Inmobiliarias a una nueva experiencia. Mientras tanto puedes contactarnos por teléfono o visitarnos en nuestras oficinas.",
+        "Estamos migrando YOU Soluciones Inmobiliarias a una nueva experiencia. Gracias por tu paciencia mientras terminamos los últimos detalles.",
       close: "Entendido",
       closeA11y: "Cerrar aviso",
-      contactHeading: "Contacto",
     },
     about: {
       title: "Sobre nosotros",
@@ -199,10 +197,9 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     modal: {
       title: "Site in progress",
       message:
-        "We are migrating YOU Soluciones Inmobiliarias to a new experience. In the meantime you can call us or visit our office.",
+        "We are migrating YOU Soluciones Inmobiliarias to a new experience. Thank you for your patience while we finish the final touches.",
       close: "Got it",
       closeA11y: "Close notice",
-      contactHeading: "Contact",
     },
     about: {
       title: "About us",

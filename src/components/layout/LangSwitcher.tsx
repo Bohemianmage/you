@@ -33,7 +33,7 @@ export function LangSwitcher({ locale, languageLabel }: LangSwitcherProps) {
       <div className="flex items-center rounded-full bg-brand-surface/90 px-1 py-0.5 ring-1 ring-brand-border/50">
         <Link
           href={buildHref(pathname ?? "/", searchParams, "es")}
-          className={`rounded-full px-2.5 py-1 transition ${
+          className={`rounded-full px-2.5 py-1 no-underline transition ${
             locale === "es"
               ? "bg-brand-accent text-brand-white shadow-sm"
               : "text-brand-muted hover:text-brand-text"
@@ -44,7 +44,7 @@ export function LangSwitcher({ locale, languageLabel }: LangSwitcherProps) {
         </Link>
         <Link
           href={buildHref(pathname ?? "/", searchParams, "en")}
-          className={`rounded-full px-2.5 py-1 transition ${
+          className={`rounded-full px-2.5 py-1 no-underline transition ${
             locale === "en"
               ? "bg-brand-accent text-brand-white shadow-sm"
               : "text-brand-muted hover:text-brand-text"

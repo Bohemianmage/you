@@ -8,6 +8,7 @@ import {
   iconClasses,
 } from "@/components/icons/SocialIcons";
 import { SITE_CONTACT } from "@/constants/site-contact";
+import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import type { TeamMember } from "@/data/team";
 import { TEAM_MEMBERS } from "@/data/team";
 import type { HomeCopy } from "@/i18n/home";
@@ -147,7 +148,7 @@ export function AboutSection({ locale, copy, footerCopy, contactHref }: AboutSec
             <address className="mt-4 text-sm font-medium leading-relaxed text-brand-muted not-italic">{SITE_CONTACT.addressLine}</address>
             <p className="mt-4 text-sm text-brand-muted">
               {footerCopy.phoneLabel}{" "}
-              <a href={SITE_CONTACT.phoneHref} className="font-semibold text-brand-accent hover:text-brand-accent-strong">
+              <a href={SITE_CONTACT.phoneHref} className={TEXT_LINK_INLINE}>
                 {SITE_CONTACT.phoneDisplay}
               </a>
             </p>
