@@ -15,7 +15,7 @@ export function MarketingLayout({ locale, children }: MarketingLayoutProps) {
   const copy = HOME_COPY[locale];
   return (
     <>
-      <SiteHeader locale={locale} navItems={marketingNav(locale)} languageLabel={copy.languageLabel} />
+      <SiteHeader locale={locale} navItems={marketingNav(locale)} />
       <main className="flex-1">{children}</main>
       <SiteFooter navItems={marketingNav(locale)} footerCopy={copy.footer} />
     </>

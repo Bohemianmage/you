@@ -27,13 +27,12 @@ const HEADER_SOCIAL = [
 interface SiteHeaderProps {
   locale: Locale;
   navItems: readonly NavItem[];
-  languageLabel: string;
 }
 
 /**
  * Sticky header — refined chrome: pill nav on desktop, drawer on small screens, blurred surface.
  */
-export function SiteHeader({ locale, navItems, languageLabel }: SiteHeaderProps) {
+export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -110,8 +109,8 @@ export function SiteHeader({ locale, navItems, languageLabel }: SiteHeaderProps)
             ))}
           </div>
 
-          <Suspense fallback={<LangSwitcherFallback locale={locale} languageLabel={languageLabel} />}>
-            <LangSwitcher locale={locale} languageLabel={languageLabel} />
+          <Suspense fallback={<LangSwitcherFallback locale={locale} />}>
+            <LangSwitcher locale={locale} />
           </Suspense>
 
           <button

@@ -8,8 +8,6 @@ export interface NavItem {
 
 /** UI copy dictionary for the full home experience. */
 export interface HomeCopy {
-  localeName: string;
-  languageLabel: string;
   hero: {
     announcement: string;
     title: string;
@@ -102,8 +100,6 @@ export function marketingNav(locale: Locale): NavItem[] {
 
 export const HOME_COPY: Record<Locale, HomeCopy> = {
   es: {
-    localeName: "Español",
-    languageLabel: "Idioma",
     hero: {
       announcement:
         "Looking for accommodation or your next real estate investment in México? Click here",
@@ -183,8 +179,6 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     },
   },
   en: {
-    localeName: "English",
-    languageLabel: "Language",
     hero: {
       announcement:
         "Looking for accommodation or your next real estate investment in México? Click here",
