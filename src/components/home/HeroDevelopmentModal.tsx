@@ -4,16 +4,41 @@ import { useEffect, useId, useState } from "react";
 
 import type { HomeCopy } from "@/i18n/home";
 
+const DISMISS_STORAGE_KEY = "you-soft-launch-modal-dismissed";
+
 interface HeroDevelopmentModalProps {
   copy: HomeCopy["modal"];
 }
 
+function readDismissed(): boolean {
+  try {
+    return typeof sessionStorage !== "undefined" && sessionStorage.getItem(DISMISS_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function persistDismissed(): void {
+  try {
+    sessionStorage.setItem(DISMISS_STORAGE_KEY, "1");
+  } catch {
+    /* private mode / unavailable */
+  }
+}
+
 /**
  * Soft-launch notice — informs visitors that the site is still being refined.
+ * Dismissal is remembered for the browser tab/session so in-page navigation (e.g. #downloadables) does not reopen it.
  */
 export function HeroDevelopmentModal({ copy }: HeroDevelopmentModalProps) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const titleId = useId();
+
+  useEffect(() => {
+    if (readDismissed()) return;
+    // Open only on client after mount — avoids SSR/hydration mismatch; storage isn’t available on the server.
+    queueMicrotask(() => setOpen(true));
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -24,6 +49,11 @@ export function HeroDevelopmentModal({ copy }: HeroDevelopmentModalProps) {
     };
   }, [open]);
 
+  const dismiss = () => {
+    persistDismissed();
+    setOpen(false);
+  };
+
   if (!open) return null;
 
   return (
@@ -32,7 +62,7 @@ export function HeroDevelopmentModal({ copy }: HeroDevelopmentModalProps) {
         type="button"
         className="absolute inset-0 bg-brand-text/45 backdrop-blur-[3px]"
         aria-label={copy.closeA11y}
-        onClick={() => setOpen(false)}
+        onClick={dismiss}
       />
       <div
         role="dialog"
@@ -46,7 +76,7 @@ export function HeroDevelopmentModal({ copy }: HeroDevelopmentModalProps) {
         <p className="mt-3 text-sm leading-relaxed text-brand-muted">{copy.message}</p>
         <button
           type="button"
-          onClick={() => setOpen(false)}
+          onClick={dismiss}
           className="mt-8 w-full rounded-sm bg-brand-accent py-3 text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong sm:w-auto sm:px-8"
         >
           {copy.close}
