@@ -11,14 +11,11 @@ interface LangSwitcherProps {
 
 function buildHref(pathname: string, searchParams: URLSearchParams | null, target: Locale): string {
   const params = new URLSearchParams(searchParams?.toString() ?? "");
-  if (target === "en") {
-    params.set("lang", "en");
-  } else {
-    params.delete("lang");
-  }
+  /** Siempre fijar `lang` en la URL: si solo se borraba `lang`, la cookie `en` seguía ganando y ES no aplicaba. */
+  params.set("lang", target === "en" ? "en" : "es");
   const query = params.toString();
   const path = pathname || "/";
-  return query ? `${path}?${query}` : path;
+  return `${path}?${query}`;
 }
 
 const pillShell =

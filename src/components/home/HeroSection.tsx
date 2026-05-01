@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { HeroBackdropVideo } from "@/components/home/HeroBackdropVideo";
@@ -24,7 +25,8 @@ function HeroHeadingTitle({ title, locale }: { title: string; locale: Locale }) 
   return (
     <>
       {title.slice(0, i)}
-      <span className="text-brand-accent"> YOU</span>
+      {/* YOU del logo usa carbón #2f2e2e (brand-text), no el acento pizarra. */}
+      <span className="font-semibold text-brand-text"> YOU</span>
     </>
   );
 }
@@ -84,9 +86,16 @@ export function HeroSection({ locale, copy, modalCopy, catalogHref, contactHref,
           </div>
 
           <div className="flex w-full flex-1 justify-center lg:justify-end">
-            <div className="w-full max-w-md rounded-sm border border-white/25 bg-brand-bg/40 p-8 shadow-[0_8px_32px_rgba(47,46,46,0.12)] backdrop-blur-md backdrop-saturate-150">
-              <p className="font-heading text-lg font-semibold text-brand-text">YOU Soluciones Inmobiliarias</p>
-              <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-brand-accent">{copy.imageBadge}</p>
+            <div className="flex w-full max-w-md flex-col items-center justify-center gap-4 rounded-sm border border-white/25 bg-brand-bg/40 px-8 py-10 shadow-[0_8px_32px_rgba(47,46,46,0.12)] backdrop-blur-md backdrop-saturate-150">
+              <Image
+                src="/logo-you-full.png"
+                alt="YOU Soluciones Inmobiliarias"
+                width={320}
+                height={140}
+                className="h-auto w-full max-w-[min(100%,280px)] object-contain"
+                priority
+              />
+              <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-brand-accent">{copy.imageBadge}</p>
             </div>
           </div>
         </div>
