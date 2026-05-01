@@ -56,58 +56,11 @@
     }
   ],
   "featuredCatalogIds": [
-    "polarea-torre-viena",
-    "tres-picos-polanco",
-    "tecamachalco-naucalpan",
-    "zona-hotelera-polanco",
-    "club-golf-bosques-santa-fe"
-  ],
-  "catalogProperties": [
-    {
-      "id": "polarea-torre-viena",
-      "title": "Polarea - Torre Viena",
-      "price": "$1,350,000.00 USD",
-      "specs": "240 m² · 3 rec. · 3 baños",
-      "zone": "Polanco",
-      "status": "En venta",
-      "listingType": "sale"
-    },
-    {
-      "id": "tres-picos-polanco",
-      "title": "Tres Picos - Polanco",
-      "price": "$20,000,000.00 MXN",
-      "specs": "500 m² · 3 rec. · 5 baños",
-      "zone": "Polanco",
-      "status": "En venta",
-      "listingType": "sale"
-    },
-    {
-      "id": "tecamachalco-naucalpan",
-      "title": "Tecamachalco / Naucalpan",
-      "price": "$90,000.00 MXN",
-      "specs": "250 m² · 3 rec. · 3 baños",
-      "zone": "Estado de México",
-      "status": "En renta",
-      "listingType": "rent"
-    },
-    {
-      "id": "zona-hotelera-polanco",
-      "title": "Zona Hotelera - Polanco",
-      "price": "$2,500,000.00 USD",
-      "specs": "660 m² · 3 rec. · 4 baños",
-      "zone": "Polanco",
-      "status": "En venta",
-      "listingType": "sale"
-    },
-    {
-      "id": "club-golf-bosques-santa-fe",
-      "title": "Club de Golf \"Bosques de Santa Fe\"",
-      "price": "$1,350,000.00 USD",
-      "specs": "240 m² · 3 rec. · 3 baños",
-      "zone": "Santa Fe",
-      "status": "En venta",
-      "listingType": "sale"
-    }
+    "EB-LQ0322",
+    "EB-LV0310",
+    "EB-JW6844",
+    "EB-SP2853",
+    "EB-VP4160"
   ],
   "downloadablesByLocale": {
     "es": [
