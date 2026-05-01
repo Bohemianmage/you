@@ -190,8 +190,10 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
             top: headerHeightPx,
             maxHeight: `calc(100dvh - ${headerHeightPx}px)`,
           }}
-          className={`absolute left-0 right-0 flex flex-col overflow-y-auto rounded-none border-0 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_10px_28px_-12px_rgba(47,46,46,0.18)] backdrop-blur-md transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none motion-reduce:transform-none ${
-            mobileOpen ? "pointer-events-auto translate-y-0" : "pointer-events-none -translate-y-full"
+          className={`absolute left-0 right-0 flex flex-col overflow-y-auto rounded-none border-0 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_10px_28px_-12px_rgba(47,46,46,0.18)] backdrop-blur-md transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
+            mobileOpen
+              ? "pointer-events-auto translate-y-0 opacity-100"
+              : "pointer-events-none -translate-y-full opacity-0"
           }`}
         >
           <nav className="px-4 pb-2 pt-4 sm:px-5 sm:pt-5" aria-label="Principal móvil">
