@@ -70,9 +70,9 @@ export function HomePageContent({
           {edit ? (
             <p className="mx-auto mb-3 max-w-6xl px-4 text-center text-xs text-brand-muted sm:px-6 lg:px-8">
               <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
-                Imágenes y datos de cada tarjeta
+                Catálogo y orden de destacados
               </Link>{" "}
-              (panel → Destacadas).
+              (panel Listas).
             </p>
           ) : null}
           <FeaturedPropertiesSection
@@ -107,7 +107,7 @@ export function HomePageContent({
               (panel → pestaña Descargables).
             </p>
           ) : null}
-          <DownloadablesSection copy={copy.downloadables} items={downloadables} contactHref={contactHref} />
+          <DownloadablesSection copy={copy.downloadables} items={downloadables} />
         </>
       </EditableSection>
 

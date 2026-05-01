@@ -15,6 +15,7 @@ import {
   mergeDownloadablesFromFile,
   mergeFeaturedFromFile,
   mergeHomeCopy as mergeHomeCopyFromFile,
+  mergePublicCatalogFromFile,
   mergeSiteContact as mergeSiteContactFromFile,
   mergeTeamFromFile,
 } from "@/lib/site-content/merge-public";
@@ -53,7 +54,7 @@ export async function getMergedFeaturedForLocale(locale: Locale): Promise<Featur
 
 export async function getMergedCatalog(): Promise<CatalogProperty[]> {
   const file = await getCachedSiteContent();
-  return mergeCatalogFromFile(file);
+  return mergePublicCatalogFromFile(file);
 }
 
 export async function getMergedDownloadablesForLocale(locale: Locale): Promise<DownloadableItem[]> {
@@ -61,7 +62,7 @@ export async function getMergedDownloadablesForLocale(locale: Locale): Promise<D
   return mergeDownloadablesFromFile(locale, file);
 }
 
-/** Ficha interna: primero destacadas por idioma, luego catálogo `/propiedades`. */
+/** Ficha interna: destacados derivados del catálogo o lista legacy; catálogo con slug único. */
 export async function getMergedPropertyDetailBySlug(locale: Locale, slug: string): Promise<FeaturedProperty | null> {
   const file = await getCachedSiteContent();
   const featured = mergeFeaturedFromFile(locale, file);
@@ -69,38 +70,34 @@ export async function getMergedPropertyDetailBySlug(locale: Locale, slug: string
   if (fromFeatured) return fromFeatured;
   const catalog = mergeCatalogFromFile(file);
   const cat = findCatalogPropertyBySegment(catalog, slug);
-  return cat ? catalogAsFeaturedDetail(cat, locale) : null;
+  if (!cat || cat.active === false) return null;
+  return catalogAsFeaturedDetail(cat, locale);
 }
 
-/** Valores efectivos para el formulario admin (tras aplicar overrides). */
-export async function getAdminFormSeed(): Promise<{
-  contact: SiteContact;
-  footerTaglineEs: string;
-  footerTaglineEn: string;
-  heroAnnouncementEs: string;
-  heroAnnouncementEn: string;
-}> {
-  const file = await getCachedSiteContent();
-  const contact = mergeSiteContact(file);
-  return {
-    contact,
-    footerTaglineEs: mergeHomeCopy("es", HOME_COPY.es, file).footer.tagline,
-    footerTaglineEn: mergeHomeCopy("en", HOME_COPY.en, file).footer.tagline,
-    heroAnnouncementEs: mergeHomeCopy("es", HOME_COPY.es, file).hero.announcement,
-    heroAnnouncementEn: mergeHomeCopy("en", HOME_COPY.en, file).hero.announcement,
-  };
+function deriveFeaturedCatalogIdsForAdmin(file: SiteContentFile): string[] {
+  if (file.featuredCatalogIds !== undefined) return [...file.featuredCatalogIds];
+  const catalog = mergeCatalogFromFile(file);
+  const catalogIds = new Set(catalog.map((c) => c.id));
+  const legacy = file.featuredByLocale?.es;
+  if (legacy?.length) {
+    const ids = legacy.map((p) => p.id).filter((id) => catalogIds.has(id));
+    if (ids.length) return ids;
+  }
+  const fromDefaults = mergeFeaturedFromFile("es", file)
+    .map((p) => p.id)
+    .filter((id) => catalogIds.has(id));
+  if (fromDefaults.length) return fromDefaults;
+  const active = catalog.filter((c) => c.active !== false);
+  return active.slice(0, 6).map((c) => c.id);
 }
 
 export async function getAdminEditorSeed(): Promise<AdminEditorSeed> {
-  const base = await getAdminFormSeed();
   const file = await getCachedSiteContent();
-  const [team, featuredEs, featuredEn, catalog, downloadablesEs, downloadablesEn] = [
-    mergeTeamFromFile(file),
-    mergeFeaturedFromFile("es", file),
-    mergeFeaturedFromFile("en", file),
-    mergeCatalogFromFile(file),
-    mergeDownloadablesFromFile("es", file),
-    mergeDownloadablesFromFile("en", file),
-  ];
-  return { ...base, team, featuredEs, featuredEn, catalog, downloadablesEs, downloadablesEn };
+  return {
+    team: mergeTeamFromFile(file),
+    featuredCatalogIds: deriveFeaturedCatalogIdsForAdmin(file),
+    catalog: mergeCatalogFromFile(file),
+    downloadablesEs: mergeDownloadablesFromFile("es", file),
+    downloadablesEn: mergeDownloadablesFromFile("en", file),
+  };
 }

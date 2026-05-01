@@ -8,7 +8,7 @@ import { SITE_CONTACT } from "@/constants/site-contact";
 import type { HomeCopy } from "@/i18n/home";
 import { HOME_COPY } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
-import { mergeSiteContact } from "@/lib/site-content/merge-public";
+import { mergeHomeCopy, mergeSiteContact } from "@/lib/site-content/merge-public";
 import type { SiteContentFile } from "@/lib/site-content/types";
 
 function readField(
@@ -17,6 +17,10 @@ function readField(
   fieldKey: string,
   working: SiteContentFile,
 ): string {
+  if (section === "hero" && fieldKey === "announcement") {
+    return mergeHomeCopy(locale, HOME_COPY[locale], working).hero.announcement;
+  }
+
   const defaults = HOME_COPY[locale][section];
   const defRec = typeof defaults === "object" && defaults !== null ? (defaults as Record<string, unknown>) : {};
   const patchRoot = (working.homeCopyByLocale?.[locale] ?? {}) as Record<string, unknown>;

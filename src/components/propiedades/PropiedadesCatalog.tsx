@@ -8,7 +8,7 @@ import type { CatalogProperty } from "@/data/catalog-properties";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
 import type { Locale } from "@/i18n/types";
 import { catalogDetailHref } from "@/lib/property-routes";
-import { mergeCatalogFromFile } from "@/lib/site-content/merge-public";
+import { mergePublicCatalogFromFile } from "@/lib/site-content/merge-public";
 import type { SiteContentFile } from "@/lib/site-content/types";
 
 type CatalogCopy = (typeof CATALOG_PAGE_COPY)[Locale];
@@ -25,7 +25,7 @@ export function PropiedadesCatalog({
   contactHref: string;
 }) {
   const edit = useSiteContentEditOptional();
-  const catalog = edit ? mergeCatalogFromFile(edit.working as SiteContentFile) : serverCatalog;
+  const catalog = edit ? mergePublicCatalogFromFile(edit.working as SiteContentFile) : serverCatalog;
 
   return (
     <div className="space-y-10">

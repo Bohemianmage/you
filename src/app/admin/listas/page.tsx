@@ -14,7 +14,7 @@ export default async function AdminListasPage() {
         <div>
           <h1 className="font-heading text-2xl font-semibold text-brand-text">Listas de contenido</h1>
           <p className="mt-1 text-sm text-brand-muted">
-            Equipo, destacadas del inicio, catálogo de propiedades, descargables y datos generales. Los textos del home también podés editarlos en el sitio con la barra inferior.
+            Equipo, catálogo y destacados del inicio (desde el catálogo), e ítems descargables. Contacto, pie, hero y textos de secciones del home se editan en el sitio con la barra inferior.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">

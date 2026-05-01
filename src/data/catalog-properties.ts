@@ -1,6 +1,8 @@
 /** Catálogo para `/propiedades` y fichas `/propiedades/[slug]` (persistible en JSON). */
 export interface CatalogProperty {
   id: string;
+  /** Si es `false`, no se publica en /propiedades ni en destacados (solo visible en admin). */
+  active?: boolean;
   /** Segmento de URL; por defecto `id`. */
   slug?: string;
   title: string;

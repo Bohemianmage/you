@@ -21,6 +21,7 @@ const teamMemberSchema = z.object({
 
 const catalogPropertySchema = z.object({
   id: z.string().min(1),
+  active: z.boolean().optional(),
   slug: z.string().optional(),
   title: z.string().min(1),
   price: z.string().min(1),
@@ -78,6 +79,7 @@ export const siteContentFileSchema = z
       })
       .optional(),
     team: z.array(teamMemberSchema).optional(),
+    featuredCatalogIds: z.array(z.string().min(1)).optional(),
     featuredByLocale: z
       .object({
         es: z.array(featuredPropertySchema).optional(),
@@ -133,7 +135,9 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
     }));
   }
 
-  if (input.featuredByLocale !== undefined) {
+  if (input.featuredCatalogIds !== undefined) {
+    out.featuredCatalogIds = input.featuredCatalogIds.map((id) => id.trim()).filter(Boolean);
+  } else if (input.featuredByLocale !== undefined) {
     const stripFeatured = (arr: NonNullable<SiteContentFile["featuredByLocale"]>["es"] | undefined) =>
       (arr ?? []).map((p) => ({
         ...p,
@@ -152,6 +156,7 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
   if (input.catalogProperties !== undefined) {
     out.catalogProperties = input.catalogProperties.map((p) => ({
       ...p,
+      active: p.active === false ? false : undefined,
       slug: p.slug?.trim() || undefined,
       address: p.address?.trim() || undefined,
       status: p.status?.trim() || undefined,

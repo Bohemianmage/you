@@ -68,10 +68,10 @@ export interface HomeCopy {
   downloadables: {
     title: string;
     description: string;
-    cta: string;
-    requestItemCta: string;
     /** Botón cuando hay `fileUrl` en el ítem. */
     downloadFileCta: string;
+    /** Texto cuando el ítem aún no tiene archivo. */
+    noFileHint: string;
   };
   footer: {
     tagline: string;
@@ -110,7 +110,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
   es: {
     hero: {
       announcement:
-        "Looking for accommodation or your next real estate investment in México? Click here",
+        "¿Buscas alojamiento o tu próxima inversión inmobiliaria en México? Haz clic aquí",
       title: "Encuentra el lugar perfecto para ti",
       subtitle: "Servicio profesional inmobiliario con sentido humano",
       primaryCta: "Ver propiedades",
@@ -176,11 +176,9 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     },
     downloadables: {
       title: "Descargables",
-      description:
-        "Solicita brochures, fichas técnicas y material comercial. Te lo enviamos personalizado según tu zona y tipo de operación.",
-      cta: "Ir al contacto",
-      requestItemCta: "Solicitar",
+      description: "Brochures, fichas técnicas y material comercial para descarga directa.",
       downloadFileCta: "Descargar",
+      noFileHint: "Archivo próximamente.",
     },
     footer: {
       tagline: "Comienza a escribir una nueva historia con nosotros.",
@@ -256,11 +254,9 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     },
     downloadables: {
       title: "Downloadables",
-      description:
-        "Request brochures, data sheets, and commercial assets tailored to your zone and operation type.",
-      cta: "Go to contact",
-      requestItemCta: "Request",
+      description: "Brochures, data sheets, and commercial assets available for direct download.",
       downloadFileCta: "Download",
+      noFileHint: "File coming soon.",
     },
     footer: {
       tagline: "Start writing a new story with us.",

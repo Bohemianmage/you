@@ -1,20 +1,17 @@
 import Image from "next/image";
-import Link from "next/link";
 
 import type { DownloadableItem } from "@/data/downloadables";
 import type { HomeCopy } from "@/i18n/home";
-import { appendContactParams } from "@/lib/contact-url";
 
 interface DownloadablesSectionProps {
   copy: HomeCopy["downloadables"];
   items: readonly DownloadableItem[];
-  contactHref: string;
 }
 
 /**
- * Descargables — fichas comerciales solicitadas vía contacto.
+ * Descargables — material comercial con descarga directa cuando hay archivo.
  */
-export function DownloadablesSection({ copy, items, contactHref }: DownloadablesSectionProps) {
+export function DownloadablesSection({ copy, items }: DownloadablesSectionProps) {
   return (
     <section id="downloadables" className="border-b border-brand-border bg-brand-bg py-14 sm:py-16 md:py-20" aria-labelledby="downloadables-heading">
       <div className="mx-auto max-w-6xl space-y-10 px-4 sm:px-6 lg:px-8">
@@ -23,12 +20,6 @@ export function DownloadablesSection({ copy, items, contactHref }: Downloadables
             {copy.title}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-brand-muted">{copy.description}</p>
-          <Link
-            href={contactHref}
-            className="mt-6 inline-flex items-center justify-center rounded-sm border border-brand-accent px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-brand-accent transition hover:bg-brand-accent hover:text-brand-white"
-          >
-            {copy.cta}
-          </Link>
         </div>
         <ul className="grid gap-6 sm:grid-cols-2">
           {items.map((item) => (
@@ -59,17 +50,9 @@ export function DownloadablesSection({ copy, items, contactHref }: Downloadables
                       >
                         {copy.downloadFileCta}
                       </a>
-                    ) : null}
-                    <Link
-                      href={appendContactParams(contactHref, { topic: "descargables", item: item.id })}
-                      className={`inline-flex items-center justify-center rounded-sm px-5 py-2 text-xs font-bold uppercase tracking-[0.14em] transition ${
-                        item.fileUrl
-                          ? "border border-brand-border text-brand-text hover:border-brand-accent hover:text-brand-accent-strong"
-                          : "bg-brand-accent text-brand-white hover:bg-brand-accent-strong"
-                      }`}
-                    >
-                      {copy.requestItemCta}
-                    </Link>
+                    ) : (
+                      <p className="text-xs text-brand-muted">{copy.noFileHint}</p>
+                    )}
                   </div>
                 </div>
               </article>

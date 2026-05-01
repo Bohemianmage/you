@@ -85,9 +85,8 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
     fields: [
       { section: "downloadables", key: "title", label: "Título" },
       { section: "downloadables", key: "description", label: "Descripción", multiline: true },
-      { section: "downloadables", key: "cta", label: "CTA principal" },
-      { section: "downloadables", key: "requestItemCta", label: "CTA por ítem (contacto)" },
       { section: "downloadables", key: "downloadFileCta", label: "CTA descarga directa" },
+      { section: "downloadables", key: "noFileHint", label: "Texto si aún no hay archivo" },
     ],
   },
   footer: {

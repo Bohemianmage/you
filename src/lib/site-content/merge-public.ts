@@ -30,11 +30,17 @@ export function mergeHomeCopy(locale: Locale, base: HomeCopy, file: SiteContentF
   }
   let out = outRecord as unknown as HomeCopy;
   const taglineOverride = file.footerTagline?.[locale];
-  const announcementOverride = file.heroAnnouncement?.[locale];
+  const announcementOverride = file.heroAnnouncement?.[locale]?.trim();
   if (taglineOverride) {
     out = { ...out, footer: { ...out.footer, tagline: taglineOverride } };
   }
-  if (announcementOverride) {
+  /**
+   * `heroAnnouncement` es atajo por idioma; si en `homeCopyByLocale` hay `hero.announcement`, gana el structured patch
+   * (coherente con el drawer de edición).
+   */
+  const structuredAnnouncement = file.homeCopyByLocale?.[locale]?.hero?.announcement;
+  const hasStructuredAnnouncement = typeof structuredAnnouncement === "string" && structuredAnnouncement.trim().length > 0;
+  if (announcementOverride && !hasStructuredAnnouncement) {
     out = { ...out, hero: { ...out.hero, announcement: announcementOverride } };
   }
   return out;
@@ -46,6 +52,15 @@ export function mergeTeamFromFile(file: SiteContentFile): TeamMember[] {
 }
 
 export function mergeFeaturedFromFile(locale: Locale, file: SiteContentFile): FeaturedProperty[] {
+  if (file.featuredCatalogIds !== undefined) {
+    const catalog = mergeCatalogFromFile(file);
+    const byId = new Map(catalog.map((c) => [c.id, c]));
+    return file.featuredCatalogIds
+      .map((id) => byId.get(id))
+      .filter((c): c is CatalogProperty => c != null && c.active !== false)
+      .map((c) => catalogAsFeaturedDetail(c, locale));
+  }
+
   const list = file.featuredByLocale?.[locale];
   if (list !== undefined) return [...list];
   return [...FEATURED_PROPERTIES_BY_LOCALE[locale]];
@@ -54,6 +69,11 @@ export function mergeFeaturedFromFile(locale: Locale, file: SiteContentFile): Fe
 export function mergeCatalogFromFile(file: SiteContentFile): CatalogProperty[] {
   if (file.catalogProperties !== undefined) return [...file.catalogProperties];
   return [...CATALOG_PROPERTIES];
+}
+
+/** Catálogo visible en sitio público (excluye `active: false`). */
+export function mergePublicCatalogFromFile(file: SiteContentFile): CatalogProperty[] {
+  return mergeCatalogFromFile(file).filter((p) => p.active !== false);
 }
 
 export function mergeDownloadablesFromFile(locale: Locale, file: SiteContentFile): DownloadableItem[] {

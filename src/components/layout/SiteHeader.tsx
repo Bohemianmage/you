@@ -62,11 +62,11 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
         >
           <Image
             src="/logo-you-full.png"
-            width={280}
-            height={88}
-            sizes="(max-width: 640px) 160px, 220px"
+            width={560}
+            height={176}
+            sizes="(max-width: 640px) 320px, 440px"
             alt="YOU. Soluciones inmobiliarias"
-            className="h-9 w-auto max-w-[10.5rem] object-contain object-left transition-opacity group-hover:opacity-[0.92] sm:h-11 sm:max-w-[13.75rem]"
+            className="h-[72px] w-auto max-w-[21rem] object-contain object-left transition-opacity group-hover:opacity-[0.92] sm:h-[88px] sm:max-w-[27.5rem]"
             priority
           />
         </Link>
