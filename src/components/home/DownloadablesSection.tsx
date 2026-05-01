@@ -13,7 +13,11 @@ interface DownloadablesSectionProps {
  */
 export function DownloadablesSection({ copy, items }: DownloadablesSectionProps) {
   return (
-    <section id="downloadables" className="border-b border-brand-border bg-brand-bg py-14 sm:py-16 md:py-20" aria-labelledby="downloadables-heading">
+    <section
+      id="downloadables"
+      className="scroll-mt-[6.5rem] border-b border-brand-border bg-brand-bg py-14 sm:py-16 sm:scroll-mt-28 md:py-20"
+      aria-labelledby="downloadables-heading"
+    >
       <div className="mx-auto max-w-6xl space-y-10 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 id="downloadables-heading" className="font-heading text-xl font-semibold text-brand-text sm:text-2xl">

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { IconFacebook, IconInstagram, IconYoutube, iconClasses } from "@/components/icons/SocialIcons";
 import { LangSwitcher, LangSwitcherFallback } from "@/components/layout/LangSwitcher";
@@ -24,16 +25,71 @@ const HEADER_SOCIAL = [
   },
 ] as const;
 
+const HOME_SECTION_IDS = ["about", "downloadables"] as const;
+
 interface SiteHeaderProps {
   locale: Locale;
   navItems: readonly NavItem[];
 }
 
+function parseNavHref(href: string): URL {
+  return new URL(href, "https://yousoluciones.com");
+}
+
+function scrollToSectionHash(hash: string) {
+  const id = hash.startsWith("#") ? hash.slice(1) : hash;
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 /**
  * Sticky header — refined chrome: pill nav on desktop, drawer on small screens, blurred surface.
+ * Scroll espaciado en anclas del home, estado activo por ruta/sección y panel móvil animado.
  */
 export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+
+  const isHome = pathname === "/";
+
+  useEffect(() => {
+    if (!isHome) {
+      setActiveSectionId(null);
+      return;
+    }
+
+    const headerOffset = 112;
+
+    const pickSectionFromScroll = () => {
+      let current: string | null = null;
+      for (const id of HOME_SECTION_IDS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top;
+        if (top <= headerOffset) current = id;
+      }
+      setActiveSectionId(current);
+    };
+
+    const syncHash = () => {
+      const raw = window.location.hash.replace(/^#/, "");
+      if (raw === "about" || raw === "downloadables") {
+        setActiveSectionId(raw);
+        return;
+      }
+      pickSectionFromScroll();
+    };
+
+    pickSectionFromScroll();
+    syncHash();
+
+    window.addEventListener("scroll", pickSectionFromScroll, { passive: true });
+    window.addEventListener("hashchange", syncHash);
+    return () => {
+      window.removeEventListener("scroll", pickSectionFromScroll);
+      window.removeEventListener("hashchange", syncHash);
+    };
+  }, [isHome]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -53,6 +109,50 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     };
   }, [mobileOpen]);
 
+  function handleInPageNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (typeof window === "undefined") return;
+    const dest = parseNavHref(href);
+    const here = `${window.location.pathname}${window.location.search}`;
+    const destLoc = `${dest.pathname}${dest.search}`;
+    if (destLoc !== here) return;
+    if (!dest.hash) {
+      setMobileOpen(false);
+      return;
+    }
+    e.preventDefault();
+    scrollToSectionHash(dest.hash);
+    window.history.pushState(null, "", href);
+    setMobileOpen(false);
+    setActiveSectionId(dest.hash.slice(1));
+  }
+
+  function isNavItemActive(item: NavItem): boolean {
+    const u = parseNavHref(item.href);
+    if (u.pathname === "/contacto") {
+      return pathname === "/contacto";
+    }
+    if (u.pathname.startsWith("/propiedades")) {
+      return pathname.startsWith("/propiedades");
+    }
+    if (u.pathname === "/" && u.hash) {
+      const id = u.hash.slice(1);
+      return isHome && activeSectionId === id;
+    }
+    return false;
+  }
+
+  const desktopPillBase =
+    "block rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] no-underline transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none";
+  const desktopPillActive =
+    "scale-[1.02] bg-brand-accent text-brand-white shadow-[0_2px_10px_rgba(97,110,137,0.35)] ring-1 ring-brand-accent/45";
+  const desktopPillIdle =
+    "text-brand-text hover:bg-brand-bg hover:text-brand-accent-strong hover:shadow-sm active:scale-[0.98]";
+
+  const mobileLinkBase =
+    "block rounded-md px-3 py-3 text-[13px] font-bold uppercase tracking-[0.12em] text-brand-text no-underline transition-colors duration-200 ease-out motion-reduce:transition-none";
+  const mobileLinkActive = "bg-brand-accent/12 text-brand-accent-strong ring-1 ring-brand-accent/25";
+  const mobileLinkIdle = "hover:bg-brand-surface hover:text-brand-accent-strong";
+
   return (
     <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_8px_30px_-12px_rgba(47,46,46,0.12)] backdrop-blur-md">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:gap-6 lg:px-8">
@@ -61,28 +161,33 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
           className="group flex shrink-0 items-center font-semibold tracking-tight text-brand-text"
         >
           <Image
-            src="/logo-you-full.png"
-            width={560}
-            height={176}
-            sizes="(max-width: 640px) 320px, 440px"
-            alt="YOU. Soluciones inmobiliarias"
-            className="h-[72px] w-auto max-w-[21rem] object-contain object-left transition-opacity group-hover:opacity-[0.92] sm:h-[88px] sm:max-w-[27.5rem]"
+            src="/logo-you-mark.png"
+            width={256}
+            height={256}
+            sizes="(max-width: 640px) 96px, 112px"
+            alt="YOU Soluciones Inmobiliarias"
+            className="h-[72px] w-auto max-w-[5.5rem] object-contain object-left transition-opacity duration-200 group-hover:opacity-[0.92] sm:h-[88px] sm:max-w-[6.5rem]"
             priority
           />
         </Link>
 
         <nav className="hidden lg:flex lg:flex-1 lg:justify-center" aria-label="Principal">
           <ul className="flex items-center gap-0.5 rounded-full bg-brand-surface/95 px-1 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-brand-border/55">
-            {navItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="block rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-brand-text no-underline transition hover:bg-brand-bg hover:text-brand-accent-strong hover:shadow-sm"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              const active = isNavItemActive(item);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={(e) => handleInPageNavClick(e, item.href)}
+                    aria-current={active ? "page" : undefined}
+                    className={`${desktopPillBase} ${active ? desktopPillActive : desktopPillIdle}`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -109,9 +214,9 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
 
           <button
             type="button"
-            className="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text lg:hidden"
+            className="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text transition-colors duration-200 lg:hidden"
             aria-expanded={mobileOpen}
-            aria-controls="mobile-nav"
+            aria-controls="mobile-nav-panel"
             aria-label={
               mobileOpen
                 ? locale === "en"
@@ -124,46 +229,55 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
             onClick={() => setMobileOpen((o) => !o)}
           >
             <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition ${mobileOpen ? "translate-y-1.5 rotate-45" : ""}`}
+              className={`block h-0.5 w-5 rounded-full bg-current transition duration-200 ease-out ${mobileOpen ? "translate-y-1.5 rotate-45" : ""}`}
             />
-            <span className={`block h-0.5 w-5 rounded-full bg-current transition ${mobileOpen ? "opacity-0" : ""}`} />
+            <span className={`block h-0.5 w-5 rounded-full bg-current transition duration-200 ease-out ${mobileOpen ? "opacity-0" : ""}`} />
             <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition ${mobileOpen ? "-translate-y-1.5 -rotate-45" : ""}`}
+              className={`block h-0.5 w-5 rounded-full bg-current transition duration-200 ease-out ${mobileOpen ? "-translate-y-1.5 -rotate-45" : ""}`}
             />
           </button>
         </div>
       </div>
 
       <div
-        id="mobile-nav"
-        className={`border-t border-brand-border/60 bg-brand-bg/98 lg:hidden ${mobileOpen ? "block" : "hidden"}`}
+        id="mobile-nav-panel"
+        className={`grid overflow-hidden transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none lg:hidden ${mobileOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
       >
-        <nav className="mx-auto max-w-6xl space-y-1 px-4 py-4 sm:px-6" aria-label="Principal móvil">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="block rounded-md px-3 py-3 text-[13px] font-bold uppercase tracking-[0.12em] text-brand-text no-underline transition hover:bg-brand-surface hover:text-brand-accent-strong"
-              onClick={() => setMobileOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <div className="flex items-center justify-center gap-3 border-t border-brand-border/60 pt-4">
-            {HEADER_SOCIAL.map(({ label, href, Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-surface text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white"
-                aria-label={label}
-              >
-                <Icon className={iconClasses()} />
-              </a>
-            ))}
-          </div>
-        </nav>
+        <div className="min-h-0">
+          <nav className="border-t border-brand-border/60 bg-brand-bg/98 px-4 py-4 sm:px-6" aria-label="Principal móvil">
+            <ul className="space-y-1">
+              {navItems.map((item) => {
+                const active = isNavItemActive(item);
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={(e) => handleInPageNavClick(e, item.href)}
+                      aria-current={active ? "page" : undefined}
+                      className={`${mobileLinkBase} ${active ? mobileLinkActive : mobileLinkIdle}`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-4 flex items-center justify-center gap-3 border-t border-brand-border/60 pt-4">
+              {HEADER_SOCIAL.map(({ label, href, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-surface text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white"
+                  aria-label={label}
+                >
+                  <Icon className={iconClasses()} />
+                </a>
+              ))}
+            </div>
+          </nav>
+        </div>
       </div>
     </header>
   );

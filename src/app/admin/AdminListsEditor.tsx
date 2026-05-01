@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { saveSiteContent } from "@/app/actions/site-content";
+import { AdminListDisclosureRow } from "@/components/admin/admin-list-disclosure";
 import { SiteAssetUploadButton } from "@/components/admin/SiteAssetUploadButton";
 import type { CatalogProperty } from "@/data/catalog-properties";
 import type { DownloadableItem } from "@/data/downloadables";
@@ -69,7 +70,7 @@ function normalizeFeaturedIds(ids: readonly string[], catalog: readonly CatalogP
 }
 
 const tabBtn =
-  "rounded-sm border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition";
+  "rounded-sm border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition-all duration-200 ease-out motion-reduce:transition-none";
 const tabActive = "border-brand-accent bg-brand-accent/15 text-brand-accent-strong";
 const tabIdle = "border-brand-border bg-brand-bg text-brand-muted hover:border-brand-accent hover:text-brand-accent";
 
@@ -119,6 +120,17 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
   const [dragTeamIdx, setDragTeamIdx] = useState<number | null>(null);
   const [dragFeaturedIdx, setDragFeaturedIdx] = useState<number | null>(null);
   const [dragCatalogIdx, setDragCatalogIdx] = useState<number | null>(null);
+  const [dragDlIdx, setDragDlIdx] = useState<number | null>(null);
+
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(() => new Set());
+  const toggleRow = useCallback((key: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     if (!saveModalOpen) return;
@@ -223,13 +235,15 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
       {tab === "team" ? (
         <div className="space-y-6">
           <p className="text-sm text-brand-muted">
-            Arrastrá con el asa ⋮⋮ para reordenar. Las redes sociales son opcionales (URLs completas).
+            Cada fila va cerrada por defecto: abrila para editar. Arrastrá con ⋮⋮ para reordenar.
           </p>
-          <ul className="space-y-8">
-            {team.map((member, i) => (
+          <ul className="space-y-4">
+            {team.map((member, i) => {
+              const rowKey = `team:${member.id}`;
+              return (
               <li
                 key={member.id}
-                className={`rounded-sm border border-brand-border bg-brand-bg p-6 shadow-sm transition ${dragTeamIdx === i ? "opacity-55" : ""}`}
+                className={`rounded-sm border border-brand-border bg-brand-bg pb-2 shadow-sm transition ${dragTeamIdx === i ? "opacity-55" : ""}`}
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.dataTransfer.dropEffect = "move";
@@ -242,8 +256,10 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                   setTeam((prev) => reorderArray(prev, from, i));
                 }}
               >
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex min-w-0 flex-1 items-center gap-1">
+                <AdminListDisclosureRow
+                  open={expandedRows.has(rowKey)}
+                  onToggle={() => toggleRow(rowKey)}
+                  dragHandle={
                     <span
                       role="button"
                       tabIndex={0}
@@ -261,17 +277,23 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                         ⋮⋮
                       </span>
                     </span>
-                    <span className="font-heading text-sm font-semibold text-brand-text">Persona {i + 1}</span>
-                  </div>
-                  <button
-                    type="button"
-                    className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
-                    onClick={() => setTeam((prev) => prev.filter((_, j) => j !== i))}
-                  >
-                    Quitar
-                  </button>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
+                  }
+                  title={
+                    <span className="font-heading text-sm font-semibold text-brand-text">
+                      {member.name.trim() || `Persona ${i + 1}`}
+                    </span>
+                  }
+                  actions={
+                    <button
+                      type="button"
+                      className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                      onClick={() => setTeam((prev) => prev.filter((_, j) => j !== i))}
+                    >
+                      Quitar
+                    </button>
+                  }
+                >
+                <div className="grid gap-4 border-t border-brand-border/60 pt-4 sm:grid-cols-2">
                   <label className={labelClass}>
                     ID (slug interno)
                     <input type="text" value={member.id} onChange={(e) => updateTeam(i, { id: e.target.value })} className={inputClass} />
@@ -327,8 +349,10 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                     />
                   </label>
                 </div>
+                </AdminListDisclosureRow>
               </li>
-            ))}
+            );
+            })}
           </ul>
           <button
             type="button"
@@ -343,12 +367,12 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
       {tab === "featured" ? (
         <div className="space-y-8">
           <p className="text-sm text-brand-muted">
-            Las tarjetas del inicio usan los datos del <strong className="text-brand-text">catálogo</strong>. Elegí qué propiedades activas mostrar y ordenalas arrastrando ⋮⋮. Los textos de la sección se editan en el sitio.
+            Las tarjetas del inicio salen del <strong className="text-brand-text">catálogo</strong>. Podés expandir cada fila para ver el ID; arrastrá ⋮⋮ para ordenar. Los textos de la sección se editan en el sitio.
           </p>
 
           <div>
             <h3 className="font-heading text-sm font-semibold text-brand-text">Orden en el inicio</h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 space-y-4">
               {featuredCatalogIds.length === 0 ? (
                 <li className="rounded-sm border border-dashed border-brand-border bg-brand-bg px-4 py-6 text-sm text-brand-muted">
                   Ninguna propiedad destacada. Agregá desde el listado inferior.
@@ -356,10 +380,11 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
               ) : null}
               {featuredCatalogIds.map((id, idx) => {
                 const prop = catalogById.get(id);
+                const rowKey = `feat:${id}`;
                 return (
                   <li
                     key={`${id}-${idx}`}
-                    className={`flex flex-wrap items-center justify-between gap-3 rounded-sm border border-brand-border bg-brand-bg px-4 py-3 shadow-sm transition ${dragFeaturedIdx === idx ? "opacity-55" : ""}`}
+                    className={`rounded-sm border border-brand-border bg-brand-bg pb-2 shadow-sm transition ${dragFeaturedIdx === idx ? "opacity-55" : ""}`}
                     onDragOver={(e) => {
                       e.preventDefault();
                       e.dataTransfer.dropEffect = "move";
@@ -372,36 +397,48 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       setFeaturedCatalogIds((prev) => reorderArray(prev, from, idx));
                     }}
                   >
-                    <div className="flex min-w-0 flex-1 items-start gap-2">
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        aria-label="Arrastrar para reordenar"
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData("text/plain", String(idx));
-                          e.dataTransfer.effectAllowed = "move";
-                          setDragFeaturedIdx(idx);
-                        }}
-                        onDragEnd={() => setDragFeaturedIdx(null)}
-                        className={`${dragHandleClass} mt-0.5`}
-                      >
-                        <span aria-hidden className="text-base leading-none tracking-tight">
-                          ⋮⋮
+                    <AdminListDisclosureRow
+                      open={expandedRows.has(rowKey)}
+                      onToggle={() => toggleRow(rowKey)}
+                      dragHandle={
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          aria-label="Arrastrar para reordenar"
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("text/plain", String(idx));
+                            e.dataTransfer.effectAllowed = "move";
+                            setDragFeaturedIdx(idx);
+                          }}
+                          onDragEnd={() => setDragFeaturedIdx(null)}
+                          className={`${dragHandleClass} mt-0.5`}
+                        >
+                          <span aria-hidden className="text-base leading-none tracking-tight">
+                            ⋮⋮
+                          </span>
                         </span>
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium text-brand-text">{prop?.title ?? `(sin catálogo: ${id})`}</p>
-                        <p className="text-xs text-brand-muted">{id}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
-                      onClick={() => setFeaturedCatalogIds((prev) => prev.filter((x) => x !== id))}
+                      }
+                      title={
+                        <span className="min-w-0">
+                          <span className="block truncate font-medium text-brand-text">{prop?.title ?? `(sin catálogo: ${id})`}</span>
+                          <span className="block truncate text-xs text-brand-muted">{id}</span>
+                        </span>
+                      }
+                      actions={
+                        <button
+                          type="button"
+                          className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                          onClick={() => setFeaturedCatalogIds((prev) => prev.filter((x) => x !== id))}
+                        >
+                          Quitar
+                        </button>
+                      }
                     >
-                      Quitar
-                    </button>
+                      <p className="border-t border-brand-border/60 pt-4 text-xs text-brand-muted">
+                        Los datos de la tarjeta se editan en la pestaña <strong className="text-brand-text">Catálogo</strong> (misma propiedad).
+                      </p>
+                    </AdminListDisclosureRow>
                   </li>
                 );
               })}
@@ -439,13 +476,15 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
       {tab === "catalog" ? (
         <div className="space-y-6">
           <p className="text-sm text-brand-muted">
-            Define fichas de <strong className="text-brand-text">/propiedades</strong>. El interruptor <strong className="text-brand-text">Activo</strong> controla si la propiedad se publica y si puede destacarse en el inicio. Reordená con ⋮⋮.
+            Define fichas de <strong className="text-brand-text">/propiedades</strong>. Expandí cada fila para editar; el estado Activo/Inactivo y ⋮⋮ quedan siempre visibles en la cabecera.
           </p>
-          <ul className="space-y-8">
-            {catalog.map((prop, idx) => (
+          <ul className="space-y-4">
+            {catalog.map((prop, idx) => {
+              const rowKey = `cat:${prop.id}`;
+              return (
               <li
                 key={`${prop.id}-${idx}`}
-                className={`rounded-sm border border-brand-border bg-brand-bg p-6 shadow-sm transition ${dragCatalogIdx === idx ? "opacity-55" : ""}`}
+                className={`rounded-sm border border-brand-border bg-brand-bg pb-2 shadow-sm transition ${dragCatalogIdx === idx ? "opacity-55" : ""}`}
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.dataTransfer.dropEffect = "move";
@@ -458,8 +497,10 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                   setCatalog((prev) => reorderArray(prev, from, idx));
                 }}
               >
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex min-w-0 flex-1 items-center gap-2">
+                <AdminListDisclosureRow
+                  open={expandedRows.has(rowKey)}
+                  onToggle={() => toggleRow(rowKey)}
+                  dragHandle={
                     <span
                       role="button"
                       tabIndex={0}
@@ -477,42 +518,56 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                         ⋮⋮
                       </span>
                     </span>
-                    <span className="font-heading text-sm font-semibold text-brand-text">Propiedad {idx + 1}</span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className={pillWrap} role="group" aria-label="Estado de publicación">
+                  }
+                  title={
+                    <span className="min-w-0">
+                      <span className="block truncate font-heading text-sm font-semibold text-brand-text">
+                        {prop.title.trim() || `Propiedad ${idx + 1}`}
+                      </span>
+                      <span className="block truncate text-xs text-brand-muted">{prop.zone}</span>
+                    </span>
+                  }
+                  actions={
+                    <>
+                      <div className={pillWrap} role="group" aria-label="Estado de publicación">
+                        <button
+                          type="button"
+                          className={`${pillSegment} ${prop.active !== false ? "bg-brand-accent text-brand-white shadow-sm" : "text-brand-muted hover:bg-brand-bg"}`}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            updateCatalog(idx, { active: true });
+                          }}
+                        >
+                          Activo
+                        </button>
+                        <button
+                          type="button"
+                          className={`${pillSegment} ${prop.active === false ? "bg-brand-accent-strong text-brand-white shadow-sm" : "text-brand-muted hover:bg-brand-bg"}`}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            updateCatalog(idx, { active: false });
+                            setFeaturedCatalogIds((prev) => prev.filter((fid) => fid !== prop.id));
+                          }}
+                        >
+                          Inactivo
+                        </button>
+                      </div>
                       <button
                         type="button"
-                        className={`${pillSegment} ${prop.active !== false ? "bg-brand-accent text-brand-white shadow-sm" : "text-brand-muted hover:bg-brand-bg"}`}
-                        onClick={() => updateCatalog(idx, { active: true })}
-                      >
-                        Activo
-                      </button>
-                      <button
-                        type="button"
-                        className={`${pillSegment} ${prop.active === false ? "bg-brand-accent-strong text-brand-white shadow-sm" : "text-brand-muted hover:bg-brand-bg"}`}
-                        onClick={() => {
-                          updateCatalog(idx, { active: false });
-                          setFeaturedCatalogIds((prev) => prev.filter((id) => id !== prop.id));
+                        className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          const id = prop.id;
+                          setCatalog((prev) => prev.filter((_, j) => j !== idx));
+                          setFeaturedCatalogIds((prev) => prev.filter((x) => x !== id));
                         }}
                       >
-                        Inactivo
+                        Quitar
                       </button>
-                    </div>
-                    <button
-                      type="button"
-                      className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
-                      onClick={() => {
-                        const id = prop.id;
-                        setCatalog((prev) => prev.filter((_, j) => j !== idx));
-                        setFeaturedCatalogIds((prev) => prev.filter((x) => x !== id));
-                      }}
-                    >
-                      Quitar
-                    </button>
-                  </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
+                    </>
+                  }
+                >
+                <div className="grid gap-4 border-t border-brand-border/60 pt-4 sm:grid-cols-2">
                   <label className={labelClass}>
                     ID
                     <input type="text" value={prop.id} onChange={(e) => updateCatalog(idx, { id: e.target.value })} className={inputClass} />
@@ -578,8 +633,10 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                     <input type="text" value={prop.ctaLabel ?? ""} onChange={(e) => updateCatalog(idx, { ctaLabel: e.target.value || undefined })} className={inputClass} />
                   </label>
                 </div>
+                </AdminListDisclosureRow>
               </li>
-            ))}
+            );
+            })}
           </ul>
           <button
             type="button"
@@ -602,24 +659,66 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
             </button>
           </div>
           <p className="text-sm text-brand-muted">
-            Los títulos de la sección se editan en el sitio (bloque descargables). <strong className="text-brand-text">Subida:</strong> los archivos van al repositorio Git (misma configuración{" "}
-            <code className="text-xs">GITHUB_TOKEN</code> / <code className="text-xs">GITHUB_REPO</code> que el JSON del sitio). Tras subir, hace falta un nuevo deploy para que queden servidos bajo{" "}
-            <code className="text-xs">/site-uploads/…</code>.
+            Expandí cada ítem para editar PDF/imagen. Arrastrá ⋮⋮ para ordenar. Los títulos de la sección se editan en el sitio. <strong className="text-brand-text">Subida:</strong> Git (
+            <code className="text-xs">GITHUB_TOKEN</code> / <code className="text-xs">GITHUB_REPO</code>); tras subir hace falta deploy para servir bajo <code className="text-xs">/site-uploads/…</code>.
           </p>
-          <ul className="space-y-8">
-            {downloadList.map((item, idx) => (
-              <li key={`${item.id}-${idx}`} className="rounded-sm border border-brand-border bg-brand-bg p-6 shadow-sm">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-heading text-sm font-semibold text-brand-text">Ítem {idx + 1}</span>
-                  <button
-                    type="button"
-                    className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
-                    onClick={() => setDownloadList((prev) => prev.filter((_, j) => j !== idx))}
-                  >
-                    Quitar
-                  </button>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
+          <ul className="space-y-4">
+            {downloadList.map((item, idx) => {
+              const rowKey = `dl:${downloadLocale}:${item.id}`;
+              return (
+              <li
+                key={`${item.id}-${idx}`}
+                className={`rounded-sm border border-brand-border bg-brand-bg pb-2 shadow-sm transition ${dragDlIdx === idx ? "opacity-55" : ""}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const from = Number(e.dataTransfer.getData("text/plain"));
+                  setDragDlIdx(null);
+                  if (Number.isNaN(from)) return;
+                  setDownloadList((prev) => reorderArray(prev, from, idx));
+                }}
+              >
+                <AdminListDisclosureRow
+                  open={expandedRows.has(rowKey)}
+                  onToggle={() => toggleRow(rowKey)}
+                  dragHandle={
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Arrastrar para reordenar"
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData("text/plain", String(idx));
+                        e.dataTransfer.effectAllowed = "move";
+                        setDragDlIdx(idx);
+                      }}
+                      onDragEnd={() => setDragDlIdx(null)}
+                      className={dragHandleClass}
+                    >
+                      <span aria-hidden className="text-base leading-none tracking-tight">
+                        ⋮⋮
+                      </span>
+                    </span>
+                  }
+                  title={
+                    <span className="font-heading text-sm font-semibold text-brand-text">
+                      {item.title.trim() || `Ítem ${idx + 1}`}
+                    </span>
+                  }
+                  actions={
+                    <button
+                      type="button"
+                      className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                      onClick={() => setDownloadList((prev) => prev.filter((_, j) => j !== idx))}
+                    >
+                      Quitar
+                    </button>
+                  }
+                >
+                <div className="grid gap-4 border-t border-brand-border/60 pt-4 sm:grid-cols-2">
                   <label className={labelClass}>
                     ID (estable)
                     <input type="text" value={item.id} onChange={(e) => updateDownloadable(idx, { id: e.target.value })} className={inputClass} />
@@ -659,8 +758,10 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                     />
                   </label>
                 </div>
+                </AdminListDisclosureRow>
               </li>
-            ))}
+            );
+            })}
           </ul>
           <button
             type="button"

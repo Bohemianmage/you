@@ -105,7 +105,11 @@ function TeamMemberCard({ member, locale }: { member: TeamMember; locale: Locale
  */
 export function AboutSection({ locale, copy, footerCopy, contact, contactHref, teamMembers }: AboutSectionProps) {
   return (
-    <section id="about" className="border-b border-brand-border bg-brand-bg py-16 sm:py-24" aria-labelledby="about-heading">
+    <section
+      id="about"
+      className="scroll-mt-[6.5rem] border-b border-brand-border bg-brand-bg py-16 sm:py-24 sm:scroll-mt-28"
+      aria-labelledby="about-heading"
+    >
       <div className="mx-auto max-w-6xl space-y-16 px-4 sm:px-6 lg:px-8">
         <header className="mx-auto max-w-3xl space-y-6 text-center lg:text-left">
           <h2 id="about-heading" className="font-heading text-3xl font-semibold tracking-tight text-brand-text sm:text-[2.35rem]">
