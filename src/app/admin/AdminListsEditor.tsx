@@ -4,12 +4,15 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { saveSiteContent } from "@/app/actions/site-content";
+import { BlobUploadButton } from "@/components/admin/BlobUploadButton";
+import type { CatalogProperty } from "@/data/catalog-properties";
+import type { DownloadableItem } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
 import type { SiteContentFile } from "@/lib/site-content/types";
 
-type TabId = "general" | "team" | "featured";
+type TabId = "general" | "team" | "featured" | "catalog" | "downloadables";
 
 function newTeamId(): string {
   return `member-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -36,6 +39,24 @@ function emptyFeatured(): FeaturedProperty {
     status: "",
     ctaLabel: "",
   };
+}
+
+function emptyCatalog(): CatalogProperty {
+  return {
+    id: newPropertyId(),
+    title: "",
+    price: "",
+    specs: "",
+    zone: "",
+  };
+}
+
+function newDownloadableId(): string {
+  return `dl-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function emptyDownloadable(): DownloadableItem {
+  return { id: newDownloadableId(), title: "", description: "" };
 }
 
 const tabBtn =
@@ -67,6 +88,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
   const router = useRouter();
   const [tab, setTab] = useState<TabId>("general");
   const [featuredLocale, setFeaturedLocale] = useState<"es" | "en">("es");
+  const [downloadLocale, setDownloadLocale] = useState<"es" | "en">("es");
 
   const [contactAddress, setContactAddress] = useState(seed.contact.addressLine);
   const [contactPhoneDisplay, setContactPhoneDisplay] = useState(seed.contact.phoneDisplay);
@@ -79,6 +101,9 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
   const [team, setTeam] = useState<TeamMember[]>(() => seed.team.map((m) => structuredClone(m)));
   const [featuredEs, setFeaturedEs] = useState<FeaturedProperty[]>(() => seed.featuredEs.map((p) => ({ ...p })));
   const [featuredEn, setFeaturedEn] = useState<FeaturedProperty[]>(() => seed.featuredEn.map((p) => ({ ...p })));
+  const [catalog, setCatalog] = useState<CatalogProperty[]>(() => seed.catalog.map((p) => ({ ...p })));
+  const [downloadablesEs, setDownloadablesEs] = useState<DownloadableItem[]>(() => seed.downloadablesEs.map((d) => ({ ...d })));
+  const [downloadablesEn, setDownloadablesEn] = useState<DownloadableItem[]>(() => seed.downloadablesEn.map((d) => ({ ...d })));
 
   const [pending, startTransition] = useTransition();
   const [saveModalOpen, setSaveModalOpen] = useState(false);
@@ -121,6 +146,8 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
       },
       team,
       featuredByLocale: { es: featuredEs, en: featuredEn },
+      catalogProperties: catalog,
+      downloadablesByLocale: { es: downloadablesEs, en: downloadablesEn },
     };
     return JSON.stringify(body);
   }, [
@@ -135,6 +162,9 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
     team,
     featuredEs,
     featuredEn,
+    catalog,
+    downloadablesEs,
+    downloadablesEn,
   ]);
 
   function updateTeam(i: number, patch: Partial<TeamMember>) {
@@ -171,6 +201,17 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
     setFeaturedList((prev) => prev.map((p, j) => (j === idx ? { ...p, ...patch } : p)));
   }
 
+  function updateCatalog(idx: number, patch: Partial<CatalogProperty>) {
+    setCatalog((prev) => prev.map((p, j) => (j === idx ? { ...p, ...patch } : p)));
+  }
+
+  const downloadList = downloadLocale === "es" ? downloadablesEs : downloadablesEn;
+  const setDownloadList = downloadLocale === "es" ? setDownloadablesEs : setDownloadablesEn;
+
+  function updateDownloadable(idx: number, patch: Partial<DownloadableItem>) {
+    setDownloadList((prev) => prev.map((d, j) => (j === idx ? { ...d, ...patch } : d)));
+  }
+
   return (
     <div className="mt-10 space-y-8">
       {saveErr ? (
@@ -185,7 +226,13 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
           Equipo
         </button>
         <button type="button" className={`${tabBtn} ${tab === "featured" ? tabActive : tabIdle}`} onClick={() => setTab("featured")}>
-          Propiedades destacadas
+          Destacadas (inicio)
+        </button>
+        <button type="button" className={`${tabBtn} ${tab === "catalog" ? tabActive : tabIdle}`} onClick={() => setTab("catalog")}>
+          Catálogo /propiedades
+        </button>
+        <button type="button" className={`${tabBtn} ${tab === "downloadables" ? tabActive : tabIdle}`} onClick={() => setTab("downloadables")}>
+          Descargables
         </button>
       </div>
 
@@ -277,6 +324,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       placeholder="/team/ejemplo.jpg"
                       className={inputClass}
                     />
+                    <BlobUploadButton kind="image" subfolder="team" onUploaded={(url) => updateTeam(i, { imageSrc: url })} />
                   </label>
                   <label className={labelClass}>
                     Facebook URL
@@ -413,13 +461,14 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                     />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
-                    Imagen /public (opcional)
+                    Imagen /public o URL (opcional)
                     <input
                       type="text"
                       value={prop.imageSrc ?? ""}
                       onChange={(e) => updateFeatured(idx, { imageSrc: e.target.value || undefined })}
                       className={inputClass}
                     />
+                    <BlobUploadButton kind="image" subfolder="featured" onUploaded={(url) => updateFeatured(idx, { imageSrc: url })} />
                   </label>
                 </div>
               </li>
@@ -431,6 +480,180 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
             onClick={() => setFeaturedList((prev) => [...prev, emptyFeatured()])}
           >
             + Agregar propiedad
+          </button>
+        </div>
+      ) : null}
+
+      {tab === "catalog" ? (
+        <div className="space-y-6">
+          <p className="text-sm text-brand-muted">
+            Listado de <strong className="text-brand-text">/propiedades</strong> y fichas <strong className="text-brand-text">/propiedades/[slug]</strong>.
+            Slug vacío usa el ID. Podés sumar dirección, descripción e imagen para la ficha.
+          </p>
+          <ul className="space-y-8">
+            {catalog.map((prop, idx) => (
+              <li key={`${prop.id}-${idx}`} className="rounded-sm border border-brand-border bg-brand-bg p-6 shadow-sm">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-heading text-sm font-semibold text-brand-text">Propiedad {idx + 1}</span>
+                  <button
+                    type="button"
+                    className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                    onClick={() => setCatalog((prev) => prev.filter((_, j) => j !== idx))}
+                  >
+                    Quitar
+                  </button>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className={labelClass}>
+                    ID
+                    <input type="text" value={prop.id} onChange={(e) => updateCatalog(idx, { id: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={labelClass}>
+                    Slug URL (opcional)
+                    <input
+                      type="text"
+                      value={prop.slug ?? ""}
+                      onChange={(e) => updateCatalog(idx, { slug: e.target.value || undefined })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Zona
+                    <input type="text" value={prop.zone} onChange={(e) => updateCatalog(idx, { zone: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={labelClass}>
+                    Estado (ficha, opcional)
+                    <input type="text" value={prop.status ?? ""} onChange={(e) => updateCatalog(idx, { status: e.target.value || undefined })} className={inputClass} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Título
+                    <input type="text" value={prop.title} onChange={(e) => updateCatalog(idx, { title: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={labelClass}>
+                    Precio
+                    <input type="text" value={prop.price} onChange={(e) => updateCatalog(idx, { price: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={labelClass}>
+                    Superficie / recámaras (texto)
+                    <input type="text" value={prop.specs} onChange={(e) => updateCatalog(idx, { specs: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Dirección (ficha, opcional)
+                    <textarea rows={2} value={prop.address ?? ""} onChange={(e) => updateCatalog(idx, { address: e.target.value || undefined })} className={inputClass} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Descripción ficha (opcional)
+                    <textarea rows={5} value={prop.description ?? ""} onChange={(e) => updateCatalog(idx, { description: e.target.value || undefined })} className={inputClass} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Imagen (/public/… o URL)
+                    <input
+                      type="text"
+                      value={prop.imageSrc ?? ""}
+                      onChange={(e) => updateCatalog(idx, { imageSrc: e.target.value || undefined })}
+                      className={inputClass}
+                    />
+                    <BlobUploadButton kind="image" subfolder="catalog" onUploaded={(url) => updateCatalog(idx, { imageSrc: url })} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Tour URL (opcional)
+                    <input type="text" value={prop.tourUrl ?? ""} onChange={(e) => updateCatalog(idx, { tourUrl: e.target.value || undefined })} className={inputClass} />
+                  </label>
+                  <label className={labelClass}>
+                    CTA tours (opcional)
+                    <input type="text" value={prop.ctaLabel ?? ""} onChange={(e) => updateCatalog(idx, { ctaLabel: e.target.value || undefined })} className={inputClass} />
+                  </label>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="rounded-sm border border-dashed border-brand-border px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:bg-brand-accent/10"
+            onClick={() => setCatalog((prev) => [...prev, emptyCatalog()])}
+          >
+            + Agregar al catálogo
+          </button>
+        </div>
+      ) : null}
+
+      {tab === "downloadables" ? (
+        <div className="space-y-6">
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className={`${tabBtn} ${downloadLocale === "es" ? tabActive : tabIdle}`} onClick={() => setDownloadLocale("es")}>
+              Español
+            </button>
+            <button type="button" className={`${tabBtn} ${downloadLocale === "en" ? tabActive : tabIdle}`} onClick={() => setDownloadLocale("en")}>
+              English
+            </button>
+          </div>
+          <p className="text-sm text-brand-muted">
+            <strong className="text-brand-text">Subida:</strong> usá &quot;Subir PDF&quot; / &quot;Subir imagen&quot; (Vercel Blob, requiere{" "}
+            <code className="text-xs">BLOB_READ_WRITE_TOKEN</code> en el servidor). También podés pegar una URL o ruta bajo{" "}
+            <code className="text-xs">/public</code>.
+          </p>
+          <ul className="space-y-8">
+            {downloadList.map((item, idx) => (
+              <li key={`${item.id}-${idx}`} className="rounded-sm border border-brand-border bg-brand-bg p-6 shadow-sm">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-heading text-sm font-semibold text-brand-text">Ítem {idx + 1}</span>
+                  <button
+                    type="button"
+                    className="text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                    onClick={() => setDownloadList((prev) => prev.filter((_, j) => j !== idx))}
+                  >
+                    Quitar
+                  </button>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className={labelClass}>
+                    ID (estable)
+                    <input type="text" value={item.id} onChange={(e) => updateDownloadable(idx, { id: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Título
+                    <input type="text" value={item.title} onChange={(e) => updateDownloadable(idx, { title: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Descripción
+                    <textarea rows={3} value={item.description} onChange={(e) => updateDownloadable(idx, { description: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    URL archivo (PDF, etc.)
+                    <input
+                      type="text"
+                      value={item.fileUrl ?? ""}
+                      onChange={(e) => updateDownloadable(idx, { fileUrl: e.target.value || undefined })}
+                      placeholder="/docs/brochure.pdf"
+                      className={inputClass}
+                    />
+                    <BlobUploadButton kind="pdf" subfolder="downloadables" onUploaded={(url) => updateDownloadable(idx, { fileUrl: url })} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Imagen tarjeta (opcional)
+                    <input
+                      type="text"
+                      value={item.imageSrc ?? ""}
+                      onChange={(e) => updateDownloadable(idx, { imageSrc: e.target.value || undefined })}
+                      className={inputClass}
+                    />
+                    <BlobUploadButton
+                      kind="image"
+                      subfolder="downloadables"
+                      label="Subir miniatura"
+                      onUploaded={(url) => updateDownloadable(idx, { imageSrc: url })}
+                    />
+                  </label>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="rounded-sm border border-dashed border-brand-border px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-brand-accent hover:bg-brand-accent/10"
+            onClick={() => setDownloadList((prev) => [...prev, emptyDownloadable()])}
+          >
+            + Agregar descargable
           </button>
         </div>
       ) : null}
@@ -463,7 +686,9 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
             <h2 id="save-confirm-title" className="font-heading text-lg font-semibold text-brand-text">
               ¿Guardar los cambios?
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted">Se actualizarán listas, contacto y avisos por idioma.</p>
+            <p className="mt-2 text-sm leading-relaxed text-brand-muted">
+              Se actualizarán contacto, equipo, destacadas, catálogo, descargables y avisos del hero.
+            </p>
             <div className="mt-6 flex flex-wrap justify-end gap-3">
               <button
                 type="button"

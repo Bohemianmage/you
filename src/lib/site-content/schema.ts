@@ -19,6 +19,29 @@ const teamMemberSchema = z.object({
     .optional(),
 });
 
+const catalogPropertySchema = z.object({
+  id: z.string().min(1),
+  slug: z.string().optional(),
+  title: z.string().min(1),
+  price: z.string().min(1),
+  specs: z.string().min(1),
+  zone: z.string().min(1),
+  address: z.string().optional(),
+  status: z.string().optional(),
+  description: z.string().optional(),
+  imageSrc: z.string().optional(),
+  tourUrl: z.string().optional(),
+  ctaLabel: z.string().optional(),
+});
+
+const downloadableItemSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  fileUrl: z.string().optional(),
+  imageSrc: z.string().optional(),
+});
+
 const featuredPropertySchema = z.object({
   id: z.string().min(1),
   slug: z.string().optional(),
@@ -59,6 +82,13 @@ export const siteContentFileSchema = z
       .object({
         es: z.array(featuredPropertySchema).optional(),
         en: z.array(featuredPropertySchema).optional(),
+      })
+      .optional(),
+    catalogProperties: z.array(catalogPropertySchema).optional(),
+    downloadablesByLocale: z
+      .object({
+        es: z.array(downloadableItemSchema).optional(),
+        en: z.array(downloadableItemSchema).optional(),
       })
       .optional(),
     homeCopyByLocale: z.any().optional(),
@@ -116,6 +146,33 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
     out.featuredByLocale = {
       ...(input.featuredByLocale.es !== undefined ? { es: stripFeatured(input.featuredByLocale.es) } : {}),
       ...(input.featuredByLocale.en !== undefined ? { en: stripFeatured(input.featuredByLocale.en) } : {}),
+    };
+  }
+
+  if (input.catalogProperties !== undefined) {
+    out.catalogProperties = input.catalogProperties.map((p) => ({
+      ...p,
+      slug: p.slug?.trim() || undefined,
+      address: p.address?.trim() || undefined,
+      status: p.status?.trim() || undefined,
+      description: p.description?.trim() || undefined,
+      imageSrc: p.imageSrc?.trim() || undefined,
+      tourUrl: p.tourUrl?.trim() || undefined,
+      ctaLabel: p.ctaLabel?.trim() || undefined,
+    }));
+  }
+
+  if (input.downloadablesByLocale !== undefined) {
+    const stripDl = (arr: NonNullable<SiteContentFile["downloadablesByLocale"]>["es"] | undefined) =>
+      (arr ?? []).map((d) => ({
+        ...d,
+        fileUrl: d.fileUrl?.trim() || undefined,
+        imageSrc: d.imageSrc?.trim() || undefined,
+      }));
+
+    out.downloadablesByLocale = {
+      ...(input.downloadablesByLocale.es !== undefined ? { es: stripDl(input.downloadablesByLocale.es) } : {}),
+      ...(input.downloadablesByLocale.en !== undefined ? { en: stripDl(input.downloadablesByLocale.en) } : {}),
     };
   }
 

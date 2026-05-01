@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { AboutSection } from "@/components/home/AboutSection";
 import { ContactSection } from "@/components/home/ContactSection";
 import { DownloadablesSection } from "@/components/home/DownloadablesSection";
@@ -12,12 +14,12 @@ import { ZonesSection } from "@/components/home/ZonesSection";
 import { EditableSection } from "@/components/admin/editable-section";
 import { useLiveSite } from "@/components/layout/MarketingPageFrame";
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
-import { DOWNLOADABLE_ITEMS_BY_LOCALE } from "@/data/downloadables";
+import type { DownloadableItem } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import { ZONES_BY_LOCALE } from "@/data/zones";
 import { CONTACT_FORM_COPY } from "@/i18n/marketing-pages";
-import { mergeFeaturedFromFile, mergeTeamFromFile } from "@/lib/site-content/merge-public";
+import { mergeDownloadablesFromFile, mergeFeaturedFromFile, mergeTeamFromFile } from "@/lib/site-content/merge-public";
 
 export function HomePageContent({
   catalogHref,
@@ -26,6 +28,7 @@ export function HomePageContent({
   tourEmbed,
   serverTeam,
   serverFeatured,
+  serverDownloadables,
 }: {
   catalogHref: string;
   contactHref: string;
@@ -33,11 +36,13 @@ export function HomePageContent({
   tourEmbed?: string;
   serverTeam: TeamMember[];
   serverFeatured: FeaturedProperty[];
+  serverDownloadables: DownloadableItem[];
 }) {
   const { homeCopy: copy, contact, locale } = useLiveSite();
   const edit = useSiteContentEditOptional();
   const team = edit ? mergeTeamFromFile(edit.working) : serverTeam;
   const featured = edit ? mergeFeaturedFromFile(locale, edit.working) : serverFeatured;
+  const downloadables = edit ? mergeDownloadablesFromFile(locale, edit.working) : serverDownloadables;
 
   return (
     <>
@@ -61,13 +66,23 @@ export function HomePageContent({
       </EditableSection>
 
       <EditableSection sectionId="featured" label="Editar">
-        <FeaturedPropertiesSection
-          locale={locale}
-          copy={copy.featured}
-          properties={featured}
-          catalogHref={catalogHref}
-          contactHref={contactHref}
-        />
+        <>
+          {edit ? (
+            <p className="mx-auto mb-3 max-w-6xl px-4 text-center text-xs text-brand-muted sm:px-6 lg:px-8">
+              <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
+                Imágenes y datos de cada tarjeta
+              </Link>{" "}
+              (panel → Destacadas).
+            </p>
+          ) : null}
+          <FeaturedPropertiesSection
+            locale={locale}
+            copy={copy.featured}
+            properties={featured}
+            catalogHref={catalogHref}
+            contactHref={contactHref}
+          />
+        </>
       </EditableSection>
 
       <EditableSection sectionId="virtualTours" label="Editar">
@@ -83,11 +98,17 @@ export function HomePageContent({
       </EditableSection>
 
       <EditableSection sectionId="downloadables" label="Editar">
-        <DownloadablesSection
-          copy={copy.downloadables}
-          items={DOWNLOADABLE_ITEMS_BY_LOCALE[locale]}
-          contactHref={contactHref}
-        />
+        <>
+          {edit ? (
+            <p className="mx-auto mb-3 max-w-6xl px-4 text-center text-xs text-brand-muted sm:px-6 lg:px-8">
+              <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
+                Archivos PDF e imágenes de tarjetas
+              </Link>{" "}
+              (panel → pestaña Descargables).
+            </p>
+          ) : null}
+          <DownloadablesSection copy={copy.downloadables} items={downloadables} contactHref={contactHref} />
+        </>
       </EditableSection>
 
       <EditableSection sectionId="contact" label="Editar contacto">

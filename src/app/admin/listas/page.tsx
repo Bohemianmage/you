@@ -12,9 +12,9 @@ export default async function AdminListasPage() {
     <div id="admin-listas" className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-4 border-b border-brand-border pb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-heading text-2xl font-semibold text-brand-text">Equipo y destacadas</h1>
+          <h1 className="font-heading text-2xl font-semibold text-brand-text">Listas de contenido</h1>
           <p className="mt-1 text-sm text-brand-muted">
-            Editá listas y datos generales. Los textos del home también podés cambiarlos en el sitio con la barra inferior.
+            Equipo, destacadas del inicio, catálogo de propiedades, descargables y datos generales. Los textos del home también podés editarlos en el sitio con la barra inferior.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">

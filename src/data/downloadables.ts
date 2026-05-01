@@ -5,6 +5,10 @@ export interface DownloadableItem {
   id: string;
   title: string;
   description: string;
+  /** PDF u otro archivo público (`/ruta.pdf` o URL absoluta). */
+  fileUrl?: string;
+  /** Miniatura opcional para la tarjeta. */
+  imageSrc?: string;
 }
 
 const DOWNLOADABLE_ITEMS_ES: readonly DownloadableItem[] = [

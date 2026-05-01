@@ -1,4 +1,8 @@
 import { SITE_CONTACT, type SiteContact } from "@/constants/site-contact";
+import type { CatalogProperty } from "@/data/catalog-properties";
+import { CATALOG_PROPERTIES } from "@/data/catalog-properties";
+import type { DownloadableItem } from "@/data/downloadables";
+import { DOWNLOADABLE_ITEMS_BY_LOCALE } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
 import { FEATURED_PROPERTIES_BY_LOCALE } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
@@ -45,4 +49,38 @@ export function mergeFeaturedFromFile(locale: Locale, file: SiteContentFile): Fe
   const list = file.featuredByLocale?.[locale];
   if (list !== undefined) return [...list];
   return [...FEATURED_PROPERTIES_BY_LOCALE[locale]];
+}
+
+export function mergeCatalogFromFile(file: SiteContentFile): CatalogProperty[] {
+  if (file.catalogProperties !== undefined) return [...file.catalogProperties];
+  return [...CATALOG_PROPERTIES];
+}
+
+export function mergeDownloadablesFromFile(locale: Locale, file: SiteContentFile): DownloadableItem[] {
+  const list = file.downloadablesByLocale?.[locale];
+  if (list !== undefined) return [...list];
+  return [...DOWNLOADABLE_ITEMS_BY_LOCALE[locale]];
+}
+
+/** Adapta un ítem del catálogo al layout de ficha (destacadas + catálogo comparten ruta). */
+export function catalogAsFeaturedDetail(c: CatalogProperty, locale: Locale): FeaturedProperty {
+  const defaultCta = locale === "en" ? "Virtual tours" : "Tours virtuales";
+  const defaultStatus = locale === "en" ? "Available" : "Disponible";
+  const fallbackDesc =
+    locale === "en"
+      ? `${c.specs}. ${c.zone}. Contact us for availability and a private visit.`
+      : `${c.specs}. ${c.zone}. Consultanos por disponibilidad y visita.`;
+
+  return {
+    id: c.id,
+    slug: c.slug,
+    title: c.title,
+    price: c.price,
+    address: c.address?.trim() || c.zone,
+    status: c.status?.trim() || defaultStatus,
+    ctaLabel: c.ctaLabel?.trim() || defaultCta,
+    description: c.description?.trim() || fallbackDesc,
+    imageSrc: c.imageSrc,
+    tourUrl: c.tourUrl,
+  };
 }

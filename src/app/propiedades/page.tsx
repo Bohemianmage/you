@@ -1,10 +1,11 @@
 import Link from "next/link";
 
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
-import { TEXT_LINK_INLINE } from "@/lib/link-styles";
-import { CATALOG_PROPERTIES } from "@/data/catalog-properties";
+import { PropiedadesCatalog } from "@/components/propiedades/PropiedadesCatalog";
 import { localeQuery, resolveLocale } from "@/i18n/home";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
+import { TEXT_LINK_INLINE } from "@/lib/link-styles";
+import { getMergedCatalog } from "@/lib/site-settings/merge";
 import type { Metadata } from "next";
 
 interface PropiedadesPageProps {
@@ -31,6 +32,7 @@ export default async function PropiedadesPage({ searchParams }: PropiedadesPageP
   const q = localeQuery(locale);
   const contactHref = `/contacto${q}`;
   const homeHref = locale === "en" ? "/?lang=en" : "/";
+  const catalog = await getMergedCatalog();
 
   return (
     <MarketingLayout locale={locale}>
@@ -53,26 +55,7 @@ export default async function PropiedadesPage({ searchParams }: PropiedadesPageP
               </Link>
             </div>
           </div>
-          <ul className="grid gap-8 md:grid-cols-2">
-            {CATALOG_PROPERTIES.map((p) => (
-              <li key={p.id}>
-                <article className="flex h-full flex-col rounded-sm border border-brand-border bg-brand-surface p-6 shadow-[0_1px_4px_rgba(0,0,0,0.12)]">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent">{copy.zoneLabel}: {p.zone}</p>
-                  <h2 className="mt-2 font-heading text-xl font-semibold text-brand-text">{p.title}</h2>
-                  <p className="mt-3 font-heading text-2xl font-semibold text-brand-text">{p.price}</p>
-                  <p className="mt-2 text-sm text-brand-muted">
-                    <span className="font-semibold text-brand-text">{copy.specsLabel}:</span> {p.specs}
-                  </p>
-                  <Link
-                    href={contactHref}
-                    className="mt-6 inline-flex w-fit items-center justify-center rounded-sm border border-brand-accent px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-brand-accent transition hover:bg-brand-accent hover:text-brand-white"
-                  >
-                    {copy.contactCta}
-                  </Link>
-                </article>
-              </li>
-            ))}
-          </ul>
+          <PropiedadesCatalog locale={locale} serverCatalog={catalog} copy={copy} contactHref={contactHref} />
         </div>
       </div>
     </MarketingLayout>

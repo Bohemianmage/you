@@ -15,6 +15,8 @@ export interface HomeCopy {
     primaryCta: string;
     secondaryCta: string;
     imageBadge: string;
+    /** Imagen lateral hero (`/public/...` o URL). */
+    imageSrc?: string;
   };
   modal: {
     title: string;
@@ -60,12 +62,16 @@ export interface HomeCopy {
     description: string;
     supportText: string;
     cta: string;
+    /** Ilustración / foto (`/public/...` o URL). */
+    imageSrc?: string;
   };
   downloadables: {
     title: string;
     description: string;
     cta: string;
     requestItemCta: string;
+    /** Botón cuando hay `fileUrl` en el ítem. */
+    downloadFileCta: string;
   };
   footer: {
     tagline: string;
@@ -174,6 +180,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
         "Solicita brochures, fichas técnicas y material comercial. Te lo enviamos personalizado según tu zona y tipo de operación.",
       cta: "Ir al contacto",
       requestItemCta: "Solicitar",
+      downloadFileCta: "Descargar",
     },
     footer: {
       tagline: "Comienza a escribir una nueva historia con nosotros.",
@@ -253,6 +260,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
         "Request brochures, data sheets, and commercial assets tailored to your zone and operation type.",
       cta: "Go to contact",
       requestItemCta: "Request",
+      downloadFileCta: "Download",
     },
     footer: {
       tagline: "Start writing a new story with us.",

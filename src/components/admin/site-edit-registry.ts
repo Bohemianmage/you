@@ -18,6 +18,7 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
       { section: "hero", key: "primaryCta", label: "Botón principal" },
       { section: "hero", key: "secondaryCta", label: "Botón secundario" },
       { section: "hero", key: "imageBadge", label: "Badge imagen" },
+      { section: "hero", key: "imageSrc", label: "Imagen hero (/public/… o URL)" },
       { section: "modal", key: "title", label: "Modal · título" },
       { section: "modal", key: "message", label: "Modal · mensaje", multiline: true },
       { section: "modal", key: "close", label: "Modal · texto cerrar" },
@@ -71,7 +72,8 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
   offices: {
     title: "Oficinas",
     fields: [
-      { section: "offices", key: "imageLabel", label: "Etiqueta imagen" },
+      { section: "offices", key: "imageLabel", label: "Etiqueta imagen (placeholder)" },
+      { section: "offices", key: "imageSrc", label: "Imagen oficinas (/public/… o URL)" },
       { section: "offices", key: "title", label: "Título" },
       { section: "offices", key: "description", label: "Descripción", multiline: true },
       { section: "offices", key: "supportText", label: "Texto apoyo", multiline: true },
@@ -84,7 +86,8 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
       { section: "downloadables", key: "title", label: "Título" },
       { section: "downloadables", key: "description", label: "Descripción", multiline: true },
       { section: "downloadables", key: "cta", label: "CTA principal" },
-      { section: "downloadables", key: "requestItemCta", label: "CTA por ítem" },
+      { section: "downloadables", key: "requestItemCta", label: "CTA por ítem (contacto)" },
+      { section: "downloadables", key: "downloadFileCta", label: "CTA descarga directa" },
     ],
   },
   footer: {

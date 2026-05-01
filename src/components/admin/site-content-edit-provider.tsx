@@ -61,7 +61,7 @@ function SiteAdminToolbar() {
             href="/admin/listas"
             className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
           >
-            Equipo y destacadas
+            Listas y catálogo
           </Link>
           <form action={logoutAdmin}>
             <button

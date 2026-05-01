@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { HeroDevelopmentModal } from "@/components/home/HeroDevelopmentModal";
@@ -58,11 +59,30 @@ export function HeroSection({ copy, modalCopy, catalogHref, contactHref }: HeroS
         </div>
 
         <div className="flex-1">
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-sm border border-brand-border bg-brand-surface shadow-[0_1px_4px_rgba(0,0,0,0.12)]">
-            <div className="flex h-full w-full flex-col justify-end bg-gradient-to-br from-brand-surface via-brand-border/40 to-brand-accent/15 p-6">
-              <p className="font-heading text-lg font-semibold text-brand-text">YOU Soluciones Inmobiliarias</p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand-accent">{copy.imageBadge}</p>
-            </div>
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm border border-brand-border bg-brand-surface shadow-[0_1px_4px_rgba(0,0,0,0.12)]">
+            {copy.imageSrc ? (
+              <>
+                <Image
+                  src={copy.imageSrc}
+                  alt=""
+                  fill
+                  unoptimized={copy.imageSrc.startsWith("http")}
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.45),transparent)]" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <p className="font-heading text-lg font-semibold text-brand-white drop-shadow-sm">YOU Soluciones Inmobiliarias</p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/90">{copy.imageBadge}</p>
+                </div>
+              </>
+            ) : (
+              <div className="flex h-full w-full flex-col justify-end bg-gradient-to-br from-brand-surface via-brand-border/40 to-brand-accent/15 p-6">
+                <p className="font-heading text-lg font-semibold text-brand-text">YOU Soluciones Inmobiliarias</p>
+                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand-accent">{copy.imageBadge}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

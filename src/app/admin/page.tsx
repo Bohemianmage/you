@@ -18,7 +18,7 @@ export default async function AdminDashboardPage() {
         </li>
         <li>
           <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
-            Equipo y propiedades destacadas
+            Listas (equipo, destacadas, catálogo, descargables)
           </Link>
         </li>
       </ul>

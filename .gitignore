@@ -21,6 +21,7 @@
 /build
 
 # misc
+.favicon-tmp/
 .DS_Store
 *.pem
 

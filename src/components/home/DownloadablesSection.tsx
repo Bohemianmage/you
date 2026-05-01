@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import type { DownloadableItem } from "@/data/downloadables";
@@ -32,15 +33,45 @@ export function DownloadablesSection({ copy, items, contactHref }: Downloadables
         <ul className="grid gap-6 sm:grid-cols-2">
           {items.map((item) => (
             <li key={item.id}>
-              <article className="flex h-full flex-col rounded-sm border border-brand-border bg-brand-surface p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-                <h3 className="font-heading text-lg font-semibold text-brand-text">{item.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-brand-muted">{item.description}</p>
-                <Link
-                  href={appendContactParams(contactHref, { topic: "descargables", item: item.id })}
-                  className="mt-4 inline-flex w-fit items-center justify-center rounded-sm bg-brand-accent px-5 py-2 text-xs font-bold uppercase tracking-[0.14em] text-brand-white transition hover:bg-brand-accent-strong"
-                >
-                  {copy.requestItemCta}
-                </Link>
+              <article className="flex h-full flex-col overflow-hidden rounded-sm border border-brand-border bg-brand-surface shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                {item.imageSrc ? (
+                  <div className="relative aspect-[16/9] bg-brand-bg">
+                    <Image
+                      src={item.imageSrc}
+                      alt=""
+                      fill
+                      unoptimized={item.imageSrc.startsWith("http")}
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                    />
+                  </div>
+                ) : null}
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="font-heading text-lg font-semibold text-brand-text">{item.title}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-brand-muted">{item.description}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {item.fileUrl ? (
+                      <a
+                        href={item.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center rounded-sm bg-brand-accent px-5 py-2 text-xs font-bold uppercase tracking-[0.14em] text-brand-white transition hover:bg-brand-accent-strong"
+                      >
+                        {copy.downloadFileCta}
+                      </a>
+                    ) : null}
+                    <Link
+                      href={appendContactParams(contactHref, { topic: "descargables", item: item.id })}
+                      className={`inline-flex items-center justify-center rounded-sm px-5 py-2 text-xs font-bold uppercase tracking-[0.14em] transition ${
+                        item.fileUrl
+                          ? "border border-brand-border text-brand-text hover:border-brand-accent hover:text-brand-accent-strong"
+                          : "bg-brand-accent text-brand-white hover:bg-brand-accent-strong"
+                      }`}
+                    >
+                      {copy.requestItemCta}
+                    </Link>
+                  </div>
+                </div>
               </article>
             </li>
           ))}

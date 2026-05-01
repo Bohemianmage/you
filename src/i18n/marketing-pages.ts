@@ -10,6 +10,7 @@ export const CATALOG_PAGE_COPY: Record<
     specsLabel: string;
     backHome: string;
     contactCta: string;
+    viewListingCta: string;
   }
 > = {
   es: {
@@ -19,6 +20,7 @@ export const CATALOG_PAGE_COPY: Record<
     specsLabel: "Superficie y distribución",
     backHome: "Volver al inicio",
     contactCta: "Platicar con un asesor",
+    viewListingCta: "Ver ficha",
   },
   en: {
     title: "Properties",
@@ -27,6 +29,7 @@ export const CATALOG_PAGE_COPY: Record<
     specsLabel: "Size & layout",
     backHome: "Back to home",
     contactCta: "Talk to an advisor",
+    viewListingCta: "View listing",
   },
 };
 

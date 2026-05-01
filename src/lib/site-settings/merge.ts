@@ -1,6 +1,8 @@
 import "server-only";
 
 import type { SiteContact } from "@/constants/site-contact";
+import type { CatalogProperty } from "@/data/catalog-properties";
+import type { DownloadableItem } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import type { HomeCopy } from "@/i18n/home";
@@ -8,6 +10,9 @@ import { HOME_COPY } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
 import {
+  catalogAsFeaturedDetail,
+  mergeCatalogFromFile,
+  mergeDownloadablesFromFile,
   mergeFeaturedFromFile,
   mergeHomeCopy as mergeHomeCopyFromFile,
   mergeSiteContact as mergeSiteContactFromFile,
@@ -15,7 +20,7 @@ import {
 } from "@/lib/site-content/merge-public";
 import type { SiteContentFile } from "@/lib/site-content/types";
 
-import { findFeaturedPropertyBySegment } from "@/lib/property-routes";
+import { findCatalogPropertyBySegment, findFeaturedPropertyBySegment } from "@/lib/property-routes";
 
 import { getCachedSiteContent } from "./load";
 
@@ -46,9 +51,25 @@ export async function getMergedFeaturedForLocale(locale: Locale): Promise<Featur
   return mergeFeaturedFromFile(locale, file);
 }
 
-export async function getMergedFeaturedPropertyBySlug(locale: Locale, slug: string): Promise<FeaturedProperty | null> {
-  const list = await getMergedFeaturedForLocale(locale);
-  return findFeaturedPropertyBySegment(list, slug) ?? null;
+export async function getMergedCatalog(): Promise<CatalogProperty[]> {
+  const file = await getCachedSiteContent();
+  return mergeCatalogFromFile(file);
+}
+
+export async function getMergedDownloadablesForLocale(locale: Locale): Promise<DownloadableItem[]> {
+  const file = await getCachedSiteContent();
+  return mergeDownloadablesFromFile(locale, file);
+}
+
+/** Ficha interna: primero destacadas por idioma, luego catálogo `/propiedades`. */
+export async function getMergedPropertyDetailBySlug(locale: Locale, slug: string): Promise<FeaturedProperty | null> {
+  const file = await getCachedSiteContent();
+  const featured = mergeFeaturedFromFile(locale, file);
+  const fromFeatured = findFeaturedPropertyBySegment(featured, slug);
+  if (fromFeatured) return fromFeatured;
+  const catalog = mergeCatalogFromFile(file);
+  const cat = findCatalogPropertyBySegment(catalog, slug);
+  return cat ? catalogAsFeaturedDetail(cat, locale) : null;
 }
 
 /** Valores efectivos para el formulario admin (tras aplicar overrides). */
@@ -73,10 +94,13 @@ export async function getAdminFormSeed(): Promise<{
 export async function getAdminEditorSeed(): Promise<AdminEditorSeed> {
   const base = await getAdminFormSeed();
   const file = await getCachedSiteContent();
-  const [team, featuredEs, featuredEn] = [
+  const [team, featuredEs, featuredEn, catalog, downloadablesEs, downloadablesEn] = [
     mergeTeamFromFile(file),
     mergeFeaturedFromFile("es", file),
     mergeFeaturedFromFile("en", file),
+    mergeCatalogFromFile(file),
+    mergeDownloadablesFromFile("es", file),
+    mergeDownloadablesFromFile("en", file),
   ];
-  return { ...base, team, featuredEs, featuredEn };
+  return { ...base, team, featuredEs, featuredEn, catalog, downloadablesEs, downloadablesEn };
 }

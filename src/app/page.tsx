@@ -1,9 +1,12 @@
 import { HomePageContent } from "@/components/home/HomePageContent";
 import { MarketingPageFrame } from "@/components/layout/MarketingPageFrame";
-import { DOWNLOADABLE_ITEMS_BY_LOCALE } from "@/data/downloadables";
-import { ZONES_BY_LOCALE } from "@/data/zones";
-import { localeQuery, marketingNav, resolveLocale } from "@/i18n/home";
-import { getMergedFeaturedForLocale, getMergedSiteContext, getMergedTeamMembers } from "@/lib/site-settings/merge";
+import { localeQuery, resolveLocale } from "@/i18n/home";
+import {
+  getMergedDownloadablesForLocale,
+  getMergedFeaturedForLocale,
+  getMergedSiteContext,
+  getMergedTeamMembers,
+} from "@/lib/site-settings/merge";
 
 interface HomePageProps {
   searchParams?: Promise<{ lang?: string }>;
@@ -15,10 +18,11 @@ interface HomePageProps {
 export default async function Home({ searchParams }: HomePageProps) {
   const params = searchParams ? await searchParams : undefined;
   const locale = resolveLocale(params?.lang);
-  const [{ homeCopy: copy, contact }, teamMembers, featuredProperties] = await Promise.all([
+  const [{ homeCopy: copy, contact }, teamMembers, featuredProperties, downloadables] = await Promise.all([
     getMergedSiteContext(locale),
     getMergedTeamMembers(),
     getMergedFeaturedForLocale(locale),
+    getMergedDownloadablesForLocale(locale),
   ]);
   const q = localeQuery(locale);
   const catalogHref = `/propiedades${q}`;
@@ -35,6 +39,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         tourEmbed={tourEmbed}
         serverTeam={teamMembers}
         serverFeatured={featuredProperties}
+        serverDownloadables={downloadables}
       />
     </MarketingPageFrame>
   );

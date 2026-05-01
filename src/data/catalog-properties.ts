@@ -1,10 +1,18 @@
-/** Catálogo de referencia para `/propiedades` (deduplicado). */
+/** Catálogo para `/propiedades` y fichas `/propiedades/[slug]` (persistible en JSON). */
 export interface CatalogProperty {
   id: string;
+  /** Segmento de URL; por defecto `id`. */
+  slug?: string;
   title: string;
   price: string;
   specs: string;
   zone: string;
+  address?: string;
+  status?: string;
+  description?: string;
+  imageSrc?: string;
+  tourUrl?: string;
+  ctaLabel?: string;
 }
 
 export const CATALOG_PROPERTIES: readonly CatalogProperty[] = [

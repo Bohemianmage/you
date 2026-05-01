@@ -7,7 +7,7 @@ import { PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
 import { homePath, localeQuery, resolveLocale } from "@/i18n/home";
 import { appendContactParams } from "@/lib/contact-url";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
-import { getMergedFeaturedPropertyBySlug } from "@/lib/site-settings/merge";
+import { getMergedPropertyDetailBySlug } from "@/lib/site-settings/merge";
 import type { Metadata } from "next";
 
 interface PropertyDetailPageProps {
@@ -18,7 +18,7 @@ interface PropertyDetailPageProps {
 export async function generateMetadata({ params, searchParams }: PropertyDetailPageProps): Promise<Metadata> {
   const [{ slug }, sp] = await Promise.all([params, searchParams ?? Promise.resolve(undefined)]);
   const locale = resolveLocale(sp?.lang);
-  const prop = await getMergedFeaturedPropertyBySlug(locale, slug);
+  const prop = await getMergedPropertyDetailBySlug(locale, slug);
   if (!prop) {
     return { title: locale === "en" ? "Listing" : "Propiedad" };
   }
@@ -31,7 +31,7 @@ export async function generateMetadata({ params, searchParams }: PropertyDetailP
 export default async function PropertyDetailPage({ params, searchParams }: PropertyDetailPageProps) {
   const [{ slug }, sp] = await Promise.all([params, searchParams ?? Promise.resolve(undefined)]);
   const locale = resolveLocale(sp?.lang);
-  const property = await getMergedFeaturedPropertyBySlug(locale, slug);
+  const property = await getMergedPropertyDetailBySlug(locale, slug);
   if (!property) notFound();
 
   const q = localeQuery(locale);
