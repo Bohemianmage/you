@@ -26,6 +26,11 @@ export default async function AdminDashboardPage() {
             Analíticas (visitas, fichas, mapa de calor)
           </Link>
         </li>
+        <li>
+          <Link href="/admin/calendario" className="font-semibold text-brand-accent no-underline hover:underline">
+            Calendario de citas (visitas agendadas)
+          </Link>
+        </li>
       </ul>
       <form action={logoutAdmin} className="mt-10">
         <button

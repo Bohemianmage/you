@@ -35,4 +35,9 @@ export type SiteContentFile = SiteSettingsPayload & {
   downloadablesByLocale?: Partial<Record<Locale, DownloadableItem[]>>;
   /** Textos del home por idioma (se fusionan sobre `HOME_COPY`). */
   homeCopyByLocale?: Partial<Record<Locale, DeepPartial<HomeCopy>>>;
+  /**
+   * ID de catálogo EasyBroker → ID de miembro del equipo (asesor) para citas y recordatorios.
+   * Solo propiedades con entrada aquí ofrecen agenda en ficha.
+   */
+  propertyAdvisorByCatalogId?: Record<string, string>;
 };

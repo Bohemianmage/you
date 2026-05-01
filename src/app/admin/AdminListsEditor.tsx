@@ -12,7 +12,7 @@ import type { TeamMember } from "@/data/team";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
 import type { SiteContentFile } from "@/lib/site-content/types";
 
-type TabId = "team" | "featured" | "downloadables";
+type TabId = "team" | "featured" | "downloadables" | "advisors";
 
 function newTeamId(): string {
   return `member-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -55,6 +55,17 @@ function normalizeFeaturedIds(ids: readonly string[], catalog: readonly CatalogP
   return out;
 }
 
+function normalizeAdvisorMap(map: Record<string, string>, catalog: readonly CatalogProperty[]): Record<string, string> {
+  const catalogIds = new Set(catalog.map((c) => c.id));
+  const out: Record<string, string> = {};
+  for (const [catalogId, advisorId] of Object.entries(map)) {
+    const a = advisorId?.trim();
+    if (!catalogIds.has(catalogId) || !a) continue;
+    out[catalogId] = a;
+  }
+  return out;
+}
+
 const tabBtn =
   "rounded-sm border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition-all duration-200 ease-out motion-reduce:transition-none";
 const tabActive = "border-brand-accent bg-brand-accent/15 text-brand-accent-strong";
@@ -89,6 +100,9 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
   const [dragFeaturedIdx, setDragFeaturedIdx] = useState<number | null>(null);
   const [dragDlIdx, setDragDlIdx] = useState<number | null>(null);
 
+  const [advisorMap, setAdvisorMap] = useState<Record<string, string>>(() => ({ ...seed.propertyAdvisorByCatalogId }));
+  const [advisorSearch, setAdvisorSearch] = useState("");
+
   const [expandedRows, setExpandedRows] = useState<Set<string>>(() => new Set());
   const toggleRow = useCallback((key: string) => {
     setExpandedRows((prev) => {
@@ -106,10 +120,12 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
       return;
     }
     const normalizedFeatured = normalizeFeaturedIds(featuredCatalogIds, catalog);
+    const normalizedAdvisors = normalizeAdvisorMap(advisorMap, catalog);
     const sig = JSON.stringify({
       team,
       featuredCatalogIds: normalizedFeatured,
       downloadablesByLocale: { es: downloadablesEs, en: downloadablesEn },
+      propertyAdvisorByCatalogId: normalizedAdvisors,
     });
     if (baselineSigRef.current === null) {
       baselineSigRef.current = sig;
@@ -124,10 +140,15 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
         downloadablesByLocale: { es: downloadablesEs, en: downloadablesEn },
       };
       delete next.featuredByLocale;
+      if (Object.keys(normalizedAdvisors).length > 0) {
+        next.propertyAdvisorByCatalogId = normalizedAdvisors;
+      } else {
+        delete next.propertyAdvisorByCatalogId;
+      }
       return next;
     });
     baselineSigRef.current = sig;
-  }, [edit, team, featuredCatalogIds, catalog, downloadablesEs, downloadablesEn]);
+  }, [edit, team, featuredCatalogIds, catalog, downloadablesEs, downloadablesEn, advisorMap]);
 
   function updateTeam(i: number, patch: Partial<TeamMember>) {
     setTeam((prev) => prev.map((m, j) => (j === i ? { ...m, ...patch } : m)));
@@ -161,6 +182,17 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
     [catalog, featuredCatalogIds],
   );
 
+  const advisorCatalogRows = useMemo(() => {
+    const q = advisorSearch.trim().toLowerCase();
+    return catalog
+      .filter((c) => c.active !== false)
+      .filter((c) => {
+        if (!q) return true;
+        return c.title.toLowerCase().includes(q) || c.id.toLowerCase().includes(q);
+      })
+      .sort((a, b) => a.title.localeCompare(b.title, "es"));
+  }, [catalog, advisorSearch]);
+
   return (
     <div className="mt-10 space-y-8">
       {edit?.saveError ? (
@@ -176,6 +208,9 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
         </button>
         <button type="button" className={`${tabBtn} ${tab === "downloadables" ? tabActive : tabIdle}`} onClick={() => setTab("downloadables")}>
           Descargables
+        </button>
+        <button type="button" className={`${tabBtn} ${tab === "advisors" ? tabActive : tabIdle}`} onClick={() => setTab("advisors")}>
+          Asesores en propiedades
         </button>
       </div>
 
@@ -430,6 +465,55 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
               )}
             </ul>
           </div>
+        </div>
+      ) : null}
+
+      {tab === "advisors" ? (
+        <div className="space-y-6">
+          <p className="text-sm text-brand-muted">
+            Asigna un miembro del <strong className="text-brand-text">Equipo</strong> a cada propiedad del catálogo EasyBroker para activar la agenda en la ficha
+            y el envío de correos al asesor (necesita <strong className="text-brand-text">correo</strong> en su ficha).
+          </p>
+          <label className={labelClass}>
+            Buscar en catálogo
+            <input
+              type="search"
+              value={advisorSearch}
+              onChange={(e) => setAdvisorSearch(e.target.value)}
+              placeholder="Título o ID…"
+              className={inputClass}
+            />
+          </label>
+          <ul className="max-h-[min(560px,70vh)] space-y-2 overflow-y-auto pr-1">
+            {advisorCatalogRows.map((c) => (
+              <li key={c.id} className="flex flex-wrap items-center gap-3 rounded-sm border border-brand-border/80 bg-brand-surface/40 px-3 py-2">
+                <span className="min-w-0 flex-1 text-sm font-medium text-brand-text">
+                  <span className="line-clamp-2">{c.title}</span>
+                  <span className="mt-0.5 block truncate text-[11px] text-brand-muted">{c.id}</span>
+                </span>
+                <select
+                  value={advisorMap[c.id] ?? ""}
+                  onChange={(e) => {
+                    const v = e.target.value.trim();
+                    setAdvisorMap((prev) => {
+                      const next = { ...prev };
+                      if (!v) delete next[c.id];
+                      else next[c.id] = v;
+                      return next;
+                    });
+                  }}
+                  className="min-w-[200px] rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text outline-none focus:border-brand-accent"
+                >
+                  <option value="">Sin asignar</option>
+                  {team.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name.trim() || m.id}
+                    </option>
+                  ))}
+                </select>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
 

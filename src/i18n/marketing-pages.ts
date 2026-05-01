@@ -7,7 +7,6 @@ export const CATALOG_PAGE_COPY: Record<
     title: string;
     subtitle: string;
     zoneLabel: string;
-    filterZoneHint: string;
     filterFeaturesLabel: string;
     filterFeaturesHint: string;
     mapHeading: string;
@@ -40,10 +39,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterCurrencyMXN: string;
     filterCurrencyUSD: string;
     filterApply: string;
-    /** Texto bajo filtros cuando se aplican en vivo (sin botón «Aplicar»). */
-    filterLiveHint: string;
     filterReset: string;
-    filterPriceNote: string;
     filtersDetailSubtitle: string;
     /** Tras el número en el chip (ej. «3 filtros activos» / «1 filtro activo»). */
     filterActivePlural: string;
@@ -52,7 +48,6 @@ export const CATALOG_PAGE_COPY: Record<
     filterGroupSize: string;
     filterGroupLayout: string;
     filterGroupPrice: string;
-    filterListingTypeHint: string;
     /** Detalle opcional (m², recámaras, precio…) dentro del panel de filtros. */
     filterMoreOptionsHeading: string;
     /** Sin filtros de listado: "{{count}}" */
@@ -67,7 +62,6 @@ export const CATALOG_PAGE_COPY: Record<
     title: "Propiedades",
     subtitle: "Portafolio disponible y referencias en zonas premium de CDMX.",
     zoneLabel: "Zona",
-    filterZoneHint: "Colonias y tramos según el catálogo en vivo. Si no aparece una zona, aún no hay propiedades publicadas ahí.",
     filterFeaturesLabel: "Características",
     filterFeaturesHint: "La propiedad debe incluir todas las características marcadas.",
     mapHeading: "Mapa",
@@ -99,9 +93,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterCurrencyMXN: "MXN",
     filterCurrencyUSD: "USD",
     filterApply: "Aplicar filtros",
-    filterLiveHint: "Los resultados se actualizan al instante al cambiar los filtros.",
     filterReset: "Limpiar todo",
-    filterPriceNote: "El filtro por precio usa la moneda indicada y los datos numéricos de cada propiedad.",
     filtersDetailSubtitle: "",
     filterActivePlural: "filtros activos",
     filterActiveSingular: "filtro activo",
@@ -109,7 +101,6 @@ export const CATALOG_PAGE_COPY: Record<
     filterGroupSize: "Superficie",
     filterGroupLayout: "Recámaras y baños",
     filterGroupPrice: "Precio",
-    filterListingTypeHint: "Todas las operaciones, solo renta o solo venta.",
     filterMoreOptionsHeading: "Más opciones",
     catalogCountAll: "{{count}} propiedades",
     catalogCountFiltered: "{{shown}} de {{total}} propiedades",
@@ -120,7 +111,6 @@ export const CATALOG_PAGE_COPY: Record<
     title: "Properties",
     subtitle: "Available portfolio and references in Mexico City premium corridors.",
     zoneLabel: "Area",
-    filterZoneHint: "Neighborhoods and corridors from the live catalog. If an area is missing, there are no published listings there yet.",
     filterFeaturesLabel: "Features",
     filterFeaturesHint: "The listing must include every feature you select.",
     mapHeading: "Map",
@@ -152,9 +142,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterCurrencyMXN: "MXN",
     filterCurrencyUSD: "USD",
     filterApply: "Apply filters",
-    filterLiveHint: "Results update instantly as you change filters.",
     filterReset: "Clear all",
-    filterPriceNote: "Price filtering uses the selected currency and each listing’s numeric amount.",
     filtersDetailSubtitle: "",
     filterActivePlural: "active filters",
     filterActiveSingular: "active filter",
@@ -162,7 +150,6 @@ export const CATALOG_PAGE_COPY: Record<
     filterGroupSize: "Floor area",
     filterGroupLayout: "Beds & baths",
     filterGroupPrice: "Price",
-    filterListingTypeHint: "All listings, rentals only, or sales only.",
     filterMoreOptionsHeading: "More options",
     catalogCountAll: "{{count}} listings",
     catalogCountFiltered: "{{shown}} of {{total}} listings",
@@ -218,6 +205,23 @@ export const PROPERTY_DETAIL_COPY: Record<
     brochureCta: string;
     officeHeading: string;
     contactFormCta: string;
+    bookingSectionTitle: string;
+    bookingSectionHint: string;
+    bookingPickSlot: string;
+    bookingNameLabel: string;
+    bookingEmailLabel: string;
+    bookingPhoneLabel: string;
+    bookingSubmit: string;
+    bookingWorking: string;
+    bookingConfirmed: string;
+    bookingErrValidation: string;
+    bookingErrConflict: string;
+    bookingErrServer: string;
+    bookingUnavailableNoAdvisor: string;
+    bookingUnavailableNoRedis: string;
+    bookingUnavailableAdvisorEmail: string;
+    bookingUnavailableNoSlots: string;
+    bookingTimezoneNote: string;
   }
 > = {
   es: {
@@ -265,6 +269,26 @@ export const PROPERTY_DETAIL_COPY: Record<
     brochureCta: "Descargar folleto",
     officeHeading: "Oficina YOU",
     contactFormCta: "Formulario de contacto",
+    bookingSectionTitle: "Agendar visita",
+    bookingSectionHint:
+      "Elige un horario disponible (hora Ciudad de México). Tu asesor asignado recibirá la solicitud y un recordatorio por correo.",
+    bookingPickSlot: "Horarios disponibles",
+    bookingNameLabel: "Nombre completo",
+    bookingEmailLabel: "Correo electrónico",
+    bookingPhoneLabel: "Teléfono (opcional)",
+    bookingSubmit: "Confirmar cita",
+    bookingWorking: "Agendando…",
+    bookingConfirmed: "Listo — revisa tu correo para la confirmación.",
+    bookingErrValidation: "Revisa nombre y correo.",
+    bookingErrConflict: "Ese horario ya no está disponible. Elige otro.",
+    bookingErrServer: "No se pudo agendar. Intenta más tarde o escríbenos por WhatsApp.",
+    bookingUnavailableNoAdvisor:
+      "La agenda en línea no está activa para esta propiedad. Escríbenos por WhatsApp o el formulario de contacto.",
+    bookingUnavailableNoRedis: "La agenda no está disponible temporalmente. Usa WhatsApp o el formulario.",
+    bookingUnavailableAdvisorEmail:
+      "Falta correo del asesor en admin (Equipo). Mientras tanto, contáctanos por WhatsApp.",
+    bookingUnavailableNoSlots: "No hay horarios libres en las próximas semanas. Escríbenos para coordinar.",
+    bookingTimezoneNote: "Horarios en hora de Ciudad de México.",
   },
   en: {
     interestCta: "I’m interested",
@@ -311,6 +335,26 @@ export const PROPERTY_DETAIL_COPY: Record<
     brochureCta: "Download brochure",
     officeHeading: "YOU office",
     contactFormCta: "Contact form",
+    bookingSectionTitle: "Schedule a visit",
+    bookingSectionHint:
+      "Pick an available time (Mexico City time). Your assigned advisor will be notified by email with a reminder before the visit.",
+    bookingPickSlot: "Available times",
+    bookingNameLabel: "Full name",
+    bookingEmailLabel: "Email",
+    bookingPhoneLabel: "Phone (optional)",
+    bookingSubmit: "Confirm appointment",
+    bookingWorking: "Booking…",
+    bookingConfirmed: "You’re set — check your inbox for confirmation.",
+    bookingErrValidation: "Please check your name and email.",
+    bookingErrConflict: "That time was just taken. Please pick another slot.",
+    bookingErrServer: "We couldn’t complete booking. Try again later or message us on WhatsApp.",
+    bookingUnavailableNoAdvisor:
+      "Online scheduling isn’t enabled for this listing yet. Reach out via WhatsApp or the contact form.",
+    bookingUnavailableNoRedis: "Scheduling is temporarily unavailable. Use WhatsApp or the contact form.",
+    bookingUnavailableAdvisorEmail:
+      "The advisor email isn’t configured yet in admin (Team). Please use WhatsApp for now.",
+    bookingUnavailableNoSlots: "No open slots in the coming weeks. Contact us to coordinate.",
+    bookingTimezoneNote: "Times are shown in Mexico City time.",
   },
 };
 

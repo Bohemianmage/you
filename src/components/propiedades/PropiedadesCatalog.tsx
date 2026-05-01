@@ -218,7 +218,6 @@ export function PropiedadesCatalog({
                   </select>
                   <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
                 </div>
-                <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterListingTypeHint}</p>
               </div>
               <div className="min-w-0 space-y-2">
                 <label htmlFor="filter-zone" className={fieldLabel}>
@@ -246,7 +245,6 @@ export function PropiedadesCatalog({
                   </select>
                   <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
                 </div>
-                <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterZoneHint}</p>
               </div>
             </div>
 
@@ -435,7 +433,6 @@ export function PropiedadesCatalog({
                     />
                   </div>
                 </div>
-                <p className="text-[11px] leading-relaxed text-brand-subtle">{copy.filterPriceNote}</p>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
                   <div className="lg:col-span-1">
                     <label htmlFor="filter-preciomin" className={fieldLabel}>
@@ -513,11 +510,10 @@ export function PropiedadesCatalog({
               ) : null}
             </div>
 
-            <div className="flex flex-col gap-3 border-t border-brand-border/45 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-              <p className="text-xs leading-relaxed text-brand-muted">{copy.filterLiveHint}</p>
+            <div className="flex justify-end border-t border-brand-border/45 pt-4">
               <Link
                 href={catalogPageHref(locale, {})}
-                className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-full border border-brand-border/90 bg-transparent px-6 text-sm font-semibold text-brand-muted transition hover:border-brand-accent/50 hover:bg-brand-surface/80 hover:text-brand-text sm:flex-none sm:flex-initial"
+                className="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-brand-border/90 bg-transparent px-6 text-sm font-semibold text-brand-muted transition hover:border-brand-accent/50 hover:bg-brand-surface/80 hover:text-brand-text"
               >
                 {copy.filterReset}
               </Link>

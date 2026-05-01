@@ -7,6 +7,8 @@ export type AdminEditorSeed = {
   team: TeamMember[];
   /** Orden de IDs del catálogo en la franja de destacados del inicio. */
   featuredCatalogIds: string[];
+  /** ID catálogo EB → ID persona equipo (citas). */
+  propertyAdvisorByCatalogId: Record<string, string>;
   catalog: CatalogProperty[];
   downloadablesEs: DownloadableItem[];
   downloadablesEn: DownloadableItem[];

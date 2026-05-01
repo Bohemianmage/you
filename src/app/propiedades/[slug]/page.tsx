@@ -6,6 +6,7 @@ import { withYouWordmark } from "@/components/brand/you-wordmark";
 import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import { PropertyImageGallery } from "@/components/propiedades/PropertyImageGallery";
+import { PropertyVisitBooking } from "@/components/propiedades/PropertyVisitBooking";
 import {
   CATALOG_PAGE_COPY,
   PROPERTY_DETAIL_COPY,
@@ -20,6 +21,7 @@ import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import { propertyGalleryImages } from "@/lib/property-media";
 import { publicSiteBaseUrl } from "@/lib/public-site-url";
 import { buildPropertyWhatsAppUrl } from "@/lib/property-whatsapp";
+import { featuredPropertySegment } from "@/lib/property-routes";
 import { getMergedPropertyDetailBySlug, getMergedSiteContact } from "@/lib/site-settings/merge";
 import type { FeaturedProperty } from "@/data/properties";
 import type { Metadata } from "next";
@@ -328,6 +330,13 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
               </p>
             ))}
           </div>
+
+          <PropertyVisitBooking
+            locale={locale}
+            catalogId={property.id}
+            segment={featuredPropertySegment(property)}
+            copy={copy}
+          />
 
           <div className="flex flex-wrap gap-3">
             <a

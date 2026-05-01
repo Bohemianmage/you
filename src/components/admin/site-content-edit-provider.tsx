@@ -106,6 +106,12 @@ function SiteAdminToolbar({
             >
               Analíticas
             </Link>
+            <Link
+              href="/admin/calendario"
+              className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
+            >
+              Calendario
+            </Link>
             <form action={logoutAdmin}>
               <button
                 type="submit"

@@ -138,6 +138,7 @@ export const siteContentFileSchema = z
       })
       .optional(),
     homeCopyByLocale: z.any().optional(),
+    propertyAdvisorByCatalogId: z.record(z.string(), z.string()).optional(),
   })
   .strict();
 
@@ -267,6 +268,13 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
     if (compact && typeof compact === "object" && Object.keys(compact as object).length > 0) {
       out.homeCopyByLocale = compact as SiteContentFile["homeCopyByLocale"];
     }
+  }
+
+  if (input.propertyAdvisorByCatalogId !== undefined) {
+    const entries = Object.entries(input.propertyAdvisorByCatalogId).filter(
+      ([k, v]) => k.trim().length > 0 && typeof v === "string" && v.trim().length > 0,
+    );
+    if (entries.length) out.propertyAdvisorByCatalogId = Object.fromEntries(entries);
   }
 
   return out;
