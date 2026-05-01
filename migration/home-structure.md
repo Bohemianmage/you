@@ -1,14 +1,11 @@
 # Home Structure - YOU Soluciones Inmobiliarias
 
-## Source
-
-Wix URL: https://eberumenalonso.wixsite.com/my-site
-Production domain: https://yousoluciones.com/
+Referencia de contenido para la página de inicio (Next.js). Dominio de producción: https://yousoluciones.com/
 
 ## 1. Header
 
 ### Content
-Logo: LOGO YOU.png
+Logo: `/public/logo-you.svg`
 
 ### Navigation links
 - Nosotros
@@ -22,8 +19,7 @@ Logo: LOGO YOU.png
 - Instagram
 
 ### Notes
-- Header includes logo, navigation and social icons.
-- Current Wix page includes Wix promotional banner.
+- Header incluye logo, navegación e iconos sociales.
 
 ## 2. Top Announcement
 
@@ -43,7 +39,7 @@ SERVICIO PROFESIONAL INMOBILIARIO
 CON SENTIDO HUMANO
 
 ### Assets
-Main image: pending extraction from Wix
+Imagen hero: definir en diseño / `/public`.
 
 ### Notes
 - Main positioning combines English slogan with Spanish real estate service message.
@@ -102,8 +98,7 @@ Status: En Renta
 CTA: Tours Virtuales
 
 ### Notes
-- Featured properties should probably become dynamic later.
-- For first reconstruction, they can be hardcoded.
+- Las destacadas son editables vía JSON de sitio y `/admin/listas`.
 
 ## 6. Virtual Tours Section
 
@@ -112,7 +107,7 @@ Title: Descubre Nuestras Experiencias 3D
 CTA: Tours Virtuales
 
 ### Assets
-Image: pending extraction from Wix
+Imagen / embed: configurar en env o CMS.
 
 ## 7. Property Owner CTA Section
 
@@ -133,7 +128,7 @@ Tenemos presencia en las mas solicitadas zonas corporativas de la Ciudad.
 CTA: Busquemos tu nueva oficina
 
 ### Assets
-Image: pending extraction from Wix
+Ilustración / foto: `/public` o diseño.
 
 ## 9. Footer
 

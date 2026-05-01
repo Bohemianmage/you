@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
 /**
- * Theme tokens validated from inline `:root` color/font definitions in the Wix viewer
- * snapshot for eberumenalonso.wixsite.com (color_11–15, accent rgb(97,110,137), etc.).
+ * Tokens de marca YOU: superficie clara, texto carbón, acento pizarra rgb(97, 110, 137).
  */
 :root {
   --background: #ffffff;

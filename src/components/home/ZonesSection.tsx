@@ -6,7 +6,7 @@ interface ZonesSectionProps {
 }
 
 /**
- * Zones strip — Wix uses bold headings + neutral section rhythm on white / light gray.
+ * Franja de zonas — titulares en negrita y ritmo neutro claro / gris suave.
  */
 export function ZonesSection({ title, zones }: ZonesSectionProps) {
   return (

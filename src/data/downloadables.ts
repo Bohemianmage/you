@@ -1,6 +1,6 @@
 import type { Locale } from "@/i18n/types";
 
-/** Commercial collateral offered on request (legacy Wix “Descargables”). */
+/** Material comercial bajo solicitud (descargables / brochures). */
 export interface DownloadableItem {
   id: string;
   title: string;

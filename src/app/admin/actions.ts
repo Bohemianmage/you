@@ -21,7 +21,7 @@ export async function loginAdmin(formData: FormData) {
     path: "/",
     maxAge: 60 * 60 * 8,
   });
-  redirect("/admin");
+  redirect("/");
 }
 
 export async function logoutAdmin() {

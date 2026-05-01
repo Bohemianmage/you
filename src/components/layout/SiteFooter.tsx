@@ -11,7 +11,7 @@ interface SiteFooterProps {
 }
 
 /**
- * Footer matches Wix SITE_FOOTER: white background (#color_11), dark border/text (#color_15).
+ * Pie — fondo claro, borde y texto carbón (`--brand-bg` / `--brand-text`).
  */
 export function SiteFooter({ navItems, footerCopy, contact }: SiteFooterProps) {
   return (

@@ -16,7 +16,7 @@ export interface TeamMember {
 }
 
 /**
- * Roster from legacy Wix “Nuestro equipo” (about-1). Social URLs can be filled when confirmed.
+ * Equipo inicial; las URLs sociales se pueden completar cuando estén confirmadas.
  */
 export const TEAM_MEMBERS: readonly TeamMember[] = [
   {

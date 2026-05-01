@@ -101,7 +101,7 @@ function TeamMemberCard({ member, locale }: { member: TeamMember; locale: Locale
 }
 
 /**
- * Nosotros — contenido alineado con Wix about-1 (misión, historia, equipo, clientes + contacto).
+ * Nosotros — misión, historia, equipo, clientes y bloque de contacto.
  */
 export function AboutSection({ locale, copy, footerCopy, contact, contactHref, teamMembers }: AboutSectionProps) {
   return (

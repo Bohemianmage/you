@@ -10,7 +10,7 @@ interface VirtualToursSectionProps {
 }
 
 /**
- * 3D tours block — same typography scale as Wix small caps headings (`font_6`-style treatment).
+ * Tours 3D — titular en versalitas / tracking amplio.
  */
 export function VirtualToursSection({ copy, contactHref, embedUrl }: VirtualToursSectionProps) {
   return (

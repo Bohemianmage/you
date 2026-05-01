@@ -11,7 +11,7 @@ interface DownloadablesSectionProps {
 }
 
 /**
- * Descargables — fichas comerciales solicitadas por contacto (paridad con Wix).
+ * Descargables — fichas comerciales solicitadas vía contacto.
  */
 export function DownloadablesSection({ copy, items, contactHref }: DownloadablesSectionProps) {
   return (

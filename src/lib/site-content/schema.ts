@@ -21,11 +21,13 @@ const teamMemberSchema = z.object({
 
 const featuredPropertySchema = z.object({
   id: z.string().min(1),
+  slug: z.string().optional(),
   title: z.string().min(1),
   price: z.string().min(1),
   address: z.string().min(1),
   status: z.string().min(1),
   ctaLabel: z.string().min(1),
+  description: z.string().optional(),
   tourUrl: z.string().optional(),
   imageSrc: z.string().optional(),
 });
@@ -59,6 +61,7 @@ export const siteContentFileSchema = z
         en: z.array(featuredPropertySchema).optional(),
       })
       .optional(),
+    homeCopyByLocale: z.any().optional(),
   })
   .strict();
 
@@ -104,6 +107,8 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
     const stripFeatured = (arr: NonNullable<SiteContentFile["featuredByLocale"]>["es"] | undefined) =>
       (arr ?? []).map((p) => ({
         ...p,
+        slug: p.slug?.trim() || undefined,
+        description: p.description?.trim() || undefined,
         tourUrl: p.tourUrl?.trim() || undefined,
         imageSrc: p.imageSrc?.trim() || undefined,
       }));
@@ -112,6 +117,13 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
       ...(input.featuredByLocale.es !== undefined ? { es: stripFeatured(input.featuredByLocale.es) } : {}),
       ...(input.featuredByLocale.en !== undefined ? { en: stripFeatured(input.featuredByLocale.en) } : {}),
     };
+  }
+
+  if (input.homeCopyByLocale != null && typeof input.homeCopyByLocale === "object") {
+    const compact = JSON.parse(JSON.stringify(input.homeCopyByLocale)) as unknown;
+    if (compact && typeof compact === "object" && Object.keys(compact as object).length > 0) {
+      out.homeCopyByLocale = compact as SiteContentFile["homeCopyByLocale"];
+    }
   }
 
   return out;

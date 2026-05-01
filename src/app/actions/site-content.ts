@@ -11,7 +11,21 @@ import { parseSiteContentFile } from "@/lib/site-content/schema";
 import type { SiteContentFile } from "@/lib/site-content/types";
 import { ZodError } from "zod";
 
-async function requireAdminSession() {
+export type SaveSiteContentError =
+  | "invalid_json"
+  | "validation"
+  | "write_failed"
+  | "github_unauthorized"
+  | "github_forbidden"
+  | "github_not_found"
+  | "github_conflict"
+  | "github_validation"
+  | "github_rate_limit"
+  | "github_unknown";
+
+export type SaveSiteContentResult = { ok: true } | { ok: false; error: SaveSiteContentError };
+
+async function requireAdminSessionOrRedirect() {
   const token = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
   if (!token || !(await verifyAdminToken(token))) redirect("/admin/login");
 }
@@ -20,14 +34,14 @@ function editorJsonToFile(raw: unknown): SiteContentFile {
   return parseSiteContentFile(raw);
 }
 
-export async function saveSiteContent(json: string) {
-  await requireAdminSession();
+export async function saveSiteContent(json: string): Promise<SaveSiteContentResult> {
+  await requireAdminSessionOrRedirect();
 
   let parsed: unknown;
   try {
     parsed = JSON.parse(json) as unknown;
   } catch {
-    redirect("/admin?error=invalid_json");
+    return { ok: false, error: "invalid_json" };
   }
 
   let file: SiteContentFile;
@@ -36,7 +50,7 @@ export async function saveSiteContent(json: string) {
   } catch (e) {
     if (e instanceof ZodError) {
       console.error("[site-content]", e.flatten());
-      redirect("/admin?error=validation");
+      return { ok: false, error: "validation" };
     }
     throw e;
   }
@@ -47,25 +61,25 @@ export async function saveSiteContent(json: string) {
       await publishSiteContentToGithub(file, gh);
     } catch (e) {
       if (e instanceof GithubPublishError) {
-        redirect(`/admin?error=github_${e.code}`);
+        return { ok: false, error: `github_${e.code}` as SaveSiteContentError };
       }
       console.error("[site-content] github", e);
-      redirect("/admin?error=github_unknown");
+      return { ok: false, error: "github_unknown" };
     }
     try {
       await writeSiteContentFile(file);
     } catch {
-      /* copia local opcional tras commit */
+      /* opcional */
     }
   } else {
     try {
       await writeSiteContentFile(file);
     } catch (err) {
       console.error("[site-content] write", err);
-      redirect("/admin?error=write_failed");
+      return { ok: false, error: "write_failed" };
     }
   }
 
   updateTag("site-content");
-  redirect("/admin?saved=1");
+  return { ok: true };
 }

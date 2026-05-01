@@ -1,41 +1,30 @@
 import "server-only";
 
-import { SITE_CONTACT, type SiteContact } from "@/constants/site-contact";
+import type { SiteContact } from "@/constants/site-contact";
 import type { FeaturedProperty } from "@/data/properties";
-import { FEATURED_PROPERTIES_BY_LOCALE } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
-import { TEAM_MEMBERS } from "@/data/team";
 import type { HomeCopy } from "@/i18n/home";
 import { HOME_COPY } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
-
-import { getCachedSiteContent } from "./load";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
+import {
+  mergeFeaturedFromFile,
+  mergeHomeCopy as mergeHomeCopyFromFile,
+  mergeSiteContact as mergeSiteContactFromFile,
+  mergeTeamFromFile,
+} from "@/lib/site-content/merge-public";
 import type { SiteContentFile } from "@/lib/site-content/types";
 
+import { findFeaturedPropertyBySegment } from "@/lib/property-routes";
+
+import { getCachedSiteContent } from "./load";
+
 export function mergeSiteContact(file: SiteContentFile): SiteContact {
-  return {
-    addressLine: file.contact?.addressLine ?? SITE_CONTACT.addressLine,
-    phoneDisplay: file.contact?.phoneDisplay ?? SITE_CONTACT.phoneDisplay,
-    phoneHref: file.contact?.phoneHref ?? SITE_CONTACT.phoneHref,
-  };
+  return mergeSiteContactFromFile(file);
 }
 
 export function mergeHomeCopy(locale: Locale, base: HomeCopy, file: SiteContentFile): HomeCopy {
-  const taglineOverride = file.footerTagline?.[locale];
-  const announcementOverride = file.heroAnnouncement?.[locale];
-
-  return {
-    ...base,
-    footer: {
-      ...base.footer,
-      ...(taglineOverride ? { tagline: taglineOverride } : {}),
-    },
-    hero: {
-      ...base.hero,
-      ...(announcementOverride ? { announcement: announcementOverride } : {}),
-    },
-  };
+  return mergeHomeCopyFromFile(locale, base, file);
 }
 
 export async function getMergedSiteContext(locale: Locale): Promise<{ homeCopy: HomeCopy; contact: SiteContact }> {
@@ -49,15 +38,17 @@ export async function getMergedSiteContext(locale: Locale): Promise<{ homeCopy: 
 
 export async function getMergedTeamMembers(): Promise<TeamMember[]> {
   const file = await getCachedSiteContent();
-  if (file.team !== undefined) return [...file.team];
-  return [...TEAM_MEMBERS];
+  return mergeTeamFromFile(file);
 }
 
 export async function getMergedFeaturedForLocale(locale: Locale): Promise<FeaturedProperty[]> {
   const file = await getCachedSiteContent();
-  const list = file.featuredByLocale?.[locale];
-  if (list !== undefined) return [...list];
-  return [...FEATURED_PROPERTIES_BY_LOCALE[locale]];
+  return mergeFeaturedFromFile(locale, file);
+}
+
+export async function getMergedFeaturedPropertyBySlug(locale: Locale, slug: string): Promise<FeaturedProperty | null> {
+  const list = await getMergedFeaturedForLocale(locale);
+  return findFeaturedPropertyBySegment(list, slug) ?? null;
 }
 
 /** Valores efectivos para el formulario admin (tras aplicar overrides). */
@@ -81,10 +72,11 @@ export async function getAdminFormSeed(): Promise<{
 
 export async function getAdminEditorSeed(): Promise<AdminEditorSeed> {
   const base = await getAdminFormSeed();
-  const [team, featuredEs, featuredEn] = await Promise.all([
-    getMergedTeamMembers(),
-    getMergedFeaturedForLocale("es"),
-    getMergedFeaturedForLocale("en"),
-  ]);
+  const file = await getCachedSiteContent();
+  const [team, featuredEs, featuredEn] = [
+    mergeTeamFromFile(file),
+    mergeFeaturedFromFile("es", file),
+    mergeFeaturedFromFile("en", file),
+  ];
   return { ...base, team, featuredEs, featuredEn };
 }

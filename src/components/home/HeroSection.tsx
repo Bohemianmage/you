@@ -11,7 +11,7 @@ interface HeroSectionProps {
 }
 
 /**
- * Hero aligned with Wix: white canvas, charcoal copy, slate accent (#616E89), Avenir-like headline weight.
+ * Hero — lienzo claro, titular Montserrat, acento pizarra `#616E89`.
  */
 export function HeroSection({ copy, modalCopy, catalogHref, contactHref }: HeroSectionProps) {
   return (

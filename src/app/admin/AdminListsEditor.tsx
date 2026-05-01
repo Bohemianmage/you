@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import { saveSiteContent } from "@/app/actions/site-content";
 import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
+import type { SiteContentFile } from "@/lib/site-content/types";
 
 type TabId = "general" | "team" | "featured";
 
@@ -45,7 +47,24 @@ const labelClass = "block text-xs font-bold uppercase tracking-[0.12em] text-bra
 const inputClass =
   "mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm outline-none ring-brand-accent focus:border-brand-accent focus:ring-1";
 
-export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
+function mapSaveErr(code: string): string {
+  const m: Record<string, string> = {
+    invalid_json: "JSON inválido.",
+    validation: "Validación incorrecta.",
+    write_failed: "No se pudo guardar en archivo.",
+    github_unauthorized: "GitHub: token.",
+    github_forbidden: "GitHub: permiso.",
+    github_not_found: "GitHub: repo/rama.",
+    github_conflict: "GitHub: conflicto.",
+    github_validation: "GitHub: rechazado.",
+    github_rate_limit: "GitHub: límite.",
+    github_unknown: "GitHub: error.",
+  };
+  return m[code] ?? "Error al guardar.";
+}
+
+export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEditorSeed; persistedBaseline: SiteContentFile }) {
+  const router = useRouter();
   const [tab, setTab] = useState<TabId>("general");
   const [featuredLocale, setFeaturedLocale] = useState<"es" | "en">("es");
 
@@ -63,6 +82,7 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
 
   const [pending, startTransition] = useTransition();
   const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [saveErr, setSaveErr] = useState<string | null>(null);
 
   useEffect(() => {
     if (!saveModalOpen) return;
@@ -79,20 +99,32 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
   }, [saveModalOpen]);
 
   const payloadJson = useMemo(() => {
-    const body = {
-      version: 1 as const,
+    const base = structuredClone(persistedBaseline);
+    const body: SiteContentFile = {
+      ...base,
+      version: 1,
       contact: {
+        ...base.contact,
         addressLine: contactAddress,
         phoneDisplay: contactPhoneDisplay,
         phoneHref: contactPhoneHref,
       },
-      footerTagline: { es: footerTaglineEs, en: footerTaglineEn },
-      heroAnnouncement: { es: heroAnnouncementEs, en: heroAnnouncementEn },
+      footerTagline: {
+        ...base.footerTagline,
+        es: footerTaglineEs,
+        en: footerTaglineEn,
+      },
+      heroAnnouncement: {
+        ...base.heroAnnouncement,
+        es: heroAnnouncementEs,
+        en: heroAnnouncementEn,
+      },
       team,
       featuredByLocale: { es: featuredEs, en: featuredEn },
     };
     return JSON.stringify(body);
   }, [
+    persistedBaseline,
     contactAddress,
     contactPhoneDisplay,
     contactPhoneHref,
@@ -141,6 +173,10 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
 
   return (
     <div className="mt-10 space-y-8">
+      {saveErr ? (
+        <p className="rounded-sm border border-brand-accent/40 bg-brand-accent/10 px-4 py-3 text-sm text-brand-accent-strong">{saveErr}</p>
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
         <button type="button" className={`${tabBtn} ${tab === "general" ? tabActive : tabIdle}`} onClick={() => setTab("general")}>
           General
@@ -159,12 +195,7 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
             <legend className="px-1 font-heading text-lg font-semibold text-brand-text">Contacto (pie, Nosotros)</legend>
             <label className={labelClass}>
               Dirección
-              <textarea
-                rows={3}
-                value={contactAddress}
-                onChange={(e) => setContactAddress(e.target.value)}
-                className={inputClass}
-              />
+              <textarea rows={3} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} className={inputClass} />
             </label>
             <label className={labelClass}>
               Teléfono (texto mostrado)
@@ -177,7 +208,7 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
           </fieldset>
 
           <fieldset className="space-y-4 rounded-sm border border-brand-border bg-brand-bg p-6 shadow-sm">
-            <legend className="px-1 font-heading text-lg font-semibold text-brand-text">Frase del pie (tagline)</legend>
+            <legend className="px-1 font-heading text-lg font-semibold text-brand-text">Frase del pie (tagline) por idioma</legend>
             <label className={labelClass}>
               Español
               <textarea rows={2} value={footerTaglineEs} onChange={(e) => setFooterTaglineEs(e.target.value)} className={inputClass} />
@@ -189,8 +220,7 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
           </fieldset>
 
           <fieldset className="space-y-4 rounded-sm border border-brand-border bg-brand-bg p-6 shadow-sm">
-            <legend className="px-1 font-heading text-lg font-semibold text-brand-text">Barra superior del inicio (hero)</legend>
-            <p className="text-xs text-brand-muted">Texto del chip de aviso que enlaza al catálogo.</p>
+            <legend className="px-1 font-heading text-lg font-semibold text-brand-text">Aviso del hero (chip) por idioma</legend>
             <label className={labelClass}>
               Español
               <textarea rows={2} value={heroAnnouncementEs} onChange={(e) => setHeroAnnouncementEs(e.target.value)} className={inputClass} />
@@ -329,6 +359,16 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
                     <input type="text" value={prop.id} onChange={(e) => updateFeatured(idx, { id: e.target.value })} className={inputClass} />
                   </label>
                   <label className={labelClass}>
+                    Slug URL (opcional)
+                    <input
+                      type="text"
+                      value={prop.slug ?? ""}
+                      onChange={(e) => updateFeatured(idx, { slug: e.target.value || undefined })}
+                      placeholder="ej. renta-residencia-en-zona"
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
                     Estado (ej. En venta)
                     <input type="text" value={prop.status} onChange={(e) => updateFeatured(idx, { status: e.target.value })} className={inputClass} />
                   </label>
@@ -352,6 +392,16 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
                   <label className={`${labelClass} sm:col-span-2`}>
                     Dirección
                     <textarea rows={2} value={prop.address} onChange={(e) => updateFeatured(idx, { address: e.target.value })} className={inputClass} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Descripción (ficha detalle)
+                    <textarea
+                      rows={6}
+                      value={prop.description ?? ""}
+                      onChange={(e) => updateFeatured(idx, { description: e.target.value || undefined })}
+                      placeholder="Párrafos separados por línea en blanco."
+                      className={inputClass}
+                    />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
                     Tour URL (opcional)
@@ -413,9 +463,7 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
             <h2 id="save-confirm-title" className="font-heading text-lg font-semibold text-brand-text">
               ¿Guardar los cambios?
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted">
-              Se aplicarán los datos actuales del formulario (contacto, hero, equipo y destacadas).
-            </p>
+            <p className="mt-2 text-sm leading-relaxed text-brand-muted">Se actualizarán listas, contacto y avisos por idioma.</p>
             <div className="mt-6 flex flex-wrap justify-end gap-3">
               <button
                 type="button"
@@ -430,7 +478,17 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
                 className="rounded-sm bg-brand-accent px-4 py-2 text-sm font-semibold text-brand-white shadow-sm transition hover:bg-brand-accent-strong disabled:cursor-not-allowed disabled:opacity-45"
                 onClick={() => {
                   setSaveModalOpen(false);
-                  startTransition(() => void saveSiteContent(payloadJson));
+                  setSaveErr(null);
+                  startTransition(() => {
+                    void (async () => {
+                      const res = await saveSiteContent(payloadJson);
+                      if (!res.ok) {
+                        setSaveErr(mapSaveErr(res.error));
+                        return;
+                      }
+                      router.refresh();
+                    })();
+                  });
                 }}
               >
                 Guardar

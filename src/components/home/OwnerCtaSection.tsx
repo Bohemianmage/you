@@ -8,7 +8,7 @@ interface OwnerCtaSectionProps {
 }
 
 /**
- * Owner CTA — Wix uses uppercase small heading + text button on neutral ground.
+ * CTA propietarios — titular en mayúsculas pequeñas y botón sobre fondo neutro.
  */
 export function OwnerCtaSection({ copy, proposalHref }: OwnerCtaSectionProps) {
   return (

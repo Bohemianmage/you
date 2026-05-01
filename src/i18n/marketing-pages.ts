@@ -30,7 +30,33 @@ export const CATALOG_PAGE_COPY: Record<
   },
 };
 
-/** `/nuestra-propuesta` — seller / landlord value prop from legacy Wix. */
+/** `/propiedades/[slug]` — ficha de una propiedad destacada (merge archivo + seed). */
+export const PROPERTY_DETAIL_COPY: Record<
+  Locale,
+  {
+    interestCta: string;
+    backFeatured: string;
+    backCatalog: string;
+    descriptionFallback: string;
+  }
+> = {
+  es: {
+    interestCta: "Me interesa",
+    backFeatured: "Volver a destacadas",
+    backCatalog: "Ver catálogo",
+    descriptionFallback:
+      "Para más detalle y disponibilidad actual, escribinos o agenda una visita con un asesor YOU.",
+  },
+  en: {
+    interestCta: "I’m interested",
+    backFeatured: "Back to featured",
+    backCatalog: "Browse listings",
+    descriptionFallback:
+      "For availability and full detail, contact us or schedule a visit with a YOU advisor.",
+  },
+};
+
+/** `/nuestra-propuesta` — propuesta para propietarios / arrendadores. */
 export const PROPOSAL_PAGE_COPY: Record<
   Locale,
   {

@@ -1,4 +1,4 @@
-/** Full portfolio listings mirrored from legacy Wix `/propiedades` (deduplicated). */
+/** Catálogo de referencia para `/propiedades` (deduplicado). */
 export interface CatalogProperty {
   id: string;
   title: string;

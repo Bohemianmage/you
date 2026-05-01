@@ -42,6 +42,8 @@ export interface HomeCopy {
     subtitle: string;
     visitCta: string;
     catalogCta: string;
+    /** Primary button on featured cards → internal `/propiedades/[slug]`. */
+    detailCta: string;
   };
   virtualTours: {
     title: string;
@@ -145,6 +147,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       subtitle: "Selección actual del portafolio YOU.",
       visitCta: "Agenda una visita",
       catalogCta: "Catálogo completo",
+      detailCta: "Ver propiedad",
     },
     virtualTours: {
       title: "Descubre nuestras experiencias 3D",
@@ -224,6 +227,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       subtitle: "Current selection from the YOU portfolio.",
       visitCta: "Schedule a visit",
       catalogCta: "Full catalog",
+      detailCta: "View listing",
     },
     virtualTours: {
       title: "Discover our 3D experiences",
