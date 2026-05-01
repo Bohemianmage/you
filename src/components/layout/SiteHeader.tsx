@@ -34,7 +34,8 @@ function scrollToSectionHash(hash: string) {
 
 /**
  * Sticky header — pill nav en desktop, drawer en móvil; barra sin blur.
- * El overlay móvil se monta en `#marketing-mobile-menu-host` (solo bajo la barra): ahí sí hay blur/dim;
+ * El overlay móvil se monta en `#marketing-mobile-menu-host` (columna bajo la barra): blur/dim ahí;
+ * el panel empieza en `top: 0` del host — sin hueco duplicado bajo el navbar.
  * el navbar queda fuera para poder usar hamburguesa/X, idioma y logo.
  */
 export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
@@ -43,24 +44,8 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const [mobileOverlayRoot, setMobileOverlayRoot] = useState<HTMLElement | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
-  /** Altura real del navbar (px) para anclar el panel móvil justo debajo, sin solaparlo. */
-  const [headerHeightPx, setHeaderHeightPx] = useState(80);
 
   const isHome = pathname === "/";
-
-  useLayoutEffect(() => {
-    const el = headerRef.current;
-    if (!el) return;
-    const measure = () => setHeaderHeightPx(el.offsetHeight);
-    measure();
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", measure);
-      return () => window.removeEventListener("resize", measure);
-    }
-    const ro = new ResizeObserver(() => measure());
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   useEffect(() => {
     if (!isHome) {
@@ -189,11 +174,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
           role="dialog"
           aria-modal="true"
           aria-label={locale === "en" ? "Main menu" : "Menú principal"}
-          style={{
-            top: headerHeightPx,
-            maxHeight: `calc(100dvh - ${headerHeightPx}px)`,
-          }}
-          className={`absolute left-0 right-0 flex flex-col overflow-y-auto rounded-none border-0 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_10px_28px_-12px_rgba(47,46,46,0.18)] backdrop-blur-md transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
+          className={`absolute inset-x-0 top-0 flex max-h-full flex-col overflow-y-auto rounded-none border-0 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_10px_28px_-12px_rgba(47,46,46,0.18)] backdrop-blur-md transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
             mobileOpen
               ? "pointer-events-auto translate-y-0 opacity-100"
               : "pointer-events-none -translate-y-full opacity-0"
@@ -324,18 +305,18 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
             onClick={() => setMobileOpen((o) => !o)}
           >
             <span
-              className={`block h-[2px] w-[1.1rem] origin-[14%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
-                mobileOpen ? "translate-x-[2px] translate-y-[7px] rotate-[44deg]" : ""
+              className={`block h-[2px] w-[1.125rem] origin-center rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
+                mobileOpen ? "translate-y-[5px] rotate-45" : ""
               }`}
             />
             <span
-              className={`block h-[2px] w-5 origin-[55%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
-                mobileOpen ? "translate-x-2 scale-x-[0.06] opacity-0" : ""
+              className={`block h-[2px] w-[1.125rem] origin-center rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
+                mobileOpen ? "scale-x-0 opacity-0" : ""
               }`}
             />
             <span
-              className={`block h-[2px] w-[1rem] origin-[88%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
-                mobileOpen ? "-translate-x-[3px] -translate-y-[7px] -rotate-[34deg]" : ""
+              className={`block h-[2px] w-[1.125rem] origin-center rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
+                mobileOpen ? "-translate-y-[5px] -rotate-45" : ""
               }`}
             />
           </button>
