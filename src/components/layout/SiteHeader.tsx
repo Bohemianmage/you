@@ -164,19 +164,16 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
         aria-label={locale === "en" ? "Close menu" : "Cerrar menú"}
         onClick={() => setMobileOpen(false)}
       />
-      <div className="absolute inset-0 flex justify-end">
+      <div className="absolute inset-0 flex items-start justify-end p-2 sm:p-3">
         <div
-          className={`relative flex h-full min-h-0 w-[min(100%,22rem)] flex-col border-l border-white/15 bg-brand-bg/88 shadow-[0_0_40px_rgba(26,30,97,0.18)] backdrop-blur-xl transition-transform duration-300 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+          className={`relative flex h-auto max-h-[calc(100dvh-1rem)] w-[min(100%,20rem)] flex-col overflow-y-auto rounded-lg border border-brand-border/35 bg-brand-bg/78 shadow-[0_8px_32px_rgba(26,30,97,0.14)] backdrop-blur-xl transition-transform duration-300 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
             mobileOpen ? "translate-x-0" : "translate-x-full"
           }`}
           role="dialog"
           aria-modal="true"
           aria-label={locale === "en" ? "Main menu" : "Menú principal"}
         >
-          <nav
-            className="min-h-0 shrink-0 overflow-y-auto px-4 pb-3 pt-8 sm:px-5"
-            aria-label="Principal móvil"
-          >
+          <nav className="px-4 pb-2 pt-6 sm:px-5 sm:pt-7" aria-label="Principal móvil">
             <ul className="space-y-1">
               {navItems.map((item) => {
                 const active = isNavItemActive(item);
@@ -197,21 +194,21 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
             </ul>
           </nav>
           <div
-            className="flex min-h-0 flex-1 flex-col border-t border-brand-border/45 bg-brand-surface/45"
+            className="border-t border-brand-border/35 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:px-5"
             role="group"
             aria-label={locale === "en" ? "Social media" : "Redes sociales"}
           >
-            <div className="flex min-h-0 flex-1 flex-row items-stretch gap-1.5 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:gap-2 sm:p-3 sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <div className="flex justify-center gap-3 sm:gap-4">
               {MARKETING_SOCIAL_LINKS.map(({ label, href, Icon }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center rounded-sm bg-brand-bg/55 py-4 text-brand-muted ring-1 ring-brand-border/40 transition hover:bg-brand-accent hover:text-brand-white hover:ring-brand-accent sm:py-6"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-surface/75 text-brand-muted ring-1 ring-brand-border/45 transition hover:bg-brand-accent hover:text-brand-white hover:ring-brand-accent"
                   aria-label={label}
                 >
-                  <Icon className="h-[min(2.25rem,11vmin)] w-[min(2.25rem,11vmin)] max-h-12 max-w-12 shrink-0" />
+                  <Icon className={iconClasses("sm")} />
                 </a>
               ))}
             </div>
