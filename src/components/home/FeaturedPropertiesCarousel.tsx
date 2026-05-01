@@ -18,9 +18,13 @@ const ROTATION_MS = 6500;
 
 /** Ancho del slide; mitad del min() coincide con scroll-padding para peek simétrico y tarjeta centrada (`snap-center`). */
 const SLIDE_WIDTH_CLASS = "w-[min(78vw,22rem)] shrink-0 snap-center";
-/** Padding horizontal del carril = (viewport − ancho slide) / 2 → misma porción visible a izquierda y derecha del centro. */
-const SCROLL_SYMMETRIC_PAD =
-  "scroll-pl-[calc(50%_-_min(39vw,11rem))] scroll-pr-[calc(50%_-_min(39vw,11rem))]";
+/**
+ * Padding horizontal del carril: deja espacio para centrar el primer y último slide
+ * (incl. clones del bucle) sin chocar con scrollLeft min/max.
+ * Misma media fórmula que el ancho del slide (`min(78vw,22rem)` → mitad `min(39vw,11rem)`).
+ */
+const CAROUSEL_EDGE_PAD =
+  "pl-[max(0.75rem,calc(50%-min(39vw,11rem)))] pr-[max(0.75rem,calc(50%-min(39vw,11rem)))]";
 
 type ExtSlide = {
   property: FeaturedProperty;
@@ -247,6 +251,27 @@ export function FeaturedPropertiesCarousel({
     };
   }, [scheduleSettle, settleInfiniteScroll]);
 
+  /** Trackpad horizontal (o Mayús+rueda): en el primer/último slide real, el gesto continúa al clon del bucle. */
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || n <= 1) return;
+    const onWheel = (e: WheelEvent) => {
+      if (settlingRef.current) return;
+      const dominantH = Math.abs(e.deltaX) >= Math.abs(e.deltaY);
+      const dx = dominantH ? e.deltaX : e.shiftKey ? e.deltaY : 0;
+      if (Math.abs(dx) < 10) return;
+      const near = readNearestExtIndex();
+      if (near === 0 || near === n + 1) return;
+      if (dx < 0 && near === 1) {
+        goPrev();
+      } else if (dx > 0 && near === n) {
+        goNext();
+      }
+    };
+    el.addEventListener("wheel", onWheel, { passive: true });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [n, goNext, goPrev, readNearestExtIndex]);
+
   if (n === 0) return null;
 
   const activeExtTarget = n > 1 ? activeReal + 1 : 0;
@@ -288,7 +313,7 @@ export function FeaturedPropertiesCarousel({
 
         <div
           ref={scrollRef}
-          className="flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible scroll-pl-4 scroll-pr-4 pb-2 pt-1 [scrollbar-width:none] sm:gap-4 sm:scroll-pl-6 sm:scroll-pr-6 md:px-0 [&::-webkit-scrollbar]:hidden"
+          className={`flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible pb-2 pt-1 [scrollbar-width:none] sm:gap-4 [&::-webkit-scrollbar]:hidden ${CAROUSEL_EDGE_PAD}`}
           aria-label={featuredCopy.title}
         >
           {extSlides.map((slide, i) => {

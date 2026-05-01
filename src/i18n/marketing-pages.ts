@@ -226,6 +226,8 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingUnavailableAdvisorEmail: string;
     bookingUnavailableNoSlots: string;
     bookingTimezoneNote: string;
+    /** Cuando la propiedad no tiene asesor en catálogo: el equipo asigna al confirmar. */
+    bookingAssignAdvisorNote: string;
     bookingUnavailableNoEncryption: string;
     bookingDocHeading: string;
     bookingDocLead: string;
@@ -309,6 +311,8 @@ export const PROPERTY_DETAIL_COPY: Record<
       "Falta correo del asesor en admin (Equipo). Mientras tanto, contáctanos por WhatsApp.",
     bookingUnavailableNoSlots: "No hay horarios libres en las próximas semanas. Escríbenos para coordinar.",
     bookingTimezoneNote: "Hora Ciudad de México; suele haber huecos también sábado y domingo (salvo que el asesor solo atienda entre semana).",
+    bookingAssignAdvisorNote:
+      "Esta propiedad aún no tiene asesor asignado en catálogo; elegimos quién te atiende al confirmar tu solicitud. Los horarios muestran cuando hay disponibilidad en el equipo.",
     bookingUnavailableNoEncryption:
       "La solicitud de visitas no está configurada en el servidor (falta cifrado de documentación). Contacta al equipo técnico o usa WhatsApp.",
     bookingDocHeading: "Documentación para la visita",
@@ -393,6 +397,8 @@ export const PROPERTY_DETAIL_COPY: Record<
       "The advisor email isn’t configured yet in admin (Team). Please use WhatsApp for now.",
     bookingUnavailableNoSlots: "No open slots in the coming weeks. Contact us to coordinate.",
     bookingTimezoneNote: "Mexico City time; weekend slots are usually available unless the advisor is weekdays-only.",
+    bookingAssignAdvisorNote:
+      "This listing isn’t mapped to a specific advisor yet—we’ll assign someone when your request is confirmed. Times shown reflect availability across the team.",
     bookingUnavailableNoEncryption:
       "Visit requests aren’t configured on the server (document encryption missing). Contact us or use WhatsApp.",
     bookingDocHeading: "Documentation for your visit",

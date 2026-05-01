@@ -13,7 +13,8 @@ type DetailCopy = (typeof PROPERTY_DETAIL_COPY)["es"];
 type SlotsOk = {
   ok: true;
   slotsIso: string[];
-  advisorName: string;
+  advisorName: string | null;
+  assignAdvisorAtConfirm: boolean;
 };
 
 type SlotsErr = {
@@ -208,10 +209,13 @@ export function PropertyVisitBooking({
         {copy.bookingSectionTitle}
       </h2>
       <p className="mt-2 text-xs text-brand-muted">{copy.bookingTimezoneNote}</p>
+      {slotsRes.assignAdvisorAtConfirm ? (
+        <p className="mt-2 text-xs leading-relaxed text-brand-muted">{copy.bookingAssignAdvisorNote}</p>
+      ) : null}
       <p className="mt-3 text-sm leading-relaxed text-brand-muted">{withYouWordmark(copy.bookingSectionHint)}</p>
-      <p className="mt-2 text-xs font-semibold text-brand-text">
-        {slotsRes.advisorName ? `${slotsRes.advisorName}` : null}
-      </p>
+      {slotsRes.advisorName ? (
+        <p className="mt-2 text-xs font-semibold text-brand-text">{slotsRes.advisorName}</p>
+      ) : null}
 
       {done ? (
         <p className="mt-4 rounded-sm border border-brand-accent/30 bg-brand-accent/10 px-4 py-3 text-sm font-medium text-brand-accent-strong">

@@ -2,11 +2,16 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { catalogPropertySegment, findCatalogPropertyBySegment } from "@/lib/property-routes";
+import { UNASSIGNED_ADVISOR_ID } from "@/lib/appointments/constants";
 import { bookingSlotMinutes } from "@/lib/appointments/config";
-import { getAvailableSlotStartsForAdvisor } from "@/lib/appointments/availability";
+import { getAvailableSlotStartsForAdvisor, getAvailableSlotStartsUnionTeam } from "@/lib/appointments/availability";
 import { bookingDocsEncryptionConfigured } from "@/lib/appointments/doc-vault";
 import { saveEncryptedBookingDocs } from "@/lib/appointments/docs-store";
-import { sendAdvisorPendingVisitRequest, sendGuestVisitRequestReceived } from "@/lib/appointments/email";
+import {
+  notifyPendingVisitRecipients,
+  sendAdvisorPendingVisitRequest,
+  sendGuestVisitRequestReceived,
+} from "@/lib/appointments/email";
 import { resolveAdvisorForCatalogProperty } from "@/lib/appointments/resolve-advisor";
 import { createAppointment, rejectAndDeleteAppointment } from "@/lib/appointments/store";
 import type { StoredAppointment } from "@/lib/appointments/types";
@@ -66,9 +71,6 @@ export async function POST(req: Request) {
 
   const file = await getCachedSiteContent();
   const resolved = resolveAdvisorForCatalogProperty(file, catalogId);
-  if (!resolved.ok) {
-    return NextResponse.json({ ok: false as const, code: resolved.code }, { status: 400 });
-  }
 
   const catalog = await getCachedEasyBrokerCatalog(locale as Locale);
   const prop = findCatalogPropertyBySegment(catalog, segment);
@@ -81,7 +83,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false as const, code: "bad_slot" }, { status: 400 });
   }
 
-  const slotStarts = await getAvailableSlotStartsForAdvisor(resolved.advisor.id, file);
+  let advisorId: string;
+  let slotStarts: Date[];
+
+  if (resolved.ok) {
+    advisorId = resolved.advisor.id;
+    slotStarts = await getAvailableSlotStartsForAdvisor(resolved.advisor.id, file);
+  } else {
+    advisorId = UNASSIGNED_ADVISOR_ID;
+    slotStarts = await getAvailableSlotStartsUnionTeam(file);
+  }
+
   const allowed = slotStarts.some((d) => d.getTime() === startMs);
   if (!allowed) {
     return NextResponse.json({ ok: false as const, code: "slot_unavailable" }, { status: 409 });
@@ -93,7 +105,7 @@ export async function POST(req: Request) {
 
   const appt: StoredAppointment = {
     id,
-    advisorId: resolved.advisor.id,
+    advisorId,
     catalogPropertyId: catalogId,
     propertySegment: catalogPropertySegment(prop),
     propertyTitle: prop.title,
@@ -130,11 +142,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false as const, code: "docs_store_failed" }, { status: 500 });
   }
 
-  const advisorEmail = resolved.advisor.email!.trim();
-  await Promise.all([
-    sendAdvisorPendingVisitRequest(advisorEmail, appt),
-    sendGuestVisitRequestReceived(guestEmail.trim(), appt),
-  ]);
+  if (resolved.ok) {
+    await sendAdvisorPendingVisitRequest(resolved.advisor.email!.trim(), appt);
+  } else {
+    await notifyPendingVisitRecipients(appt, file);
+  }
+  await sendGuestVisitRequestReceived(guestEmail.trim(), appt);
 
   return NextResponse.json({ ok: true as const, id });
 }

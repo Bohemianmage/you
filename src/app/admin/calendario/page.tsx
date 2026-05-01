@@ -17,6 +17,7 @@ export default async function AdminCalendarioPage() {
   const [appointments, file] = await Promise.all([listAppointmentsInRange(from, to), getCachedSiteContent()]);
   const team = mergeTeamFromFile(file);
   const teamById = Object.fromEntries(team.map((m) => [m.id, m]));
+  const assignableTeam = team.filter((m) => m.email?.trim());
 
   return (
     <div id="admin-calendario" className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -36,7 +37,12 @@ export default async function AdminCalendarioPage() {
         </Link>
       </header>
 
-      <AdminCalendarView appointments={appointments} teamById={teamById} redisConfigured={appointmentsRedisConfigured()} />
+      <AdminCalendarView
+        appointments={appointments}
+        teamById={teamById}
+        assignableTeam={assignableTeam}
+        redisConfigured={appointmentsRedisConfigured()}
+      />
     </div>
   );
 }

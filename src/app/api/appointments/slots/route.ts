@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { findCatalogPropertyBySegment } from "@/lib/property-routes";
-import { appointmentsRedisConfigured } from "@/lib/appointments/store";
-import { getAvailableSlotStartsForAdvisor } from "@/lib/appointments/availability";
+import { getAvailableSlotStartsForAdvisor, getAvailableSlotStartsUnionTeam } from "@/lib/appointments/availability";
 import { resolveAdvisorForCatalogProperty } from "@/lib/appointments/resolve-advisor";
-import { getCachedSiteContent } from "@/lib/site-settings/load";
+import { appointmentsRedisConfigured } from "@/lib/appointments/store";
 import { getCachedEasyBrokerCatalog } from "@/lib/easybroker/catalog-cache";
+import { getCachedSiteContent } from "@/lib/site-settings/load";
 import type { Locale } from "@/i18n/types";
 
 export async function GET(req: Request) {
@@ -23,24 +23,32 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false as const, code: "redis_off" });
   }
 
-  const file = await getCachedSiteContent();
-  const resolved = resolveAdvisorForCatalogProperty(file, catalogId);
-  if (!resolved.ok) {
-    return NextResponse.json({ ok: false as const, code: resolved.code });
-  }
-
   const catalog = await getCachedEasyBrokerCatalog(locale);
   const prop = findCatalogPropertyBySegment(catalog, segment);
   if (!prop || prop.id !== catalogId || prop.active === false) {
     return NextResponse.json({ ok: false as const, code: "unknown_property" }, { status: 404 });
   }
 
-  const slots = await getAvailableSlotStartsForAdvisor(resolved.advisor.id, file);
+  const file = await getCachedSiteContent();
+  const resolved = resolveAdvisorForCatalogProperty(file, catalogId);
 
+  if (resolved.ok) {
+    const slots = await getAvailableSlotStartsForAdvisor(resolved.advisor.id, file);
+    return NextResponse.json({
+      ok: true as const,
+      slotsIso: slots.map((d) => d.toISOString()),
+      timezone: "America/Mexico_City",
+      advisorName: resolved.advisor.name,
+      assignAdvisorAtConfirm: false as const,
+    });
+  }
+
+  const slots = await getAvailableSlotStartsUnionTeam(file);
   return NextResponse.json({
     ok: true as const,
     slotsIso: slots.map((d) => d.toISOString()),
     timezone: "America/Mexico_City",
-    advisorName: resolved.advisor.name,
+    advisorName: null as null,
+    assignAdvisorAtConfirm: true as const,
   });
 }

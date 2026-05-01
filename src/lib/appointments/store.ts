@@ -2,7 +2,10 @@ import "server-only";
 
 import { Redis } from "@upstash/redis";
 
+import { UNASSIGNED_ADVISOR_ID } from "./constants";
+import { bookingSlotMinutes } from "./config";
 import { deleteBookingDocs } from "./docs-store";
+import { intervalsOverlap } from "./slots";
 import { resolvedAppointmentStatus, type AppointmentStatus, type StoredAppointment } from "./types";
 
 /** Credenciales REST en consola Upstash: Redis → tu base → pestaña REST / Connect (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`). */
@@ -100,6 +103,8 @@ export type BookResult =
   | { ok: true; id: string }
   | { ok: false; code: "redis_off" | "slot_taken" | "bad_times" };
 
+const LOCK_EX_SEC = 60 * 60 * 24 * 14;
+
 export async function createAppointment(appt: StoredAppointment): Promise<BookResult> {
   const r = redis();
   if (!r) return { ok: false, code: "redis_off" };
@@ -111,7 +116,7 @@ export async function createAppointment(appt: StoredAppointment): Promise<BookRe
   }
 
   const lk = lockKey(appt.advisorId, startMs);
-  const locked = await r.set(lk, appt.id, { nx: true, ex: 60 * 60 * 24 * 14 });
+  const locked = await r.set(lk, appt.id, { nx: true, ex: LOCK_EX_SEC });
   if (!locked) return { ok: false, code: "slot_taken" };
 
   try {
@@ -140,12 +145,51 @@ export async function markReminderSent(id: string): Promise<boolean> {
   return true;
 }
 
-export async function confirmAppointment(id: string): Promise<StoredAppointment | null> {
+/**
+ * Confirma una solicitud pendiente. Si fue creada sin asesor en ficha (`__unassigned__`),
+ * `assignAdvisorId` debe ser el id de un miembro del equipo; mueve el bloqueo de hueco al asesor.
+ */
+export async function confirmAppointment(id: string, assignAdvisorId?: string | null): Promise<StoredAppointment | null> {
   const r = redis();
   if (!r) return null;
   const a = await getAppointmentById(id);
   if (!a || effectiveStatus(a) !== "pending") return null;
-  const next: StoredAppointment = { ...a, status: "confirmed", confirmedAt: Date.now() };
+
+  const startMs = Date.parse(a.startIso);
+  const endMs = Date.parse(a.endIso);
+  if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) return null;
+
+  let nextAdvisorId = a.advisorId;
+  const slotMs = bookingSlotMinutes() * 60_000;
+
+  if (a.advisorId === UNASSIGNED_ADVISOR_ID) {
+    const pick = assignAdvisorId?.trim();
+    if (!pick || pick === UNASSIGNED_ADVISOR_ID) return null;
+
+    const neighbors = await listAdvisorAppointmentsBetween(pick, startMs - slotMs, endMs + slotMs);
+    for (const other of neighbors) {
+      if (other.id === id) continue;
+      if (effectiveStatus(other) === "rejected") continue;
+      const oStart = Date.parse(other.startIso);
+      const oEnd = Date.parse(other.endIso);
+      if (!Number.isFinite(oStart) || !Number.isFinite(oEnd)) continue;
+      if (intervalsOverlap(startMs, endMs, oStart, oEnd)) return null;
+    }
+
+    const poolLk = lockKey(UNASSIGNED_ADVISOR_ID, startMs);
+    const newLk = lockKey(pick, startMs);
+    await r.del(poolLk);
+    const got = await r.set(newLk, id, { nx: true, ex: LOCK_EX_SEC });
+    if (!got) {
+      await r.set(poolLk, id, { ex: LOCK_EX_SEC });
+      return null;
+    }
+    await r.zrem(advisorIndexKey(UNASSIGNED_ADVISOR_ID), id);
+    await r.zadd(advisorIndexKey(pick), { score: startMs, member: id });
+    nextAdvisorId = pick;
+  }
+
+  const next: StoredAppointment = { ...a, advisorId: nextAdvisorId, status: "confirmed", confirmedAt: Date.now() };
   await r.set(dataKey(id), JSON.stringify(next));
   return next;
 }

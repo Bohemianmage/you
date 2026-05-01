@@ -4,12 +4,31 @@ import { Resend } from "resend";
 
 import type { Locale } from "@/i18n/types";
 
+import { mergeTeamFromFile } from "@/lib/site-content/merge-public";
 import { publicSiteBaseUrl } from "@/lib/public-site-url";
+import type { SiteContentFile } from "@/lib/site-content/types";
 
+import { UNASSIGNED_ADVISOR_ID } from "./constants";
 import type { StoredAppointment } from "./types";
 
 function fromEmail(): string {
   return process.env.RESEND_FROM_EMAIL ?? "YOU Sitio <onboarding@resend.dev>";
+}
+
+/** Aviso de solicitud pendiente a bandejas configuradas (equipo + CONTACT_TO_EMAIL) cuando no hay asesor en ficha. */
+export async function notifyPendingVisitRecipients(appt: StoredAppointment, file: SiteContentFile): Promise<void> {
+  const recipients = new Set<string>();
+  const inbox = process.env.CONTACT_TO_EMAIL?.trim();
+  if (inbox) recipients.add(inbox);
+  for (const m of mergeTeamFromFile(file)) {
+    const e = m.email?.trim();
+    if (e) recipients.add(e);
+  }
+  if (recipients.size === 0) {
+    console.warn("[appointments] Sin CONTACT_TO_EMAIL ni emails en equipo — aviso de solicitud omitido.");
+    return;
+  }
+  await Promise.all([...recipients].map((to) => sendAdvisorPendingVisitRequest(to, appt)));
 }
 
 /** Solicitud pendiente de tu confirmación en panel admin. */
@@ -21,9 +40,21 @@ export async function sendAdvisorPendingVisitRequest(advisorEmail: string, appt:
   }
   const when = formatWhen(appt.startIso, appt.locale);
   const adminCal = `${publicSiteBaseUrl()}/admin/calendario`;
+  const poolLead =
+    appt.advisorId === UNASSIGNED_ADVISOR_ID
+      ? [
+          "Nueva solicitud de visita — la propiedad no tenía asesor asignado en catálogo.",
+          "Al confirmar en el panel elegí quién cubrirá la visita según disponibilidad.",
+        ]
+      : [
+          "Nueva solicitud de visita desde el sitio YOU — pendiente de tu confirmación.",
+          "Confírmala o recházala en el calendario admin; hasta entonces el cliente solo recibió aviso de solicitud recibida.",
+        ];
+  const subjectSuffix =
+    appt.advisorId === UNASSIGNED_ADVISOR_ID ? ` — asignar asesor al confirmar` : "";
+
   const body = [
-    "Nueva solicitud de visita desde el sitio YOU — pendiente de tu confirmación.",
-    "Confírmala o recházala en el calendario admin; hasta entonces el cliente solo recibió aviso de solicitud recibida.",
+    ...poolLead,
     "",
     `Panel: ${adminCal}`,
     "",
@@ -51,7 +82,7 @@ export async function sendAdvisorPendingVisitRequest(advisorEmail: string, appt:
       from: fromEmail(),
       to: [advisorEmail],
       replyTo: appt.guestEmail,
-      subject: `[YOU] Confirmar visita (pendiente) — ${appt.propertyTitle}`,
+      subject: `[YOU] Confirmar visita (pendiente) — ${appt.propertyTitle}${subjectSuffix}`,
       text: body,
     });
     if (error) {

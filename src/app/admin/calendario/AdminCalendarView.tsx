@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { UNASSIGNED_ADVISOR_ID } from "@/lib/appointments/constants";
 import type { StoredAppointment } from "@/lib/appointments/types";
 import { resolvedAppointmentStatus } from "@/lib/appointments/types";
 import type { TeamMember } from "@/data/team";
@@ -36,16 +37,19 @@ function statusLabel(s: ReturnType<typeof resolvedAppointmentStatus>): string {
 export function AdminCalendarView({
   appointments,
   teamById,
+  assignableTeam,
   redisConfigured,
 }: {
   appointments: StoredAppointment[];
   teamById: Record<string, TeamMember | undefined>;
+  assignableTeam: TeamMember[];
   redisConfigured: boolean;
 }) {
   const router = useRouter();
   const [advisorFilter, setAdvisorFilter] = useState<string>("");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [docJson, setDocJson] = useState<string | null>(null);
+  const [assignPickByAppt, setAssignPickByAppt] = useState<Record<string, string>>({});
 
   const advisors = useMemo(() => {
     const ids = new Set<string>();
@@ -60,12 +64,25 @@ export function AdminCalendarView({
 
   const tz = "America/Mexico_City";
 
-  async function confirmVisit(id: string) {
+  function advisorCellLabel(advisorId: string): string {
+    if (advisorId === UNASSIGNED_ADVISOR_ID) return "Por asignar";
+    return teamById[advisorId]?.name ?? advisorId;
+  }
+
+  async function confirmVisit(id: string, payload?: { advisorId: string }) {
     setBusyId(id);
     try {
-      const res = await fetch(`/api/admin/appointments/${encodeURIComponent(id)}/confirm`, { method: "POST" });
+      const res = await fetch(`/api/admin/appointments/${encodeURIComponent(id)}/confirm`, {
+        method: "POST",
+        headers: payload ? { "Content-Type": "application/json" } : undefined,
+        body: payload ? JSON.stringify(payload) : undefined,
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        alert("No se pudo confirmar (¿ya estaba confirmada?).");
+        if (data.error === "advisor_required") alert("Elegí un asesor del equipo antes de confirmar.");
+        else if (data.error === "invalid_advisor") alert("Ese asesor no tiene correo en Equipo; revisá la configuración.");
+        else if (data.error === "slot_conflict") alert("Ese asesor ya tiene cita en ese horario. Elegí otro miembro u otro momento.");
+        else alert("No se pudo confirmar (¿ya estaba confirmada?).");
         return;
       }
       router.refresh();
@@ -137,7 +154,7 @@ export function AdminCalendarView({
             <option value="">Todos</option>
             {advisors.map((id) => (
               <option key={id} value={id}>
-                {teamById[id]?.name ?? id}
+                {advisorCellLabel(id)}
               </option>
             ))}
           </select>
@@ -183,7 +200,7 @@ export function AdminCalendarView({
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 font-medium text-brand-text">{fmt(a.startIso, tz)}</td>
-                    <td className="px-4 py-3 text-brand-text">{teamById[a.advisorId]?.name ?? a.advisorId}</td>
+                    <td className="px-4 py-3 text-brand-text">{advisorCellLabel(a.advisorId)}</td>
                     <td className="max-w-[220px] px-4 py-3">
                       <span className="line-clamp-2 font-medium text-brand-text">{a.propertyTitle}</span>
                       <span className="mt-1 block truncate text-xs text-brand-muted">{a.catalogPropertyId}</span>
@@ -199,11 +216,41 @@ export function AdminCalendarView({
                       <div className="flex flex-col gap-2">
                         {pending ? (
                           <>
+                            {a.advisorId === UNASSIGNED_ADVISOR_ID ? (
+                              <label className="block text-[10px] font-bold uppercase tracking-[0.12em] text-brand-muted">
+                                Asignar a
+                                <select
+                                  value={assignPickByAppt[a.id] ?? ""}
+                                  onChange={(e) =>
+                                    setAssignPickByAppt((prev) => ({ ...prev, [a.id]: e.target.value }))
+                                  }
+                                  className="mt-1 block w-full max-w-[200px] rounded-sm border border-brand-border bg-brand-bg px-2 py-1.5 text-xs text-brand-text outline-none focus:border-brand-accent"
+                                >
+                                  <option value="">— Equipo —</option>
+                                  {assignableTeam.map((m) => (
+                                    <option key={m.id} value={m.id}>
+                                      {m.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            ) : null}
                             <button
                               type="button"
-                              disabled={busyId === a.id}
+                              disabled={
+                                busyId === a.id ||
+                                (a.advisorId === UNASSIGNED_ADVISOR_ID && !(assignPickByAppt[a.id]?.trim()))
+                              }
                               className="rounded-sm bg-brand-accent px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-brand-white disabled:opacity-40"
-                              onClick={() => void confirmVisit(a.id)}
+                              onClick={() => {
+                                if (a.advisorId === UNASSIGNED_ADVISOR_ID) {
+                                  const aid = assignPickByAppt[a.id]?.trim();
+                                  if (!aid) return;
+                                  void confirmVisit(a.id, { advisorId: aid });
+                                } else {
+                                  void confirmVisit(a.id);
+                                }
+                              }}
                             >
                               Confirmar
                             </button>
@@ -245,7 +292,7 @@ export function AdminCalendarView({
       )}
 
       <p className="text-xs leading-relaxed text-brand-muted">
-        Las solicitudes entran en estado pendiente hasta que confirmás o rechazás en esta tabla. Al confirmar, el cliente recibe el correo de cita confirmada. Los recordatorios ~24 h solo aplican a citas confirmadas (cron +{" "}
+        Las solicitudes entran en estado pendiente hasta que confirmás o rechazás en esta tabla. Si figuran como «Por asignar», elegí un miembro del equipo con correo antes de confirmar; al confirmar, el cliente recibe el correo de cita confirmada. Los recordatorios ~24 h solo aplican a citas confirmadas (cron +{" "}
         <code className="rounded bg-brand-surface px-1">CRON_SECRET</code>).
       </p>
     </div>
