@@ -1,6 +1,5 @@
 import { SITE_CONTACT, type SiteContact } from "@/constants/site-contact";
 import type { CatalogProperty } from "@/data/catalog-properties";
-import { CATALOG_PROPERTIES } from "@/data/catalog-properties";
 import type { DownloadableItem } from "@/data/downloadables";
 import { DOWNLOADABLE_ITEMS_BY_LOCALE } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
@@ -81,10 +80,13 @@ export function mergeTeamFromFile(file: SiteContentFile): TeamMember[] {
   });
 }
 
-export function mergeFeaturedFromFile(locale: Locale, file: SiteContentFile): FeaturedProperty[] {
+export function mergeFeaturedFromFile(
+  locale: Locale,
+  file: SiteContentFile,
+  ebCatalog: readonly CatalogProperty[],
+): FeaturedProperty[] {
   if (file.featuredCatalogIds !== undefined) {
-    const catalog = mergeCatalogFromFile(file);
-    const byId = new Map(catalog.map((c) => [c.id, c]));
+    const byId = new Map(ebCatalog.map((c) => [c.id, c]));
     return file.featuredCatalogIds
       .map((id) => byId.get(id))
       .filter((c): c is CatalogProperty => c != null && c.active !== false)
@@ -93,17 +95,11 @@ export function mergeFeaturedFromFile(locale: Locale, file: SiteContentFile): Fe
 
   const list = file.featuredByLocale?.[locale];
   if (list !== undefined) return [...list];
+
+  const active = ebCatalog.filter((c) => c.active !== false);
+  if (active.length) return active.slice(0, 6).map((c) => catalogAsFeaturedDetail(c, locale));
+
   return [...FEATURED_PROPERTIES_BY_LOCALE[locale]];
-}
-
-export function mergeCatalogFromFile(file: SiteContentFile): CatalogProperty[] {
-  if (file.catalogProperties !== undefined) return [...file.catalogProperties];
-  return [...CATALOG_PROPERTIES];
-}
-
-/** Catálogo visible en sitio público (excluye `active: false`). */
-export function mergePublicCatalogFromFile(file: SiteContentFile): CatalogProperty[] {
-  return mergeCatalogFromFile(file).filter((p) => p.active !== false);
 }
 
 export function mergeDownloadablesFromFile(locale: Locale, file: SiteContentFile): DownloadableItem[] {

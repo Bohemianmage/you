@@ -122,29 +122,47 @@ export function FeaturedPropertiesCarousel({
   const n = properties.length;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  /** Solo centrado horizontal y autoplay cuando una parte visible del bloque está en el viewport. */
+  const [featuredInView, setFeaturedInView] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const next = useCallback(() => setIndex((i) => (i + 1) % n), [n]);
   const prev = useCallback(() => setIndex((i) => (i - 1 + n) % n), [n]);
 
   useEffect(() => {
-    if (n <= 1 || reducedMotion || paused) return;
+    const root = containerRef.current;
+    if (!root) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return;
+        setFeaturedInView(entry.isIntersecting && entry.intersectionRatio >= 0.12);
+      },
+      { root: null, threshold: [0, 0.12, 0.25, 0.5, 0.75, 1] },
+    );
+    io.observe(root);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (n <= 1 || reducedMotion || paused || !featuredInView) return;
     const id = window.setInterval(next, ROTATION_MS);
     return () => window.clearInterval(id);
-  }, [n, reducedMotion, paused, next]);
+  }, [n, reducedMotion, paused, featuredInView, next]);
 
   useEffect(() => {
     setIndex((i) => (n === 0 ? 0 : i % n));
   }, [n]);
 
   useEffect(() => {
+    if (!featuredInView) return;
     const el = itemRefs.current[index];
     el?.scrollIntoView({
       inline: "center",
       block: "nearest",
       behavior: reducedMotion ? "auto" : "smooth",
     });
-  }, [index, reducedMotion]);
+  }, [index, reducedMotion, featuredInView]);
 
   if (n === 0) return null;
 
@@ -152,6 +170,7 @@ export function FeaturedPropertiesCarousel({
 
   return (
     <div
+      ref={containerRef}
       className="relative mx-auto max-w-6xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}

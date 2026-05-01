@@ -9,13 +9,12 @@ import type { HomeCopy } from "@/i18n/home";
 import { HOME_COPY } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
+import { getCachedEasyBrokerCatalog, getCachedEasyBrokerPropertyDetail } from "@/lib/easybroker/catalog-cache";
 import {
   catalogAsFeaturedDetail,
-  mergeCatalogFromFile,
   mergeDownloadablesFromFile,
   mergeFeaturedFromFile,
   mergeHomeCopy as mergeHomeCopyFromFile,
-  mergePublicCatalogFromFile,
   mergeSiteContact as mergeSiteContactFromFile,
   mergeTeamFromFile,
   mergeClientLogosFromFile,
@@ -55,12 +54,13 @@ export async function getMergedClientLogos(): Promise<ClientLogo[]> {
 
 export async function getMergedFeaturedForLocale(locale: Locale): Promise<FeaturedProperty[]> {
   const file = await getCachedSiteContent();
-  return mergeFeaturedFromFile(locale, file);
+  const catalog = await getCachedEasyBrokerCatalog();
+  return mergeFeaturedFromFile(locale, file, catalog);
 }
 
 export async function getMergedCatalog(): Promise<CatalogProperty[]> {
-  const file = await getCachedSiteContent();
-  return mergePublicCatalogFromFile(file);
+  const catalog = await getCachedEasyBrokerCatalog();
+  return catalog.filter((p) => p.active !== false);
 }
 
 export async function getMergedDownloadablesForLocale(locale: Locale): Promise<DownloadableItem[]> {
@@ -68,16 +68,20 @@ export async function getMergedDownloadablesForLocale(locale: Locale): Promise<D
   return mergeDownloadablesFromFile(locale, file);
 }
 
-/** Ficha interna: destacados derivados del catálogo o lista legacy; catálogo con slug único. */
+/** Ficha interna: catálogo EasyBroker enriquecido con GET detalle; compatibilidad con destacados legacy. */
 export async function getMergedPropertyDetailBySlug(locale: Locale, slug: string): Promise<FeaturedProperty | null> {
   const file = await getCachedSiteContent();
-  const featured = mergeFeaturedFromFile(locale, file);
-  const fromFeatured = findFeaturedPropertyBySegment(featured, slug);
-  if (fromFeatured) return fromFeatured;
-  const catalog = mergeCatalogFromFile(file);
-  const cat = findCatalogPropertyBySegment(catalog, slug);
-  if (!cat || cat.active === false) return null;
-  return catalogAsFeaturedDetail(cat, locale);
+  const catalog = await getCachedEasyBrokerCatalog();
+  const segment = decodeURIComponent(slug);
+
+  const fromList = findCatalogPropertyBySegment(catalog, slug);
+  if (fromList && fromList.active !== false) {
+    const detail = await getCachedEasyBrokerPropertyDetail(segment);
+    return catalogAsFeaturedDetail(detail ?? fromList, locale);
+  }
+
+  const featured = mergeFeaturedFromFile(locale, file, catalog);
+  return findFeaturedPropertyBySegment(featured, slug) ?? null;
 }
 
 export async function getMergedSiteContact(): Promise<SiteContact> {
@@ -85,29 +89,29 @@ export async function getMergedSiteContact(): Promise<SiteContact> {
   return mergeSiteContact(file);
 }
 
-function deriveFeaturedCatalogIdsForAdmin(file: SiteContentFile): string[] {
+function deriveFeaturedCatalogIdsForAdmin(file: SiteContentFile, ebCatalog: readonly CatalogProperty[]): string[] {
   if (file.featuredCatalogIds !== undefined) return [...file.featuredCatalogIds];
-  const catalog = mergeCatalogFromFile(file);
-  const catalogIds = new Set(catalog.map((c) => c.id));
+  const catalogIds = new Set(ebCatalog.map((c) => c.id));
   const legacy = file.featuredByLocale?.es;
   if (legacy?.length) {
     const ids = legacy.map((p) => p.id).filter((id) => catalogIds.has(id));
     if (ids.length) return ids;
   }
-  const fromDefaults = mergeFeaturedFromFile("es", file)
+  const fromDefaults = mergeFeaturedFromFile("es", file, ebCatalog)
     .map((p) => p.id)
     .filter((id) => catalogIds.has(id));
   if (fromDefaults.length) return fromDefaults;
-  const active = catalog.filter((c) => c.active !== false);
+  const active = ebCatalog.filter((c) => c.active !== false);
   return active.slice(0, 6).map((c) => c.id);
 }
 
 export async function getAdminEditorSeed(): Promise<AdminEditorSeed> {
   const file = await getCachedSiteContent();
+  const catalog = await getCachedEasyBrokerCatalog();
   return {
     team: mergeTeamFromFile(file),
-    featuredCatalogIds: deriveFeaturedCatalogIdsForAdmin(file),
-    catalog: mergeCatalogFromFile(file),
+    featuredCatalogIds: deriveFeaturedCatalogIdsForAdmin(file, catalog),
+    catalog,
     downloadablesEs: mergeDownloadablesFromFile("es", file),
     downloadablesEn: mergeDownloadablesFromFile("en", file),
   };

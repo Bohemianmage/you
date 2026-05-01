@@ -13,8 +13,6 @@ import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
 import type { Locale } from "@/i18n/types";
 import { propertyCoverImage } from "@/lib/property-media";
 import { catalogDetailHref } from "@/lib/property-routes";
-import { mergePublicCatalogFromFile } from "@/lib/site-content/merge-public";
-import type { SiteContentFile } from "@/lib/site-content/types";
 
 type CatalogCopy = (typeof CATALOG_PAGE_COPY)[Locale];
 
@@ -66,7 +64,7 @@ export function PropiedadesCatalog({
   filters: CatalogQueryFilters;
 }) {
   const edit = useSiteContentEditOptional();
-  const catalog = edit ? mergePublicCatalogFromFile(edit.working as SiteContentFile) : serverCatalog;
+  const catalog = edit ? [...edit.previewEbCatalog].filter((p) => p.active !== false) : serverCatalog;
 
   const filtered = useMemo(() => filterCatalogProperties(catalog, filters), [catalog, filters]);
 

@@ -1,9 +1,7 @@
 /**
- * Catálogo `/propiedades` y fichas `/propiedades/[slug]` (persistible en JSON).
- * Respaldo en repo: `catalog-seed.json` (regenerar con `node scripts/build-catalog-from-html.mjs` tras actualizar `scripts/listings-page.html`).
+ * Catálogo `/propiedades` y fichas `/propiedades/[slug]`.
+ * El inventario en vivo proviene de EasyBroker (`getCachedEasyBrokerCatalog`).
  */
-import catalogSeed from "./catalog-seed.json";
-
 export interface CatalogProperty {
   id: string;
   /** Si es `false`, no se publica en /propiedades ni en destacados (solo visible en admin). */
@@ -40,5 +38,3 @@ export interface CatalogProperty {
   yearBuilt?: number;
   brochureUrl?: string;
 }
-
-export const CATALOG_PROPERTIES: readonly CatalogProperty[] = catalogSeed as CatalogProperty[];

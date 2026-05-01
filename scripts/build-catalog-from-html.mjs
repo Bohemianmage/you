@@ -1,6 +1,6 @@
 /**
- * Lee `scripts/listings-page.html` (HTML guardado del listado público de propiedades)
- * y escribe `src/data/catalog-seed.json` para usar como respaldo del catálogo en el repo.
+ * @deprecated El catálogo sale de EasyBroker (`EASYBROKER_API_KEY`). Este extractor ya no alimenta el sitio.
+ * Lee `scripts/listings-page.html` y podría escribir `catalog-seed.json` solo como utilidad legacy.
  */
 import fs from "fs";
 

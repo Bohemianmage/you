@@ -44,6 +44,10 @@ export async function saveSiteContent(json: string): Promise<SaveSiteContentResu
     return { ok: false, error: "invalid_json" };
   }
 
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    delete (parsed as Record<string, unknown>).catalogProperties;
+  }
+
   let file: SiteContentFile;
   try {
     file = editorJsonToFile(parsed);

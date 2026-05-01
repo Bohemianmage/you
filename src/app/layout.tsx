@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { DM_Sans, Montserrat } from "next/font/google";
 
 import { SiteContentEditProvider } from "@/components/admin/site-content-edit-provider";
+import type { CatalogProperty } from "@/data/catalog-properties";
+import { getCachedEasyBrokerCatalog } from "@/lib/easybroker/catalog-cache";
 import { getIsAdmin } from "@/lib/admin/is-admin";
 import type { SiteContentFile } from "@/lib/site-content/types";
 import { getSiteContentFresh } from "@/lib/site-settings/load";
@@ -44,11 +46,19 @@ export default async function RootLayout({
 }>) {
   const isAdmin = await getIsAdmin();
   const initialPersisted: SiteContentFile = isAdmin ? await getSiteContentFresh() : {};
+  let previewEbCatalog: CatalogProperty[] = [];
+  if (isAdmin) {
+    previewEbCatalog = await getCachedEasyBrokerCatalog();
+  }
 
   return (
     <html lang="es" className={`${dmSans.variable} ${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-brand-bg text-brand-text">
-        <SiteContentEditProvider enabled={isAdmin} initialPersisted={initialPersisted}>
+        <SiteContentEditProvider
+          enabled={isAdmin}
+          initialPersisted={initialPersisted}
+          previewEbCatalog={previewEbCatalog}
+        >
           {children}
         </SiteContentEditProvider>
       </body>

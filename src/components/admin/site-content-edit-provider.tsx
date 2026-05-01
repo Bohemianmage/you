@@ -7,11 +7,14 @@ import { useRouter } from "next/navigation";
 import { logoutAdmin } from "@/app/admin/actions";
 import { saveSiteContent } from "@/app/actions/site-content";
 import { AdminEditDrawer } from "@/components/admin/admin-edit-drawer";
+import type { CatalogProperty } from "@/data/catalog-properties";
 import type { Locale } from "@/i18n/types";
 import type { SiteContentFile } from "@/lib/site-content/types";
 
 type EditContextValue = {
   working: SiteContentFile;
+  /** Inventario EasyBroker (solo servidor); vista previa en modo edición. */
+  previewEbCatalog: readonly CatalogProperty[];
   patchWorking: (fn: (w: SiteContentFile) => SiteContentFile) => void;
   openSection: (id: string) => void;
   activeSection: string | null;
@@ -95,7 +98,7 @@ function SiteAdminToolbar({
               href="/admin/listas"
               className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
             >
-              Listas y catálogo
+              Listas
             </Link>
             <form action={logoutAdmin}>
               <button
@@ -132,10 +135,12 @@ function SiteAdminToolbar({
 export function SiteContentEditProvider({
   enabled,
   initialPersisted,
+  previewEbCatalog,
   children,
 }: {
   enabled: boolean;
   initialPersisted: SiteContentFile;
+  previewEbCatalog: readonly CatalogProperty[];
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -191,6 +196,7 @@ export function SiteContentEditProvider({
   const ctxValue = useMemo<EditContextValue>(
     () => ({
       working,
+      previewEbCatalog,
       patchWorking,
       openSection,
       activeSection,
@@ -205,6 +211,7 @@ export function SiteContentEditProvider({
     }),
     [
       working,
+      previewEbCatalog,
       patchWorking,
       openSection,
       activeSection,

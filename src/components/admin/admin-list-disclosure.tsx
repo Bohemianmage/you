@@ -38,7 +38,11 @@ export function AdminListDisclosureRow({
           </span>
           <span className="min-w-0 flex-1">{title}</span>
         </button>
-        {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+        {actions ? (
+          <div className="flex flex-wrap items-center gap-2" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+            {actions}
+          </div>
+        ) : null}
       </div>
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}

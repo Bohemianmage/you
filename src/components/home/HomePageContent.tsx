@@ -47,7 +47,7 @@ export function HomePageContent({
   const { homeCopy: copy, locale } = useLiveSite();
   const edit = useSiteContentEditOptional();
   const team = edit ? mergeTeamFromFile(edit.working) : serverTeam;
-  const featured = edit ? mergeFeaturedFromFile(locale, edit.working) : serverFeatured;
+  const featured = edit ? mergeFeaturedFromFile(locale, edit.working, edit.previewEbCatalog) : serverFeatured;
   const downloadables = edit ? mergeDownloadablesFromFile(locale, edit.working) : serverDownloadables;
   const clientLogos = edit ? mergeClientLogosFromFile(edit.working) : serverClientLogos;
   const announcementHref = catalogHref;
