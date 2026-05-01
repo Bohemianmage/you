@@ -27,3 +27,18 @@ export function deriveZoneGroup(locationLine: string): string {
   }
   return parts[0] ?? raw;
 }
+
+/**
+ * Parte «fina» de la ubicación antes de ciudad+estado: p. ej. `Colonia, Ciudad, Estado` → `Colonia`.
+ * Con 4+ segmentos une todo salvo los dos últimos (`A, B, Ciudad, Estado` → `A, B`).
+ */
+export function extractLocalZonePart(locationLine: string): string | undefined {
+  const raw = locationLine.trim();
+  if (!raw || raw === "—") return undefined;
+  const parts = raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (parts.length < 3) return undefined;
+  return parts.slice(0, -2).join(", ");
+}

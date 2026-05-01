@@ -30,6 +30,12 @@ export function catalogDetailHref(locale: Locale, c: CatalogProperty): string {
   return `/propiedades/${seg}${localeQuery(locale)}`;
 }
 
+/** Relative href when you only have the URL segment (slug or id). */
+export function catalogDetailSegmentHref(locale: Locale, segment: string): string {
+  const seg = encodeURIComponent(segment);
+  return `/propiedades/${seg}${localeQuery(locale)}`;
+}
+
 export function findCatalogPropertyBySegment(list: readonly CatalogProperty[], slugParam: string): CatalogProperty | undefined {
   const decoded = decodeURIComponent(slugParam);
   return list.find((p) => catalogPropertySegment(p) === decoded);

@@ -67,4 +67,7 @@ export interface CatalogProperty {
   agentName?: string;
   agentEmail?: string;
   foreclosure?: boolean;
+  /** Coordenadas (suelen venir solo del detalle EasyBroker). */
+  latitude?: number;
+  longitude?: number;
 }

@@ -1,5 +1,5 @@
 import type { CatalogProperty } from "@/data/catalog-properties";
-import { resolveCatalogZoneGroup } from "@/lib/catalog-zone-group";
+import { extractLocalZonePart, resolveCatalogZoneGroup } from "@/lib/catalog-zone-group";
 import { getListingMetrics, getListingPrice } from "@/lib/catalog-metrics";
 import type { CatalogQueryFilters } from "@/lib/catalog-query";
 
@@ -55,6 +55,18 @@ function zoneFilterMatches(p: CatalogProperty, filterZone: string): boolean {
   return z === f || g === f;
 }
 
+function regionFilterMatches(p: CatalogProperty, filterRegion: string): boolean {
+  const f = filterRegion.trim().toLowerCase();
+  const g = resolveCatalogZoneGroup(p.zone, p.zoneGroup).trim().toLowerCase();
+  return g === f;
+}
+
+function areaFilterMatches(p: CatalogProperty, filterArea: string): boolean {
+  const f = filterArea.trim().toLowerCase();
+  const local = extractLocalZonePart(p.zone)?.trim().toLowerCase();
+  return local != null && local === f;
+}
+
 function inRange(
   value: number | undefined,
   min: number | undefined,
@@ -75,9 +87,17 @@ function effectiveMin(n: number | undefined): number | undefined {
 export function filterCatalogProperties(list: CatalogProperty[], opts: CatalogQueryFilters): CatalogProperty[] {
   let out = list;
 
-  const zone = opts.zone?.trim();
-  if (zone) {
-    out = out.filter((p) => zoneFilterMatches(p, zone));
+  const region = opts.region?.trim();
+  const legacyZone = opts.zone?.trim();
+  if (region) {
+    out = out.filter((p) => regionFilterMatches(p, region));
+  } else if (legacyZone) {
+    out = out.filter((p) => zoneFilterMatches(p, legacyZone));
+  }
+
+  const area = opts.area?.trim();
+  if (area) {
+    out = out.filter((p) => areaFilterMatches(p, area));
   }
 
   const tipo = opts.tipo;

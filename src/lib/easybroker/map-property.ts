@@ -52,6 +52,15 @@ function currencyToCatalog(c: string | undefined): "MXN" | "USD" | undefined {
   return undefined;
 }
 
+function locationCoordinates(loc: Record<string, unknown>): { lat: number; lng: number } | undefined {
+  const lat = num(loc.latitude) ?? num(loc.lat);
+  const lng = num(loc.longitude) ?? num(loc.lng) ?? num(loc.lon);
+  if (lat == null || lng == null) return undefined;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return undefined;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return undefined;
+  return { lat, lng };
+}
+
 function joinLocation(loc: Record<string, unknown>): string {
   const name = str(loc.name);
   if (name) return name;
@@ -304,9 +313,12 @@ export function mapEasyBrokerPropertyToCatalog(raw: Record<string, unknown>, mod
 
   const opDetail = operationsDetail(ops);
   const foreclosure = raw.foreclosure === true;
+  const coords = locObj ? locationCoordinates(locObj) : undefined;
 
   return {
     ...base,
+    latitude: coords?.lat,
+    longitude: coords?.lng,
     ebOperations: opDetail.length ? opDetail : undefined,
     expenses: expenses || undefined,
     floorsCount: floorsCount != null ? Math.round(floorsCount) : undefined,

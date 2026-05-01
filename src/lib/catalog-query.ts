@@ -4,6 +4,11 @@ export type ListingTypeFilter = "" | "rent" | "sale";
 
 /** Estado de filtros del listado (URL ↔ UI). */
 export type CatalogQueryFilters = {
+  /** Ciudad + estado (agrupación); preferido frente a `zone` legado. */
+  region?: string;
+  /** Colonia / segmento local (requiere contexto de región en la UI). */
+  area?: string;
+  /** Filtro legado: coincide con línea completa o con la región agrupada. */
   zone?: string;
   tipo?: ListingTypeFilter;
   m2Min?: number;
@@ -33,8 +38,15 @@ function appendNumericParams(params: URLSearchParams, f: CatalogQueryFilters): v
 export function catalogPageHref(locale: Locale, filters: CatalogQueryFilters): string {
   const params = new URLSearchParams();
   if (locale === "en") params.set("lang", "en");
+  const r = filters.region?.trim();
+  const a = filters.area?.trim();
   const z = filters.zone?.trim();
-  if (z) params.set("zone", z);
+  if (r) {
+    params.set("region", r);
+    if (a) params.set("area", a);
+  } else if (z) {
+    params.set("zone", z);
+  }
   if (filters.tipo === "rent" || filters.tipo === "sale") params.set("tipo", filters.tipo);
   appendNumericParams(params, filters);
   const q = params.toString();
@@ -55,6 +67,8 @@ function parseNonNegNumber(v: string | undefined): number | undefined {
 
 /** Lee query string de Next (`searchParams`) hacia estado de filtros. */
 export function parseCatalogFiltersFromSearchParams(params: {
+  region?: string | string[];
+  area?: string | string[];
   zone?: string | string[];
   tipo?: string | string[];
   m2Min?: string | string[];
@@ -76,8 +90,12 @@ export function parseCatalogFiltersFromSearchParams(params: {
   /** `precioMin=0` no debe activar el filtro de precio (equivale a sin mínimo). */
   const precioMin = precioMinRaw === 0 ? undefined : precioMinRaw;
   const wantsPrice = precioMin != null || precioMaxRaw != null;
+  const region = spFirst(params.region)?.trim();
+  const area = spFirst(params.area)?.trim();
   const zone = spFirst(params.zone)?.trim();
   return {
+    region: region || undefined,
+    area: area || undefined,
     zone: zone || undefined,
     tipo,
     m2Min: parseNonNegNumber(spFirst(params.m2Min)),

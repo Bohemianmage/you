@@ -8,7 +8,8 @@ import { useSiteContentEditOptional } from "@/components/admin/site-content-edit
 import type { CatalogProperty } from "@/data/catalog-properties";
 import { filterCatalogProperties, inferListingDisplayType } from "@/lib/catalog-filters";
 import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
-import { resolveCatalogZoneGroup } from "@/lib/catalog-zone-group";
+import { CatalogPropertiesMap } from "@/components/propiedades/CatalogPropertiesMap";
+import { extractLocalZonePart, resolveCatalogZoneGroup } from "@/lib/catalog-zone-group";
 import { catalogPageHref, type CatalogQueryFilters, type ListingTypeFilter } from "@/lib/catalog-query";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
 import type { Locale } from "@/i18n/types";
@@ -32,7 +33,12 @@ const fieldInput =
 function countDetailFilters(f: CatalogQueryFilters): number {
   let n = 0;
   if (f.tipo === "rent" || f.tipo === "sale") n++;
-  if (f.zone?.trim()) n++;
+  if (f.region?.trim()) {
+    n++;
+    if (f.area?.trim()) n++;
+  } else if (f.zone?.trim()) {
+    n++;
+  }
   const nums: (keyof CatalogQueryFilters)[] = ["m2Min", "m2Max", "recMin", "recMax", "banMin", "banMax", "precioMin", "precioMax"];
   for (const k of nums) {
     const v = f[k];
@@ -101,7 +107,7 @@ export function PropiedadesCatalog({
 
   const tipo: ListingTypeFilter = live.tipo === "rent" || live.tipo === "sale" ? live.tipo : "";
 
-  const zones = useMemo(() => {
+  const regions = useMemo(() => {
     const set = new Set<string>();
     for (const p of catalog) {
       const g = resolveCatalogZoneGroup(p.zone, p.zoneGroup);
@@ -109,6 +115,30 @@ export function PropiedadesCatalog({
     }
     return [...set].sort((a, b) => a.localeCompare(b, locale === "en" ? "en" : "es"));
   }, [catalog, locale]);
+
+  const areaOptions = useMemo(() => {
+    const r = live.region?.trim();
+    if (!r) return [];
+    const set = new Set<string>();
+    for (const p of catalog) {
+      if (resolveCatalogZoneGroup(p.zone, p.zoneGroup).trim() !== r) continue;
+      const local = extractLocalZonePart(p.zone)?.trim();
+      if (local) set.add(local);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b, locale === "en" ? "en" : "es"));
+  }, [catalog, live.region, locale]);
+
+  /** Enlaces `?zone=` que coinciden con una región agrupada pasan a `region` en la URL viva. */
+  useEffect(() => {
+    const z = filters.zone?.trim();
+    if (!z || filters.region?.trim()) return;
+    const hit = regions.find((r) => r.toLowerCase() === z.toLowerCase());
+    if (!hit) return;
+    setLive((prev) => {
+      if (prev.region?.trim()) return prev;
+      return { ...prev, region: hit, zone: undefined, area: undefined };
+    });
+  }, [filtersKeyFromUrl, filters.region, filters.zone, regions]);
 
   const detailFilterCount = useMemo(() => countDetailFilters(live), [live]);
   const advancedFilterCount = useMemo(() => countAdvancedFilters(live), [live]);
@@ -177,7 +207,7 @@ export function PropiedadesCatalog({
           ) : null}
 
           <div className="space-y-5 px-4 py-5 sm:px-6 sm:py-6">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
               <div className="min-w-0 space-y-2">
                 <label htmlFor="filter-tipo" className={fieldLabel}>
                   {copy.filterHeading}
@@ -204,29 +234,66 @@ export function PropiedadesCatalog({
                 <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterListingTypeHint}</p>
               </div>
               <div className="min-w-0 space-y-2">
-                <label htmlFor="filter-zone" className={fieldLabel}>
+                <label htmlFor="filter-region" className={fieldLabel}>
                   {copy.zoneLabel}
                 </label>
                 <div className="relative">
                   <select
-                    id="filter-zone"
-                    value={live.zone ?? ""}
+                    id="filter-region"
+                    value={live.region ?? ""}
                     onChange={(e) => {
-                      const z = e.target.value.trim();
-                      setLive((prev) => ({ ...prev, zone: z || undefined }));
+                      const r = e.target.value.trim();
+                      setLive((prev) => ({
+                        ...prev,
+                        region: r || undefined,
+                        area: undefined,
+                        zone: undefined,
+                      }));
                     }}
                     className={`${fieldInput} appearance-none pr-11`}
                   >
                     <option value="">{copy.filterZoneAll}</option>
-                    {zones.map((z) => (
-                      <option key={z} value={z}>
-                        {z}
+                    {regions.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
                       </option>
                     ))}
                   </select>
                   <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
                 </div>
                 <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterRegionHint}</p>
+              </div>
+              <div className="min-w-0 space-y-2 md:col-span-1">
+                <label htmlFor="filter-area" className={fieldLabel}>
+                  {copy.areaLabel}
+                </label>
+                <div className="relative">
+                  <select
+                    id="filter-area"
+                    value={live.area ?? ""}
+                    disabled={!live.region?.trim() || areaOptions.length === 0}
+                    onChange={(e) => {
+                      const a = e.target.value.trim();
+                      setLive((prev) => ({
+                        ...prev,
+                        area: a || undefined,
+                        zone: undefined,
+                      }));
+                    }}
+                    className={`${fieldInput} appearance-none pr-11 disabled:cursor-not-allowed disabled:opacity-55`}
+                  >
+                    <option value="">{copy.filterAreaAll}</option>
+                    {areaOptions.map((a) => (
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
+                    ))}
+                  </select>
+                  <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
+                </div>
+                <p className="text-[11px] leading-snug text-brand-subtle">
+                  {!live.region?.trim() ? copy.filterAreaHint : copy.filterAreaOptional}
+                </p>
               </div>
             </div>
 
@@ -470,6 +537,17 @@ export function PropiedadesCatalog({
         </details>
       </section>
 
+      {filtered.length > 0 ? (
+        <div className="space-y-2">
+          <h2 className="font-heading text-lg font-semibold tracking-tight text-brand-text">{copy.mapHeading}</h2>
+          <CatalogPropertiesMap
+            locale={locale}
+            listings={filtered}
+            copy={{ mapEmpty: copy.mapEmpty, mapError: copy.mapError, mapHint: copy.mapHint }}
+          />
+        </div>
+      ) : null}
+
       <p className="text-center text-sm font-medium text-brand-muted sm:text-left">{countCaption}</p>
 
       {filtered.length === 0 ? (
@@ -514,7 +592,7 @@ export function PropiedadesCatalog({
                           labels={{ rent: copy.listingBadgeRent, sale: copy.listingBadgeSale }}
                         />
                         <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent">
-                          {copy.zoneLabel}: {p.zone}
+                          {copy.cardLocationLabel}: {p.zone}
                         </p>
                       </div>
                       <h2 className="mt-2 font-heading text-xl font-semibold text-brand-text group-hover:text-brand-accent-strong">

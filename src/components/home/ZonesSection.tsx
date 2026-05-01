@@ -27,7 +27,7 @@ export function ZonesSection({ title, zones, locale }: ZonesSectionProps) {
         <ul className="flex flex-wrap justify-center gap-3">
           {zones.map((z) => {
             const zoneParam = z.filterZone ?? z.label;
-            const href = catalogPageHref(locale, { zone: zoneParam });
+            const href = catalogPageHref(locale, { region: zoneParam });
             return (
               <li key={z.label}>
                 <Link

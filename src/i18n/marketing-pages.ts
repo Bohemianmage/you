@@ -7,8 +7,19 @@ export const CATALOG_PAGE_COPY: Record<
     title: string;
     subtitle: string;
     zoneLabel: string;
+    /** Segundo nivel de ubicación (colonia / tramo antes de ciudad+estado). */
+    areaLabel: string;
     /** Texto de ayuda bajo el selector de región (agrupación). */
     filterRegionHint: string;
+    filterAreaHint: string;
+    /** Con región ya elegida y opciones de colonia disponibles. */
+    filterAreaOptional: string;
+    mapHeading: string;
+    mapHint: string;
+    mapEmpty: string;
+    mapError: string;
+    /** Línea de ubicación en tarjetas del listado. */
+    cardLocationLabel: string;
     specsLabel: string;
     backHome: string;
     contactCta: string;
@@ -21,6 +32,7 @@ export const CATALOG_PAGE_COPY: Record<
     noResults: string;
     filtersDetailHeading: string;
     filterZoneAll: string;
+    filterAreaAll: string;
     filterM2Min: string;
     filterM2Max: string;
     filterBedMin: string;
@@ -60,8 +72,15 @@ export const CATALOG_PAGE_COPY: Record<
     title: "Propiedades",
     subtitle: "Portafolio disponible y referencias en zonas premium de CDMX.",
     zoneLabel: "Región",
-    filterRegionHint:
-      "Agrupamos por ciudad y estado (últimos segmentos de la ubicación) para filtrar más fácil; cada tarjeta sigue mostrando la ubicación completa.",
+    areaLabel: "Colonia o zona",
+    filterRegionHint: "Ciudad y estado (últimos segmentos). Luego puedes afinar por colonia o tramo local.",
+    filterAreaHint: "Elige primero una región para ver colonias o zonas disponibles en el catálogo.",
+    filterAreaOptional: "Opcional: refina por colonia o tramo local cuando exista en los datos.",
+    mapHeading: "Mapa",
+    mapHint: "Marcadores según el listado filtrado (coordenadas desde la ficha de cada propiedad).",
+    mapEmpty: "Ninguna propiedad del listado tiene coordenadas para mostrar.",
+    mapError: "No se pudo cargar el mapa. Intenta de nuevo más tarde.",
+    cardLocationLabel: "Ubicación",
     specsLabel: "Superficie y distribución",
     backHome: "Volver al inicio",
     contactCta: "Platicar con un asesor",
@@ -74,6 +93,7 @@ export const CATALOG_PAGE_COPY: Record<
     noResults: "No hay propiedades que coincidan con estos filtros.",
     filtersDetailHeading: "Filtros",
     filterZoneAll: "Todas las regiones",
+    filterAreaAll: "Todas las colonias / zonas",
     filterM2Min: "m² mín.",
     filterM2Max: "m² máx.",
     filterBedMin: "Rec. mín.",
@@ -107,8 +127,15 @@ export const CATALOG_PAGE_COPY: Record<
     title: "Properties",
     subtitle: "Available portfolio and references in Mexico City premium corridors.",
     zoneLabel: "Region",
-    filterRegionHint:
-      "We group by city and state (last segments of the address) so filtering is easier; each card still shows the full location line.",
+    areaLabel: "Neighborhood or area",
+    filterRegionHint: "City and state (last segments). Then narrow by neighborhood or local area.",
+    filterAreaHint: "Pick a region first to see available neighborhoods in the catalog.",
+    filterAreaOptional: "Optional: narrow by neighborhood when present in the data.",
+    mapHeading: "Map",
+    mapHint: "Markers reflect the filtered list (coordinates from each listing’s record).",
+    mapEmpty: "No listings in this view have coordinates to display.",
+    mapError: "Could not load the map. Please try again later.",
+    cardLocationLabel: "Location",
     specsLabel: "Size & layout",
     backHome: "Back to home",
     contactCta: "Talk to an advisor",
@@ -121,6 +148,7 @@ export const CATALOG_PAGE_COPY: Record<
     noResults: "No listings match these filters.",
     filtersDetailHeading: "Filters",
     filterZoneAll: "All regions",
+    filterAreaAll: "All neighborhoods / areas",
     filterM2Min: "Min m²",
     filterM2Max: "Max m²",
     filterBedMin: "Min beds",

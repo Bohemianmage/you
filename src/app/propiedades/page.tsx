@@ -11,6 +11,8 @@ import type { Metadata } from "next";
 interface PropiedadesPageProps {
   searchParams?: Promise<{
     lang?: string;
+    region?: string;
+    area?: string;
     zone?: string;
     tipo?: string;
     m2Min?: string;
