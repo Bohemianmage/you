@@ -47,73 +47,103 @@
       }
     }
   ],
-  "featuredByLocale": {
+  "featuredCatalogIds": [
+    "polarea-torre-viena",
+    "tres-picos-polanco",
+    "tecamachalco-naucalpan",
+    "zona-hotelera-polanco",
+    "club-golf-bosques-santa-fe"
+  ],
+  "catalogProperties": [
+    {
+      "id": "polarea-torre-viena",
+      "title": "Polarea - Torre Viena",
+      "price": "$1,350,000.00 USD",
+      "specs": "240 m² · 3 rec. · 3 baños",
+      "zone": "Polanco",
+      "status": "En venta",
+      "listingType": "sale"
+    },
+    {
+      "id": "tres-picos-polanco",
+      "title": "Tres Picos - Polanco",
+      "price": "$20,000,000.00 MXN",
+      "specs": "500 m² · 3 rec. · 5 baños",
+      "zone": "Polanco",
+      "status": "En venta",
+      "listingType": "sale"
+    },
+    {
+      "id": "tecamachalco-naucalpan",
+      "title": "Tecamachalco / Naucalpan",
+      "price": "$90,000.00 MXN",
+      "specs": "250 m² · 3 rec. · 3 baños",
+      "zone": "Estado de México",
+      "status": "En renta",
+      "listingType": "rent"
+    },
+    {
+      "id": "zona-hotelera-polanco",
+      "title": "Zona Hotelera - Polanco",
+      "price": "$2,500,000.00 USD",
+      "specs": "660 m² · 3 rec. · 4 baños",
+      "zone": "Polanco",
+      "status": "En venta",
+      "listingType": "sale"
+    },
+    {
+      "id": "club-golf-bosques-santa-fe",
+      "title": "Club de Golf \"Bosques de Santa Fe\"",
+      "price": "$1,350,000.00 USD",
+      "specs": "240 m² · 3 rec. · 3 baños",
+      "zone": "Santa Fe",
+      "status": "En venta",
+      "listingType": "sale"
+    }
+  ],
+  "downloadablesByLocale": {
     "es": [
       {
-        "id": "polanco-rent-luxury-balcony",
-        "title": "Renta Departamento de Lujo con Balcón en Polanco",
-        "price": "US$ 8,500.00",
-        "address": "Campos Elíseos, Polanco, Polanco II Secc, Miguel Hidalgo, 11550 Ciudad de México, CDMX, México",
-        "status": "En renta",
-        "ctaLabel": "Tours virtuales"
+        "id": "brochure-corporativo",
+        "title": "Brochure corporativo YOU",
+        "description": "Presentación de servicios, zonas de cobertura y proceso de asesoría."
       },
       {
-        "id": "bosques-sale-ph-golf",
-        "title": "Venta PH Dos Niveles con Terraza en Club de Golf Bosques de Santa Fe",
-        "price": "US$ 4,300,000.00",
-        "address": "Canadá 77, Parque San Andrés, Cuajimalpa de Morelos, 05600 CDMX, México",
-        "status": "En venta",
-        "ctaLabel": "Tours virtuales"
+        "id": "guia-plusvalia-cdmx",
+        "title": "Guía de zonas de plusvalía CDMX",
+        "description": "Resumen orientativo de corredores premium para inversión y habitabilidad."
       },
       {
-        "id": "miyana-sale-ph-colibri",
-        "title": "Venta PH con Terraza en Miyana Torre Colibrí",
-        "price": "$58,900,000.00 MXN",
-        "address": "Avenida Ejército Nacional, Granada, Ciudad de México, CDMX, México",
-        "status": "En venta",
-        "ctaLabel": "Tours virtuales"
+        "id": "checklist-compra-renta",
+        "title": "Checklist compra / renta",
+        "description": "Lista de verificación para documentación y pasos clave antes de firmar."
       },
       {
-        "id": "polanco-rent-ph-terraces",
-        "title": "Renta PH con Terrazas y Balcones en Polanco",
-        "price": "$110,000.00 MXN",
-        "address": "Eugenio Sue, Polanco IV Secc, Ciudad de México, CDMX, México",
-        "status": "En renta",
-        "ctaLabel": "Tours virtuales"
+        "id": "ficha-oficinas-corporativas",
+        "title": "Ficha — oficinas corporativas",
+        "description": "Criterios de búsqueda, zonas corporativas y acompañamiento para equipos."
       }
     ],
     "en": [
       {
-        "id": "polanco-rent-luxury-balcony",
-        "title": "Luxury Apartment for Rent with Balcony in Polanco",
-        "price": "US$ 8,500.00",
-        "address": "Campos Elíseos, Polanco, Polanco II Secc, Miguel Hidalgo, 11550 Mexico City, CDMX, Mexico",
-        "status": "For rent",
-        "ctaLabel": "Virtual tours"
+        "id": "brochure-corporativo",
+        "title": "YOU corporate brochure",
+        "description": "Services overview, coverage areas, and how we work with you."
       },
       {
-        "id": "bosques-sale-ph-golf",
-        "title": "Two-level Penthouse for Sale with Terrace in Club de Golf Bosques de Santa Fe",
-        "price": "US$ 4,300,000.00",
-        "address": "Canadá 77, Parque San Andrés, Cuajimalpa de Morelos, 05600 CDMX, Mexico",
-        "status": "For sale",
-        "ctaLabel": "Virtual tours"
+        "id": "guia-plusvalia-cdmx",
+        "title": "CDMX value corridors guide",
+        "description": "Orientation on premium districts for living and investment."
       },
       {
-        "id": "miyana-sale-ph-colibri",
-        "title": "Penthouse for Sale with Terrace in Miyana Torre Colibrí",
-        "price": "$58,900,000.00 MXN",
-        "address": "Avenida Ejército Nacional, Granada, Mexico City, CDMX, Mexico",
-        "status": "For sale",
-        "ctaLabel": "Virtual tours"
+        "id": "checklist-compra-renta",
+        "title": "Buy / lease checklist",
+        "description": "Documentation and key steps before signing."
       },
       {
-        "id": "polanco-rent-ph-terraces",
-        "title": "Penthouse for Rent with Terraces and Balconies in Polanco",
-        "price": "$110,000.00 MXN",
-        "address": "Eugenio Sue, Polanco IV Secc, Mexico City, CDMX, Mexico",
-        "status": "For rent",
-        "ctaLabel": "Virtual tours"
+        "id": "ficha-oficinas-corporativas",
+        "title": "Corporate offices one-pager",
+        "description": "Search criteria, districts, and team workspace advisory."
       }
     ]
   }
