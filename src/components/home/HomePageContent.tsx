@@ -16,7 +16,6 @@ import { useSiteContentEditOptional } from "@/components/admin/site-content-edit
 import type { DownloadableItem } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
-import { ZONES_BY_LOCALE } from "@/data/zones";
 import type { ClientLogo } from "@/lib/site-content/types";
 import {
   mergeClientLogosFromFile,
@@ -30,6 +29,7 @@ export function HomePageContent({
   contactHref,
   proposalHref,
   tourEmbed,
+  catalogZones,
   serverTeam,
   serverFeatured,
   serverDownloadables,
@@ -39,6 +39,7 @@ export function HomePageContent({
   contactHref: string;
   proposalHref: string;
   tourEmbed?: string;
+  catalogZones: readonly string[];
   serverTeam: TeamMember[];
   serverFeatured: FeaturedProperty[];
   serverDownloadables: DownloadableItem[];
@@ -76,7 +77,7 @@ export function HomePageContent({
       </EditableSection>
 
       <EditableSection sectionId="zones" label="Editar">
-        <ZonesSection title={copy.zones.title} zones={ZONES_BY_LOCALE[locale]} locale={locale} />
+        <ZonesSection title={copy.zones.title} zones={catalogZones} locale={locale} />
       </EditableSection>
 
       <EditableSection sectionId="featured" label="Editar">

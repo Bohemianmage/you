@@ -6,10 +6,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import type { CatalogProperty } from "@/data/catalog-properties";
-import { filterCatalogProperties, inferListingDisplayType } from "@/lib/catalog-filters";
+import { filterCatalogProperties, inferListingDisplayType, normalizeCatalogFeatureKey } from "@/lib/catalog-filters";
 import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import { CatalogPropertiesMap } from "@/components/propiedades/CatalogPropertiesMap";
-import { extractLocalZonePart, resolveCatalogZoneGroup } from "@/lib/catalog-zone-group";
+import { distinctCatalogZoneFilterKeys } from "@/lib/catalog-zone-filter";
 import { catalogPageHref, type CatalogQueryFilters, type ListingTypeFilter } from "@/lib/catalog-query";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
 import type { Locale } from "@/i18n/types";
@@ -33,12 +33,8 @@ const fieldInput =
 function countDetailFilters(f: CatalogQueryFilters): number {
   let n = 0;
   if (f.tipo === "rent" || f.tipo === "sale") n++;
-  if (f.region?.trim()) {
-    n++;
-    if (f.area?.trim()) n++;
-  } else if (f.zone?.trim()) {
-    n++;
-  }
+  if (f.zone?.trim()) n++;
+  n += f.features?.length ?? 0;
   const nums: (keyof CatalogQueryFilters)[] = ["m2Min", "m2Max", "recMin", "recMax", "banMin", "banMax", "precioMin", "precioMax"];
   for (const k of nums) {
     const v = f[k];
@@ -107,38 +103,29 @@ export function PropiedadesCatalog({
 
   const tipo: ListingTypeFilter = live.tipo === "rent" || live.tipo === "sale" ? live.tipo : "";
 
-  const regions = useMemo(() => {
-    const set = new Set<string>();
+  const zoneOptions = useMemo(
+    () => distinctCatalogZoneFilterKeys(catalog, locale === "en" ? "en" : "es"),
+    [catalog, locale],
+  );
+
+  const featureOptions = useMemo(() => {
+    const collator = locale === "en" ? "en" : "es";
+    const byKey = new Map<string, string>();
     for (const p of catalog) {
-      const g = resolveCatalogZoneGroup(p.zone, p.zoneGroup);
-      if (g.trim()) set.add(g.trim());
+      for (const row of p.ebFeatures ?? []) {
+        const label = row.name.trim();
+        if (!label) continue;
+        const k = normalizeCatalogFeatureKey(label);
+        if (!byKey.has(k)) byKey.set(k, label);
+      }
     }
-    return [...set].sort((a, b) => a.localeCompare(b, locale === "en" ? "en" : "es"));
+    return [...byKey.values()].sort((a, b) => a.localeCompare(b, collator));
   }, [catalog, locale]);
 
-  const areaOptions = useMemo(() => {
-    const r = live.region?.trim();
-    if (!r) return [];
-    const set = new Set<string>();
-    for (const p of catalog) {
-      if (resolveCatalogZoneGroup(p.zone, p.zoneGroup).trim() !== r) continue;
-      const local = extractLocalZonePart(p.zone)?.trim();
-      if (local) set.add(local);
-    }
-    return [...set].sort((a, b) => a.localeCompare(b, locale === "en" ? "en" : "es"));
-  }, [catalog, live.region, locale]);
-
-  /** Enlaces `?zone=` que coinciden con una región agrupada pasan a `region` en la URL viva. */
-  useEffect(() => {
-    const z = filters.zone?.trim();
-    if (!z || filters.region?.trim()) return;
-    const hit = regions.find((r) => r.toLowerCase() === z.toLowerCase());
-    if (!hit) return;
-    setLive((prev) => {
-      if (prev.region?.trim()) return prev;
-      return { ...prev, region: hit, zone: undefined, area: undefined };
-    });
-  }, [filtersKeyFromUrl, filters.region, filters.zone, regions]);
+  const selectedFeatureKeys = useMemo(
+    () => new Set((live.features ?? []).map((x) => normalizeCatalogFeatureKey(x))),
+    [live.features],
+  );
 
   const detailFilterCount = useMemo(() => countDetailFilters(live), [live]);
   const advancedFilterCount = useMemo(() => countAdvancedFilters(live), [live]);
@@ -207,7 +194,7 @@ export function PropiedadesCatalog({
           ) : null}
 
           <div className="space-y-5 px-4 py-5 sm:px-6 sm:py-6">
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="min-w-0 space-y-2">
                 <label htmlFor="filter-tipo" className={fieldLabel}>
                   {copy.filterHeading}
@@ -234,68 +221,70 @@ export function PropiedadesCatalog({
                 <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterListingTypeHint}</p>
               </div>
               <div className="min-w-0 space-y-2">
-                <label htmlFor="filter-region" className={fieldLabel}>
+                <label htmlFor="filter-zone" className={fieldLabel}>
                   {copy.zoneLabel}
                 </label>
                 <div className="relative">
                   <select
-                    id="filter-region"
-                    value={live.region ?? ""}
+                    id="filter-zone"
+                    value={live.zone ?? ""}
                     onChange={(e) => {
-                      const r = e.target.value.trim();
+                      const z = e.target.value.trim();
                       setLive((prev) => ({
                         ...prev,
-                        region: r || undefined,
-                        area: undefined,
-                        zone: undefined,
+                        zone: z || undefined,
                       }));
                     }}
                     className={`${fieldInput} appearance-none pr-11`}
                   >
                     <option value="">{copy.filterZoneAll}</option>
-                    {regions.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
+                    {zoneOptions.map((z) => (
+                      <option key={z} value={z}>
+                        {z}
                       </option>
                     ))}
                   </select>
                   <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
                 </div>
-                <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterRegionHint}</p>
-              </div>
-              <div className="min-w-0 space-y-2 md:col-span-1">
-                <label htmlFor="filter-area" className={fieldLabel}>
-                  {copy.areaLabel}
-                </label>
-                <div className="relative">
-                  <select
-                    id="filter-area"
-                    value={live.area ?? ""}
-                    disabled={!live.region?.trim() || areaOptions.length === 0}
-                    onChange={(e) => {
-                      const a = e.target.value.trim();
-                      setLive((prev) => ({
-                        ...prev,
-                        area: a || undefined,
-                        zone: undefined,
-                      }));
-                    }}
-                    className={`${fieldInput} appearance-none pr-11 disabled:cursor-not-allowed disabled:opacity-55`}
-                  >
-                    <option value="">{copy.filterAreaAll}</option>
-                    {areaOptions.map((a) => (
-                      <option key={a} value={a}>
-                        {a}
-                      </option>
-                    ))}
-                  </select>
-                  <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
-                </div>
-                <p className="text-[11px] leading-snug text-brand-subtle">
-                  {!live.region?.trim() ? copy.filterAreaHint : copy.filterAreaOptional}
-                </p>
+                <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterZoneHint}</p>
               </div>
             </div>
+
+            {featureOptions.length > 0 ? (
+              <fieldset className="min-w-0 space-y-2">
+                <legend className={`${fieldLabel} mb-2 px-0`}>{copy.filterFeaturesLabel}</legend>
+                <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterFeaturesHint}</p>
+                <div className="max-h-44 overflow-y-auto rounded-xl border border-brand-border/70 bg-brand-bg/60 px-3 py-3">
+                  <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {featureOptions.map((label) => {
+                      const k = normalizeCatalogFeatureKey(label);
+                      const checked = selectedFeatureKeys.has(k);
+                      return (
+                        <li key={k}>
+                          <label className="flex cursor-pointer items-start gap-2 text-sm text-brand-text">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              className="mt-1 size-4 shrink-0 rounded border-brand-border text-brand-accent focus:ring-brand-accent"
+                              onChange={() => {
+                                setLive((prev) => {
+                                  const cur = [...(prev.features ?? [])];
+                                  const i = cur.findIndex((x) => normalizeCatalogFeatureKey(x) === k);
+                                  if (i >= 0) cur.splice(i, 1);
+                                  else cur.push(label);
+                                  return { ...prev, features: cur.length ? cur : undefined };
+                                });
+                              }}
+                            />
+                            <span className="leading-snug">{label}</span>
+                          </label>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </fieldset>
+            ) : null}
 
             <div className="overflow-hidden rounded-xl border border-brand-border/60 bg-brand-surface/25">
               <button

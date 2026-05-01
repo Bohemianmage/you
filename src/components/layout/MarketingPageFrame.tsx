@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useLayoutEffect, type ReactNode }
 
 import { EditableSection } from "@/components/admin/editable-section";
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import { HashUrlSanitizer } from "@/components/layout/HashUrlSanitizer";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -55,6 +56,7 @@ export function MarketingPageFrame({
 
   return (
     <LiveSiteContext.Provider value={live}>
+      <AnalyticsTracker />
       <HashUrlSanitizer />
       <SiteHeader locale={locale} navItems={marketingNav(locale)} />
       <main className="flex-1">{children}</main>

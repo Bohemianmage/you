@@ -30,12 +30,13 @@ const CHUNK = 28;
 const DEFAULT_CENTER: [number, number] = [19.4326, -99.1332];
 const DEFAULT_ZOOM = 11;
 
-async function fetchGeoPoints(ids: string[]): Promise<GeoPoint[]> {
+async function fetchGeoPoints(ids: string[], locale: Locale): Promise<GeoPoint[]> {
   const out: GeoPoint[] = [];
+  const lang = locale === "en" ? "en" : "es";
   for (let i = 0; i < ids.length; i += CHUNK) {
     const chunk = ids.slice(i, i + CHUNK);
     const q = chunk.map((id) => encodeURIComponent(id)).join(",");
-    const res = await fetch(`/api/catalog/geo?ids=${q}`);
+    const res = await fetch(`/api/catalog/geo?ids=${q}&lang=${lang}`);
     if (!res.ok) throw new Error("geo_failed");
     const data = (await res.json()) as { points?: GeoPoint[] };
     const pts = Array.isArray(data.points) ? data.points : [];
@@ -75,7 +76,7 @@ export function CatalogPropertiesMap({
     const ids = [...new Set(listings.map((p) => catalogPropertySegment(p)))];
     void (async () => {
       try {
-        const pts = await fetchGeoPoints(ids);
+        const pts = await fetchGeoPoints(ids, locale);
         if (cancelled) return;
         setPoints(pts);
         setStatus("ready");
@@ -88,7 +89,7 @@ export function CatalogPropertiesMap({
     return () => {
       cancelled = true;
     };
-  }, [idsKey, listings]);
+  }, [idsKey, listings, locale]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -109,6 +110,30 @@ export function CatalogPropertiesMap({
       setMapReady(false);
     };
   }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const el = containerRef.current;
+    if (!mapReady || !map || !el) return;
+
+    map.scrollWheelZoom.disable();
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        map.scrollWheelZoom.enable();
+      } else {
+        map.scrollWheelZoom.disable();
+        e.preventDefault();
+      }
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    const onLeave = () => map.scrollWheelZoom.disable();
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("mouseleave", onLeave);
+      map.scrollWheelZoom.disable();
+    };
+  }, [mapReady]);
 
   useEffect(() => {
     if (!mapReady) return;

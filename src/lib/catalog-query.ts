@@ -4,11 +4,7 @@ export type ListingTypeFilter = "" | "rent" | "sale";
 
 /** Estado de filtros del listado (URL ↔ UI). */
 export type CatalogQueryFilters = {
-  /** Ciudad + estado (agrupación); preferido frente a `zone` legado. */
-  region?: string;
-  /** Colonia / segmento local (requiere contexto de región en la UI). */
-  area?: string;
-  /** Filtro legado: coincide con línea completa o con la región agrupada. */
+  /** Colonia / tramo local o línea completa según datos del catálogo. */
   zone?: string;
   tipo?: ListingTypeFilter;
   m2Min?: number;
@@ -20,6 +16,8 @@ export type CatalogQueryFilters = {
   precioMin?: number;
   precioMax?: number;
   moneda?: "MXN" | "USD";
+  /** Características EasyBroker (nombre visible); coincidencia con AND entre valores elegidos. */
+  features?: string[];
 };
 
 function appendNumericParams(params: URLSearchParams, f: CatalogQueryFilters): void {
@@ -38,16 +36,13 @@ function appendNumericParams(params: URLSearchParams, f: CatalogQueryFilters): v
 export function catalogPageHref(locale: Locale, filters: CatalogQueryFilters): string {
   const params = new URLSearchParams();
   if (locale === "en") params.set("lang", "en");
-  const r = filters.region?.trim();
-  const a = filters.area?.trim();
   const z = filters.zone?.trim();
-  if (r) {
-    params.set("region", r);
-    if (a) params.set("area", a);
-  } else if (z) {
-    params.set("zone", z);
-  }
+  if (z) params.set("zone", z);
   if (filters.tipo === "rent" || filters.tipo === "sale") params.set("tipo", filters.tipo);
+  for (const feat of filters.features ?? []) {
+    const t = feat.trim();
+    if (t) params.append("feat", t);
+  }
   appendNumericParams(params, filters);
   const q = params.toString();
   return `/propiedades${q ? `?${q}` : ""}`;
@@ -59,10 +54,43 @@ function spFirst(v: string | string[] | undefined): string | undefined {
   return typeof s === "string" ? s : undefined;
 }
 
+function spAllStrings(v: string | string[] | undefined): string[] {
+  if (v == null) return [];
+  const arr = Array.isArray(v) ? v : [v];
+  return arr.flatMap((x) => (typeof x === "string" && x.trim() ? [x.trim()] : []));
+}
+
 function parseNonNegNumber(v: string | undefined): number | undefined {
   if (v == null || v === "") return undefined;
   const n = Number(v);
   return Number.isFinite(n) && n >= 0 ? n : undefined;
+}
+
+/** Migra query legacy `region` / `area` a una sola `zone` para el modelo plano. */
+function migrateLegacyZone(params: {
+  zone?: string | string[];
+  region?: string | string[];
+  area?: string | string[];
+}): string | undefined {
+  const zoneDirect = spFirst(params.zone)?.trim();
+  if (zoneDirect) return zoneDirect;
+  const area = spFirst(params.area)?.trim();
+  if (area) return area;
+  const region = spFirst(params.region)?.trim();
+  if (region) return region;
+  return undefined;
+}
+
+function dedupePreserveOrder(values: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const v of values) {
+    const k = v.trim().toLowerCase();
+    if (!v.trim() || seen.has(k)) continue;
+    seen.add(k);
+    out.push(v.trim());
+  }
+  return out;
 }
 
 /** Lee query string de Next (`searchParams`) hacia estado de filtros. */
@@ -70,6 +98,7 @@ export function parseCatalogFiltersFromSearchParams(params: {
   region?: string | string[];
   area?: string | string[];
   zone?: string | string[];
+  feat?: string | string[];
   tipo?: string | string[];
   m2Min?: string | string[];
   m2Max?: string | string[];
@@ -90,13 +119,11 @@ export function parseCatalogFiltersFromSearchParams(params: {
   /** `precioMin=0` no debe activar el filtro de precio (equivale a sin mínimo). */
   const precioMin = precioMinRaw === 0 ? undefined : precioMinRaw;
   const wantsPrice = precioMin != null || precioMaxRaw != null;
-  const region = spFirst(params.region)?.trim();
-  const area = spFirst(params.area)?.trim();
-  const zone = spFirst(params.zone)?.trim();
+  const zone = migrateLegacyZone(params);
+  const featRaw = spAllStrings(params.feat);
   return {
-    region: region || undefined,
-    area: area || undefined,
     zone: zone || undefined,
+    features: featRaw.length ? dedupePreserveOrder(featRaw) : undefined,
     tipo,
     m2Min: parseNonNegNumber(spFirst(params.m2Min)),
     m2Max: parseNonNegNumber(spFirst(params.m2Max)),

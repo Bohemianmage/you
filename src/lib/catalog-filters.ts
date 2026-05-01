@@ -1,5 +1,5 @@
 import type { CatalogProperty } from "@/data/catalog-properties";
-import { extractLocalZonePart, resolveCatalogZoneGroup } from "@/lib/catalog-zone-group";
+import { catalogZoneFilterKey } from "@/lib/catalog-zone-filter";
 import { getListingMetrics, getListingPrice } from "@/lib/catalog-metrics";
 import type { CatalogQueryFilters } from "@/lib/catalog-query";
 
@@ -47,24 +47,28 @@ export function inferListingDisplayType(p: {
   return null;
 }
 
-/** Coincide con la ubicación completa o con la región agrupada (`zoneGroup` / derivada). */
-function zoneFilterMatches(p: CatalogProperty, filterZone: string): boolean {
-  const f = filterZone.trim().toLowerCase();
-  const z = p.zone.trim().toLowerCase();
-  const g = resolveCatalogZoneGroup(p.zone, p.zoneGroup).toLowerCase();
-  return z === f || g === f;
+export function normalizeCatalogFeatureKey(s: string): string {
+  return s
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "");
 }
 
-function regionFilterMatches(p: CatalogProperty, filterRegion: string): boolean {
-  const f = filterRegion.trim().toLowerCase();
-  const g = resolveCatalogZoneGroup(p.zone, p.zoneGroup).trim().toLowerCase();
-  return g === f;
+function flatZoneMatches(p: CatalogProperty, filterZone: string): boolean {
+  const f = normalizeCatalogFeatureKey(filterZone);
+  const key = normalizeCatalogFeatureKey(catalogZoneFilterKey(p));
+  const full = normalizeCatalogFeatureKey(p.zone);
+  return key === f || full === f;
 }
 
-function areaFilterMatches(p: CatalogProperty, filterArea: string): boolean {
-  const f = filterArea.trim().toLowerCase();
-  const local = extractLocalZonePart(p.zone)?.trim().toLowerCase();
-  return local != null && local === f;
+function propertyFeatureKeys(p: CatalogProperty): Set<string> {
+  const set = new Set<string>();
+  for (const row of p.ebFeatures ?? []) {
+    const k = normalizeCatalogFeatureKey(row.name);
+    if (k) set.add(k);
+  }
+  return set;
 }
 
 function inRange(
@@ -87,22 +91,25 @@ function effectiveMin(n: number | undefined): number | undefined {
 export function filterCatalogProperties(list: CatalogProperty[], opts: CatalogQueryFilters): CatalogProperty[] {
   let out = list;
 
-  const region = opts.region?.trim();
-  const legacyZone = opts.zone?.trim();
-  if (region) {
-    out = out.filter((p) => regionFilterMatches(p, region));
-  } else if (legacyZone) {
-    out = out.filter((p) => zoneFilterMatches(p, legacyZone));
-  }
-
-  const area = opts.area?.trim();
-  if (area) {
-    out = out.filter((p) => areaFilterMatches(p, area));
+  const zone = opts.zone?.trim();
+  if (zone) {
+    out = out.filter((p) => flatZoneMatches(p, zone));
   }
 
   const tipo = opts.tipo;
   if (tipo === "rent" || tipo === "sale") {
     out = out.filter((p) => inferListingType(p) === tipo);
+  }
+
+  const wantedFeats = (opts.features ?? []).map(normalizeCatalogFeatureKey).filter(Boolean);
+  if (wantedFeats.length) {
+    out = out.filter((p) => {
+      const have = propertyFeatureKeys(p);
+      for (const w of wantedFeats) {
+        if (!have.has(w)) return false;
+      }
+      return true;
+    });
   }
 
   const m2Lo = effectiveMin(opts.m2Min);

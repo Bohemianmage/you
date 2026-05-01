@@ -28,14 +28,6 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
             <p className="font-heading text-xl font-semibold leading-snug tracking-tight text-brand-text sm:text-2xl">
               {footerCopy.tagline}
             </p>
-            <p className="text-sm">
-              <Link
-                href={`/nuestra-propuesta${localeQuery(locale)}`}
-                className={`${TEXT_LINK_INLINE} font-semibold`}
-              >
-                {footerCopy.proposalLinkLabel}
-              </Link>
-            </p>
             <address className="max-w-md not-italic text-sm font-medium leading-relaxed text-brand-muted">{contact.addressLine}</address>
             <p className="text-sm text-brand-muted">
               {footerCopy.phoneLabel}{" "}
@@ -61,6 +53,12 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
           </div>
 
           <nav className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-10 sm:gap-y-3 lg:flex-col lg:items-end lg:gap-4" aria-label="Pie">
+            <Link
+              href={`/nuestra-propuesta${localeQuery(locale)}`}
+              className="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-text no-underline transition hover:text-brand-accent"
+            >
+              {footerCopy.proposalLinkLabel}
+            </Link>
             {navItems.map((item) => (
               <Link
                 key={item.href}

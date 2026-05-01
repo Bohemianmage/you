@@ -306,20 +306,6 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
             </section>
           ) : null}
 
-          {(property.agentName?.trim() || property.agentEmail?.trim()) ? (
-            <section aria-labelledby="prop-agent-heading">
-              <h2 id="prop-agent-heading" className="font-heading text-lg font-semibold text-brand-text">
-                {copy.agentHeading}
-              </h2>
-              <p className="mt-2 text-sm font-semibold text-brand-text">{property.agentName?.trim()}</p>
-              {property.agentEmail?.trim() ? (
-                <a href={`mailto:${property.agentEmail.trim()}`} className={`${TEXT_LINK_INLINE} mt-1 inline-block text-sm`}>
-                  {property.agentEmail.trim()}
-                </a>
-              ) : null}
-            </section>
-          ) : null}
-
           <section aria-labelledby="prop-location-heading">
             <h2 id="prop-location-heading" className="font-heading text-lg font-semibold text-brand-text">
               {copy.locationHeading}

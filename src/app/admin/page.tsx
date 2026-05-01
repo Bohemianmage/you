@@ -21,6 +21,11 @@ export default async function AdminDashboardPage() {
             Contenidos del sitio (equipo, destacadas, descargables)
           </Link>
         </li>
+        <li>
+          <Link href="/admin/analytics" className="font-semibold text-brand-accent no-underline hover:underline">
+            Analíticas (visitas, fichas, mapa de calor)
+          </Link>
+        </li>
       </ul>
       <form action={logoutAdmin} className="mt-10">
         <button

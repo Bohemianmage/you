@@ -3,14 +3,21 @@ import { NextResponse } from "next/server";
 import type { CatalogProperty } from "@/data/catalog-properties";
 import { getCachedEasyBrokerPropertyDetail } from "@/lib/easybroker/catalog-cache";
 import { catalogPropertySegment } from "@/lib/property-routes";
+import type { Locale } from "@/i18n/types";
 
 const MAX_IDS = 80;
 const BATCH = 12;
 
 type GeoPoint = { lat: number; lng: number; title: string; segment: string };
 
+function localeFromRequest(searchParams: URLSearchParams): Locale {
+  const raw = searchParams.get("lang")?.trim().toLowerCase();
+  return raw === "en" ? "en" : "es";
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  const locale = localeFromRequest(searchParams);
   const raw = searchParams.get("ids") ?? "";
   const ids = [...new Set(raw.split(",").map((s) => s.trim()).filter(Boolean))].slice(0, MAX_IDS);
   if (!ids.length) {
@@ -23,7 +30,7 @@ export async function GET(req: Request) {
     const slice = ids.slice(i, i + BATCH);
     const batch = await Promise.all(
       slice.map(async (id) => {
-        const p: CatalogProperty | null = await getCachedEasyBrokerPropertyDetail(id);
+        const p: CatalogProperty | null = await getCachedEasyBrokerPropertyDetail(id, locale);
         if (p == null) return null;
         const lat = p.latitude;
         const lng = p.longitude;

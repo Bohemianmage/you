@@ -1,12 +1,13 @@
 import "server-only";
 
+import type { CatalogProperty } from "@/data/catalog-properties";
 import {
   getEasyBrokerApiBaseUrl,
   getEasyBrokerApiKey,
   getEasyBrokerPropertyStatuses,
 } from "@/lib/easybroker/config";
 import { mapEasyBrokerPropertyToCatalog } from "@/lib/easybroker/map-property";
-import type { CatalogProperty } from "@/data/catalog-properties";
+import type { Locale } from "@/i18n/types";
 
 type EbListResponse = {
   content?: unknown[];
@@ -17,13 +18,18 @@ function asRecord(v: unknown): Record<string, unknown> | null {
   return v != null && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
 }
 
-async function ebJson(url: string): Promise<unknown> {
+function acceptLanguageHeader(locale: Locale): string {
+  return locale === "en" ? "en-US,en;q=0.9,es;q=0.8" : "es-MX,es;q=0.9,en;q=0.8";
+}
+
+async function ebJson(url: string, locale: Locale): Promise<unknown> {
   const key = getEasyBrokerApiKey();
   if (!key) return null;
   const res = await fetch(url, {
     headers: {
       "X-Authorization": key,
       Accept: "application/json",
+      "Accept-Language": acceptLanguageHeader(locale),
     },
     cache: "no-store",
   });
@@ -31,19 +37,19 @@ async function ebJson(url: string): Promise<unknown> {
   return res.json() as Promise<unknown>;
 }
 
-export async function fetchEasyBrokerPropertyDetail(publicId: string): Promise<CatalogProperty | null> {
+export async function fetchEasyBrokerPropertyDetail(publicId: string, locale: Locale): Promise<CatalogProperty | null> {
   const key = getEasyBrokerApiKey();
   if (!key) return null;
   const base = getEasyBrokerApiBaseUrl();
   const url = `${base}/properties/${encodeURIComponent(publicId)}`;
-  const json = await ebJson(url);
+  const json = await ebJson(url, locale);
   const raw = asRecord(json);
   if (!raw) return null;
   return mapEasyBrokerPropertyToCatalog(raw, "detail");
 }
 
 /** Todas las páginas del listado (máx. 50 ítems por página). */
-export async function fetchEasyBrokerCatalogPages(): Promise<CatalogProperty[]> {
+export async function fetchEasyBrokerCatalogPages(locale: Locale): Promise<CatalogProperty[]> {
   const key = getEasyBrokerApiKey();
   if (!key) {
     if (process.env.NODE_ENV === "development") {
@@ -74,7 +80,7 @@ export async function fetchEasyBrokerCatalogPages(): Promise<CatalogProperty[]> 
       break;
     }
 
-    const json = await ebJson(nextUrl);
+    const json = await ebJson(nextUrl, locale);
     const data = json as EbListResponse | null;
     if (!data || !Array.isArray(data.content)) break;
 

@@ -54,12 +54,12 @@ export async function getMergedClientLogos(): Promise<ClientLogo[]> {
 
 export async function getMergedFeaturedForLocale(locale: Locale): Promise<FeaturedProperty[]> {
   const file = await getCachedSiteContent();
-  const catalog = await getCachedEasyBrokerCatalog();
+  const catalog = await getCachedEasyBrokerCatalog(locale);
   return mergeFeaturedFromFile(locale, file, catalog);
 }
 
-export async function getMergedCatalog(): Promise<CatalogProperty[]> {
-  const catalog = await getCachedEasyBrokerCatalog();
+export async function getMergedCatalog(locale: Locale): Promise<CatalogProperty[]> {
+  const catalog = await getCachedEasyBrokerCatalog(locale);
   return catalog.filter((p) => p.active !== false);
 }
 
@@ -71,12 +71,12 @@ export async function getMergedDownloadablesForLocale(locale: Locale): Promise<D
 /** Ficha interna: catálogo EasyBroker enriquecido con GET detalle; compatibilidad con destacados legacy. */
 export async function getMergedPropertyDetailBySlug(locale: Locale, slug: string): Promise<FeaturedProperty | null> {
   const file = await getCachedSiteContent();
-  const catalog = await getCachedEasyBrokerCatalog();
+  const catalog = await getCachedEasyBrokerCatalog(locale);
   const segment = decodeURIComponent(slug);
 
   const fromList = findCatalogPropertyBySegment(catalog, slug);
   if (fromList && fromList.active !== false) {
-    const detail = await getCachedEasyBrokerPropertyDetail(segment);
+    const detail = await getCachedEasyBrokerPropertyDetail(segment, locale);
     return catalogAsFeaturedDetail(detail ?? fromList, locale);
   }
 
@@ -107,7 +107,7 @@ function deriveFeaturedCatalogIdsForAdmin(file: SiteContentFile, ebCatalog: read
 
 export async function getAdminEditorSeed(): Promise<AdminEditorSeed> {
   const file = await getCachedSiteContent();
-  const catalog = await getCachedEasyBrokerCatalog();
+  const catalog = await getCachedEasyBrokerCatalog("es");
   return {
     team: mergeTeamFromFile(file),
     featuredCatalogIds: deriveFeaturedCatalogIdsForAdmin(file, catalog),

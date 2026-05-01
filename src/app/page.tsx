@@ -2,7 +2,9 @@ import { HomePageContent } from "@/components/home/HomePageContent";
 import { MarketingPageFrame } from "@/components/layout/MarketingPageFrame";
 import { localeQuery } from "@/i18n/home";
 import { resolveMarketingLocale } from "@/lib/marketing-locale";
+import { distinctCatalogZoneFilterKeys } from "@/lib/catalog-zone-filter";
 import {
+  getMergedCatalog,
   getMergedClientLogos,
   getMergedDownloadablesForLocale,
   getMergedFeaturedForLocale,
@@ -20,13 +22,16 @@ interface HomePageProps {
 export default async function Home({ searchParams }: HomePageProps) {
   const params = searchParams ? await searchParams : undefined;
   const locale = await resolveMarketingLocale(params?.lang);
-  const [{ homeCopy: copy, contact }, teamMembers, featuredProperties, downloadables, clientLogos] = await Promise.all([
-    getMergedSiteContext(locale),
-    getMergedTeamMembers(),
-    getMergedFeaturedForLocale(locale),
-    getMergedDownloadablesForLocale(locale),
-    getMergedClientLogos(),
-  ]);
+  const [{ homeCopy: copy, contact }, teamMembers, featuredProperties, downloadables, clientLogos, catalog] =
+    await Promise.all([
+      getMergedSiteContext(locale),
+      getMergedTeamMembers(),
+      getMergedFeaturedForLocale(locale),
+      getMergedDownloadablesForLocale(locale),
+      getMergedClientLogos(),
+      getMergedCatalog(locale),
+    ]);
+  const catalogZones = distinctCatalogZoneFilterKeys(catalog, locale === "en" ? "en" : "es");
   const q = localeQuery(locale);
   const catalogHref = `/propiedades${q}`;
   const contactHref = `/contacto${q}`;
@@ -40,6 +45,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         contactHref={contactHref}
         proposalHref={proposalHref}
         tourEmbed={tourEmbed}
+        catalogZones={catalogZones}
         serverTeam={teamMembers}
         serverFeatured={featuredProperties}
         serverDownloadables={downloadables}

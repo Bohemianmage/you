@@ -48,7 +48,7 @@ export default async function RootLayout({
   const initialPersisted: SiteContentFile = isAdmin ? await getSiteContentFresh() : {};
   let previewEbCatalog: CatalogProperty[] = [];
   if (isAdmin) {
-    previewEbCatalog = await getCachedEasyBrokerCatalog();
+    previewEbCatalog = await getCachedEasyBrokerCatalog("es");
   }
 
   return (

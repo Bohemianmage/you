@@ -14,6 +14,7 @@ interface PropiedadesPageProps {
     region?: string;
     area?: string;
     zone?: string;
+    feat?: string | string[];
     tipo?: string;
     m2Min?: string;
     m2Max?: string;
@@ -47,7 +48,7 @@ export default async function PropiedadesPage({ searchParams }: PropiedadesPageP
   const q = localeQuery(locale);
   const contactHref = `/contacto${q}`;
   const homeHref = locale === "en" ? "/?lang=en" : "/";
-  const catalog = await getMergedCatalog();
+  const catalog = await getMergedCatalog(locale);
   const filters = parseCatalogFiltersFromSearchParams(params ?? {});
 
   return (

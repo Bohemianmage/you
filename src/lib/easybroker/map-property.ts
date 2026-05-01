@@ -292,7 +292,11 @@ export function mapEasyBrokerPropertyToCatalog(raw: Record<string, unknown>, mod
     yearBuilt,
   };
 
-  if (mode !== "detail") return base;
+  const featsFromList = ebFeaturesList(raw);
+
+  if (mode !== "detail") {
+    return featsFromList.length ? { ...base, ebFeatures: featsFromList } : base;
+  }
 
   const pdfUrls = propertyFileUrls(raw);
   const expenses = str(raw.expenses)?.trim();
@@ -304,7 +308,7 @@ export function mapEasyBrokerPropertyToCatalog(raw: Record<string, unknown>, mod
       : str(floorRaw)?.trim();
   const lotLengthM = num(raw.lot_length);
   const lotWidthM = num(raw.lot_width);
-  const ebFeatures = ebFeaturesList(raw);
+  const ebFeatures = featsFromList;
   const tagLabels = tagStrings(raw);
   const videoUrlsList = videoUrls(raw);
   const agentRec = asRecord(raw.agent);

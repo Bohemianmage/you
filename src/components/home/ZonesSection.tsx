@@ -1,18 +1,18 @@
 import Link from "next/link";
 
-import type { HomeZone } from "@/data/zones";
 import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import { catalogPageHref } from "@/lib/catalog-query";
 
 interface ZonesSectionProps {
   title: HomeCopy["zones"]["title"];
-  zones: readonly HomeZone[];
+  /** Zonas derivadas del catálogo en vivo (colonias / tramos locales). */
+  zones: readonly string[];
   locale: Locale;
 }
 
 /**
- * Franja de zonas — enlaces al catálogo filtrado por zona.
+ * Franja de zonas — enlaces al catálogo filtrado por cada zona disponible en inventario.
  */
 export function ZonesSection({ title, zones, locale }: ZonesSectionProps) {
   return (
@@ -26,15 +26,14 @@ export function ZonesSection({ title, zones, locale }: ZonesSectionProps) {
         </h2>
         <ul className="flex flex-wrap justify-center gap-3">
           {zones.map((z) => {
-            const zoneParam = z.filterZone ?? z.label;
-            const href = catalogPageHref(locale, { region: zoneParam });
+            const href = catalogPageHref(locale, { zone: z });
             return (
-              <li key={z.label}>
+              <li key={z}>
                 <Link
                   href={href}
                   className="inline-flex rounded-full border border-brand-border bg-brand-bg px-5 py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-brand-text shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition hover:border-brand-accent hover:bg-brand-accent/[0.06] hover:text-brand-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent"
                 >
-                  {z.label}
+                  {z}
                 </Link>
               </li>
             );
