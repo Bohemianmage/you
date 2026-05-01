@@ -41,6 +41,12 @@ export function catalogPageHref(locale: Locale, filters: CatalogQueryFilters): s
   return `/propiedades${q ? `?${q}` : ""}`;
 }
 
+function spFirst(v: string | string[] | undefined): string | undefined {
+  if (v == null) return undefined;
+  const s = Array.isArray(v) ? v[0] : v;
+  return typeof s === "string" ? s : undefined;
+}
+
 function parseNonNegNumber(v: string | undefined): number | undefined {
   if (v == null || v === "") return undefined;
   const n = Number(v);
@@ -49,34 +55,39 @@ function parseNonNegNumber(v: string | undefined): number | undefined {
 
 /** Lee query string de Next (`searchParams`) hacia estado de filtros. */
 export function parseCatalogFiltersFromSearchParams(params: {
-  zone?: string;
-  tipo?: string;
-  m2Min?: string;
-  m2Max?: string;
-  recMin?: string;
-  recMax?: string;
-  banMin?: string;
-  banMax?: string;
-  precioMin?: string;
-  precioMax?: string;
-  moneda?: string;
+  zone?: string | string[];
+  tipo?: string | string[];
+  m2Min?: string | string[];
+  m2Max?: string | string[];
+  recMin?: string | string[];
+  recMax?: string | string[];
+  banMin?: string | string[];
+  banMax?: string | string[];
+  precioMin?: string | string[];
+  precioMax?: string | string[];
+  moneda?: string | string[];
 }): CatalogQueryFilters {
-  const tipo = params.tipo === "rent" || params.tipo === "sale" ? params.tipo : "";
-  const moneda = params.moneda === "USD" || params.moneda === "MXN" ? params.moneda : undefined;
-  const precioMin = parseNonNegNumber(params.precioMin);
-  const precioMax = parseNonNegNumber(params.precioMax);
-  const wantsPrice = precioMin != null || precioMax != null;
+  const tipoRaw = spFirst(params.tipo);
+  const tipo = tipoRaw === "rent" || tipoRaw === "sale" ? tipoRaw : "";
+  const monedaRaw = spFirst(params.moneda);
+  const moneda = monedaRaw === "USD" || monedaRaw === "MXN" ? monedaRaw : undefined;
+  const precioMinRaw = parseNonNegNumber(spFirst(params.precioMin));
+  const precioMaxRaw = parseNonNegNumber(spFirst(params.precioMax));
+  /** `precioMin=0` no debe activar el filtro de precio (equivale a sin mínimo). */
+  const precioMin = precioMinRaw === 0 ? undefined : precioMinRaw;
+  const wantsPrice = precioMin != null || precioMaxRaw != null;
+  const zone = spFirst(params.zone)?.trim();
   return {
-    zone: params.zone?.trim() || undefined,
+    zone: zone || undefined,
     tipo,
-    m2Min: parseNonNegNumber(params.m2Min),
-    m2Max: parseNonNegNumber(params.m2Max),
-    recMin: parseNonNegNumber(params.recMin),
-    recMax: parseNonNegNumber(params.recMax),
-    banMin: parseNonNegNumber(params.banMin),
-    banMax: parseNonNegNumber(params.banMax),
+    m2Min: parseNonNegNumber(spFirst(params.m2Min)),
+    m2Max: parseNonNegNumber(spFirst(params.m2Max)),
+    recMin: parseNonNegNumber(spFirst(params.recMin)),
+    recMax: parseNonNegNumber(spFirst(params.recMax)),
+    banMin: parseNonNegNumber(spFirst(params.banMin)),
+    banMax: parseNonNegNumber(spFirst(params.banMax)),
     precioMin: wantsPrice ? precioMin : undefined,
-    precioMax: wantsPrice ? precioMax : undefined,
+    precioMax: wantsPrice ? precioMaxRaw : undefined,
     moneda: wantsPrice ? moneda : undefined,
   };
 }

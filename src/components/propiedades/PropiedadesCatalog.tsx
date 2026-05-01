@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import type { CatalogProperty } from "@/data/catalog-properties";
@@ -86,14 +86,21 @@ export function PropiedadesCatalog({
   const advancedFilterCount = useMemo(() => countAdvancedFilters(filters), [filters]);
 
   const [filtersPanelOpen, setFiltersPanelOpen] = useState(() => detailFilterCount > 0);
-  useEffect(() => {
-    setFiltersPanelOpen(detailFilterCount > 0);
-  }, [detailFilterCount]);
-
   const [advancedOpen, setAdvancedOpen] = useState(() => advancedFilterCount > 0);
+
+  /** Solo al cambiar la URL de filtros: evita cerrar el panel principal al colapsar «Más opciones». */
+  const prevFilterKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    setAdvancedOpen(advancedFilterCount > 0);
-  }, [advancedFilterCount]);
+    if (prevFilterKeyRef.current === null) {
+      prevFilterKeyRef.current = filterFormKey;
+      return;
+    }
+    if (prevFilterKeyRef.current !== filterFormKey) {
+      prevFilterKeyRef.current = filterFormKey;
+      setFiltersPanelOpen(detailFilterCount > 0);
+      setAdvancedOpen(advancedFilterCount > 0);
+    }
+  }, [filterFormKey, detailFilterCount, advancedFilterCount]);
 
   const totalInCatalog = catalog.length;
   const countCaption = useMemo(() => {
@@ -177,22 +184,26 @@ export function PropiedadesCatalog({
               </div>
             </div>
 
-            <details
-              className="group/adv overflow-hidden rounded-xl border border-brand-border/60 bg-brand-surface/25"
-              open={advancedOpen}
-              onToggle={(e) => setAdvancedOpen((e.target as HTMLDetailsElement).open)}
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-brand-text transition-colors hover:bg-brand-surface/50 [&::-webkit-details-marker]:hidden">
-                <span className="text-left">{copy.filterMoreOptionsHeading}</span>
+            <div className="overflow-hidden rounded-xl border border-brand-border/60 bg-brand-surface/25">
+              <button
+                type="button"
+                aria-expanded={advancedOpen}
+                onClick={() => setAdvancedOpen((o) => !o)}
+                className="flex w-full cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-brand-text transition-colors hover:bg-brand-surface/50"
+              >
+                <span>{copy.filterMoreOptionsHeading}</span>
                 <span className="flex shrink-0 items-center gap-2">
                   {advancedFilterCount > 0 ? (
                     <span className="rounded-full bg-brand-you/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-you ring-1 ring-brand-you/15">
                       {advancedFilterCount}
                     </span>
                   ) : null}
-                  <SelectChevron className="text-brand-muted transition-transform duration-200 group-open/adv:rotate-180" />
+                  <SelectChevron
+                    className={`text-brand-muted transition-transform duration-200 ${advancedOpen ? "rotate-180" : ""}`}
+                  />
                 </span>
-              </summary>
+              </button>
+              {advancedOpen ? (
               <div className="space-y-4 border-t border-brand-border/45 px-4 py-4">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
@@ -345,7 +356,8 @@ export function PropiedadesCatalog({
                   </div>
                 </div>
               </div>
-            </details>
+              ) : null}
+            </div>
 
             <div className="flex flex-col gap-3 border-t border-brand-border/45 pt-4 sm:flex-row sm:flex-wrap sm:items-center">
               <button

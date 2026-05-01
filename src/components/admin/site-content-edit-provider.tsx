@@ -61,10 +61,10 @@ function SiteAdminToolbar({
   return (
     <>
       {saveNoticeOpen ? (
-        <div className="fixed inset-0 z-[240] flex items-center justify-center p-4">
+        <div className="pointer-events-none fixed inset-0 z-[240] flex min-h-[100dvh] items-center justify-center p-4 sm:p-6">
           <button
             type="button"
-            className="absolute inset-0 bg-black/45 backdrop-blur-[1px]"
+            className="pointer-events-auto absolute inset-0 bg-black/45 backdrop-blur-[1px]"
             aria-label="Cerrar"
             onClick={dismissSaveNotice}
           />
@@ -72,7 +72,7 @@ function SiteAdminToolbar({
             role="dialog"
             aria-modal="true"
             aria-labelledby="site-save-notice-title"
-            className="relative z-10 w-full max-w-sm rounded-sm border border-brand-border bg-brand-bg p-6 shadow-xl ring-1 ring-brand-border/60"
+            className="pointer-events-auto relative z-10 w-full max-w-sm rounded-sm border border-brand-border bg-brand-bg p-6 shadow-xl ring-1 ring-brand-border/60"
           >
             <p id="site-save-notice-title" className="text-center font-heading text-base font-semibold text-brand-text">
               Cambios guardados
@@ -88,42 +88,42 @@ function SiteAdminToolbar({
         </div>
       ) : null}
       <div className="fixed bottom-0 left-0 right-0 z-[190] border-t border-brand-border bg-brand-bg/95 px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-muted">Modo edición</p>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href="/admin/listas"
-            className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
-          >
-            Listas y catálogo
-          </Link>
-          <form action={logoutAdmin}>
-            <button
-              type="submit"
-              className="rounded-sm border border-brand-border px-3 py-2 text-xs font-semibold text-brand-muted hover:text-brand-text"
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-muted">Modo edición</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/admin/listas"
+              className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
             >
-              Cerrar sesión
+              Listas y catálogo
+            </Link>
+            <form action={logoutAdmin}>
+              <button
+                type="submit"
+                className="rounded-sm border border-brand-border px-3 py-2 text-xs font-semibold text-brand-muted hover:text-brand-text"
+              >
+                Cerrar sesión
+              </button>
+            </form>
+            <button
+              type="button"
+              className="rounded-sm border border-brand-border px-4 py-2 text-xs font-semibold text-brand-text disabled:opacity-40"
+              disabled={!dirty || saving}
+              onClick={discard}
+            >
+              Descartar
             </button>
-          </form>
-          <button
-            type="button"
-            className="rounded-sm border border-brand-border px-4 py-2 text-xs font-semibold text-brand-text disabled:opacity-40"
-            disabled={!dirty || saving}
-            onClick={discard}
-          >
-            Descartar
-          </button>
-          <button
-            type="button"
-            className="rounded-sm bg-brand-accent px-4 py-2 text-xs font-semibold text-brand-white shadow-sm disabled:opacity-40"
-            disabled={!dirty || saving}
-            onClick={() => void save()}
-          >
-            {saving ? "Guardando…" : "Guardar"}
-          </button>
+            <button
+              type="button"
+              className="rounded-sm bg-brand-accent px-4 py-2 text-xs font-semibold text-brand-white shadow-sm disabled:opacity-40"
+              disabled={!dirty || saving}
+              onClick={() => void save()}
+            >
+              {saving ? "Guardando…" : "Guardar"}
+            </button>
+          </div>
         </div>
-      </div>
-      {saveError ? <p className="mx-auto mt-2 max-w-6xl text-center text-xs text-brand-accent-strong">{saveError}</p> : null}
+        {saveError ? <p className="mx-auto mt-2 max-w-6xl text-center text-xs text-brand-accent-strong">{saveError}</p> : null}
       </div>
     </>
   );
@@ -166,7 +166,8 @@ export function SiteContentEditProvider({
     setDirty(false);
     setSaveError(null);
     setSaveNoticeOpen(false);
-  }, [initialPersisted]);
+    router.refresh();
+  }, [initialPersisted, router]);
 
   const save = useCallback(async () => {
     setSaving(true);

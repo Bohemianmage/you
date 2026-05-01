@@ -10,7 +10,7 @@ async function fetchSiteContent(): Promise<SiteContentFile> {
   return file ?? {};
 }
 
-export const getCachedSiteContent = unstable_cache(fetchSiteContent, ["site-content-v1"], {
+export const getCachedSiteContent = unstable_cache(fetchSiteContent, ["site-content-v2"], {
   tags: ["site-content"],
 });
 

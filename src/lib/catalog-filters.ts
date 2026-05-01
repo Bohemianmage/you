@@ -42,6 +42,12 @@ function inRange(
   return true;
 }
 
+/** `0` en un mínimo equivale a «sin límite inferior» (evita URLs tipo ?m2Min=0 que vacían el listado). */
+function effectiveMin(n: number | undefined): number | undefined {
+  if (n == null || n === 0) return undefined;
+  return n;
+}
+
 export function filterCatalogProperties(list: CatalogProperty[], opts: CatalogQueryFilters): CatalogProperty[] {
   let out = list;
 
@@ -55,19 +61,24 @@ export function filterCatalogProperties(list: CatalogProperty[], opts: CatalogQu
     out = out.filter((p) => inferListingType(p) === tipo);
   }
 
-  const hasM2 = opts.m2Min != null || opts.m2Max != null;
-  const hasRec = opts.recMin != null || opts.recMax != null;
-  const hasBan = opts.banMin != null || opts.banMax != null;
+  const m2Lo = effectiveMin(opts.m2Min);
+  const recLo = effectiveMin(opts.recMin);
+  const banLo = effectiveMin(opts.banMin);
+  const precioLo = effectiveMin(opts.precioMin);
+
+  const hasM2 = m2Lo != null || opts.m2Max != null;
+  const hasRec = recLo != null || opts.recMax != null;
+  const hasBan = banLo != null || opts.banMax != null;
   const hasPrecio =
-    (opts.precioMin != null || opts.precioMax != null) &&
+    (precioLo != null || opts.precioMax != null) &&
     (opts.moneda === "MXN" || opts.moneda === "USD");
 
   if (hasM2 || hasRec || hasBan) {
     out = out.filter((p) => {
       const m = getListingMetrics(p);
-      if (hasM2 && !inRange(m.m2, opts.m2Min, opts.m2Max)) return false;
-      if (hasRec && !inRange(m.beds, opts.recMin, opts.recMax)) return false;
-      if (hasBan && !inRange(m.baths, opts.banMin, opts.banMax)) return false;
+      if (hasM2 && !inRange(m.m2, m2Lo, opts.m2Max)) return false;
+      if (hasRec && !inRange(m.beds, recLo, opts.recMax)) return false;
+      if (hasBan && !inRange(m.baths, banLo, opts.banMax)) return false;
       return true;
     });
   }
@@ -77,7 +88,7 @@ export function filterCatalogProperties(list: CatalogProperty[], opts: CatalogQu
     out = out.filter((p) => {
       const price = getListingPrice(p);
       if (!price || price.currency !== moneda) return false;
-      return inRange(price.amount, opts.precioMin, opts.precioMax);
+      return inRange(price.amount, precioLo, opts.precioMax);
     });
   }
 

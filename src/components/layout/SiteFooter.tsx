@@ -5,7 +5,7 @@ import { iconClasses } from "@/components/icons/SocialIcons";
 import { MARKETING_SOCIAL_LINKS } from "@/constants/marketing-social";
 import type { SiteContact } from "@/constants/site-contact";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
-import type { HomeCopy, NavItem } from "@/i18n/home";
+import { localeQuery, type HomeCopy, type NavItem } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 
 interface SiteFooterProps {
@@ -24,9 +24,17 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-accent/25 to-transparent" aria-hidden />
       <div className="mx-auto max-w-6xl space-y-12 px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_auto] lg:items-start lg:gap-16">
-          <div className="space-y-6">
+          <div className="space-y-8">
             <p className="font-heading text-xl font-semibold leading-snug tracking-tight text-brand-text sm:text-2xl">
               {footerCopy.tagline}
+            </p>
+            <p className="text-sm">
+              <Link
+                href={`/nuestra-propuesta${localeQuery(locale)}`}
+                className={`${TEXT_LINK_INLINE} font-semibold`}
+              >
+                {footerCopy.proposalLinkLabel}
+              </Link>
             </p>
             <address className="max-w-md not-italic text-sm font-medium leading-relaxed text-brand-muted">{contact.addressLine}</address>
             <p className="text-sm text-brand-muted">

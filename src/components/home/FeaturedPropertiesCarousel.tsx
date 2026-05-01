@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import type { FeaturedProperty } from "@/data/properties";
@@ -14,6 +14,10 @@ import { propertyCoverImage } from "@/lib/property-media";
 import { featuredPropertyDetailHref } from "@/lib/property-routes";
 
 const ROTATION_MS = 6500;
+
+/** Ancho de cada tarjeta: deja ~6–8% de vista previa a cada lado del slide activo. */
+const SLIDE_WIDTH_CLASS =
+  "w-[min(88vw,26rem)] sm:w-[min(52vw,28rem)] md:w-[min(48vw,30rem)] lg:w-[min(42rem,calc(100vw-14rem))]";
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -36,8 +40,73 @@ function CarouselChevron({ dir }: { dir: "prev" | "next" }) {
   );
 }
 
+function FeaturedCardBody({
+  property,
+  badgeCopy,
+  detailHref,
+  cover,
+  interactive,
+}: {
+  property: FeaturedProperty;
+  badgeCopy: (typeof CATALOG_PAGE_COPY)["es"];
+  detailHref: string;
+  cover: string | null;
+  interactive: boolean;
+}) {
+  const inner = (
+    <>
+      <div className="relative aspect-[16/10] bg-gradient-to-br from-brand-surface to-brand-border/60">
+        {cover ? (
+          <Image
+            src={cover}
+            alt={property.title}
+            fill
+            unoptimized={cover.startsWith("http")}
+            className={`object-cover ${interactive ? "transition duration-300 group-hover:scale-[1.02]" : "opacity-95"}`}
+            sizes="(max-width: 768px) 88vw, 50vw"
+          />
+        ) : null}
+        <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.08),transparent)]" />
+      </div>
+      <div className="flex flex-1 flex-col gap-4 p-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <ListingTypeBadge
+            kind={inferListingDisplayType({
+              listingType: property.listingType,
+              status: property.status,
+              title: property.title,
+            })}
+            labels={{ rent: badgeCopy.listingBadgeRent, sale: badgeCopy.listingBadgeSale }}
+          />
+        </div>
+        <h3
+          className={`font-heading text-lg font-semibold leading-snug text-brand-text ${interactive ? "group-hover:text-brand-accent-strong" : ""}`}
+        >
+          {property.title}
+        </h3>
+        <p className="font-heading text-2xl font-semibold text-brand-text">{property.price}</p>
+        <p className="text-sm leading-relaxed text-brand-muted">{property.address}</p>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-accent">{property.status}</p>
+      </div>
+    </>
+  );
+
+  if (interactive) {
+    return (
+      <Link
+        href={detailHref}
+        className="group block text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return <div className="text-left">{inner}</div>;
+}
+
 /**
- * Carrusel con rotación suave; se pausa al hover o al enfocar controles (accesible).
+ * Carrusel con slide central completa y vecinos a la vista; tap en lateral centra, luego se abre la ficha.
  */
 export function FeaturedPropertiesCarousel({
   locale,
@@ -53,6 +122,7 @@ export function FeaturedPropertiesCarousel({
   const n = properties.length;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const next = useCallback(() => setIndex((i) => (i + 1) % n), [n]);
   const prev = useCallback(() => setIndex((i) => (i - 1 + n) % n), [n]);
@@ -67,13 +137,22 @@ export function FeaturedPropertiesCarousel({
     setIndex((i) => (n === 0 ? 0 : i % n));
   }, [n]);
 
+  useEffect(() => {
+    const el = itemRefs.current[index];
+    el?.scrollIntoView({
+      inline: "center",
+      block: "nearest",
+      behavior: reducedMotion ? "auto" : "smooth",
+    });
+  }, [index, reducedMotion]);
+
   if (n === 0) return null;
 
   const dotLabel = (slot: number) => featuredCopy.carouselGoToAria.replace("{{n}}", String(slot));
 
   return (
     <div
-      className="relative mx-auto max-w-3xl"
+      className="relative mx-auto max-w-6xl"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -86,7 +165,7 @@ export function FeaturedPropertiesCarousel({
           <button
             type="button"
             onClick={prev}
-            className="absolute left-0 top-[38%] z-10 flex h-11 w-11 -translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-brand-border/80 bg-brand-bg/95 text-brand-text shadow-md backdrop-blur-sm transition hover:border-brand-accent/40 hover:text-brand-accent-strong sm:-translate-x-4 md:-translate-x-7"
+            className="absolute left-1 top-[36%] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-brand-border/80 bg-brand-bg/95 text-brand-text shadow-md backdrop-blur-sm transition hover:border-brand-accent/40 hover:text-brand-accent-strong sm:left-2 md:left-0"
             aria-label={featuredCopy.carouselPrevAria}
           >
             <CarouselChevron dir="prev" />
@@ -94,7 +173,7 @@ export function FeaturedPropertiesCarousel({
           <button
             type="button"
             onClick={next}
-            className="absolute right-0 top-[38%] z-10 flex h-11 w-11 translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-brand-border/80 bg-brand-bg/95 text-brand-text shadow-md backdrop-blur-sm transition hover:border-brand-accent/40 hover:text-brand-accent-strong sm:translate-x-4 md:translate-x-7"
+            className="absolute right-1 top-[36%] z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-brand-border/80 bg-brand-bg/95 text-brand-text shadow-md backdrop-blur-sm transition hover:border-brand-accent/40 hover:text-brand-accent-strong sm:right-2 md:right-0"
             aria-label={featuredCopy.carouselNextAria}
           >
             <CarouselChevron dir="next" />
@@ -102,53 +181,25 @@ export function FeaturedPropertiesCarousel({
         </>
       ) : null}
 
-      <div className="overflow-hidden rounded-sm px-1">
-        <div
-          className="flex transition-transform duration-500 ease-out motion-reduce:transition-none"
-          style={{ transform: `translateX(-${index * 100}%)` }}
-        >
-          {properties.map((property) => {
-            const detailHref = featuredPropertyDetailHref(locale, property);
-            const cover = propertyCoverImage(property);
-            return (
-              <div key={property.id} className="min-w-full shrink-0 px-2 sm:px-4">
+      <div
+        className="flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible scroll-px-4 pb-2 pt-1 [scrollbar-width:none] sm:gap-4 md:px-2 [&::-webkit-scrollbar]:hidden"
+        aria-label={featuredCopy.title}
+      >
+        {properties.map((property, i) => {
+          const detailHref = featuredPropertyDetailHref(locale, property);
+          const cover = propertyCoverImage(property) ?? null;
+          const centered = i === index;
+          return (
+            <div
+              key={property.id}
+              ref={(el) => {
+                itemRefs.current[i] = el;
+              }}
+              className={`${SLIDE_WIDTH_CLASS} shrink-0 snap-center first:ml-3 last:mr-3 sm:first:ml-4 sm:last:mr-4`}
+            >
+              {centered ? (
                 <article className="flex h-full flex-col overflow-hidden rounded-sm border border-brand-border bg-brand-bg shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
-                  <Link
-                    href={detailHref}
-                    className="group block text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
-                  >
-                    <div className="relative aspect-[16/10] bg-gradient-to-br from-brand-surface to-brand-border/60">
-                      {cover ? (
-                        <Image
-                          src={cover}
-                          alt={property.title}
-                          fill
-                          unoptimized={cover.startsWith("http")}
-                          className="object-cover transition duration-300 group-hover:scale-[1.02]"
-                          sizes="(max-width: 768px) 100vw, 768px"
-                        />
-                      ) : null}
-                      <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.08),transparent)]" />
-                    </div>
-                    <div className="flex flex-1 flex-col gap-4 p-6">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <ListingTypeBadge
-                          kind={inferListingDisplayType({
-                            listingType: property.listingType,
-                            status: property.status,
-                            title: property.title,
-                          })}
-                          labels={{ rent: badgeCopy.listingBadgeRent, sale: badgeCopy.listingBadgeSale }}
-                        />
-                      </div>
-                      <h3 className="font-heading text-lg font-semibold leading-snug text-brand-text group-hover:text-brand-accent-strong">
-                        {property.title}
-                      </h3>
-                      <p className="font-heading text-2xl font-semibold text-brand-text">{property.price}</p>
-                      <p className="text-sm leading-relaxed text-brand-muted">{property.address}</p>
-                      <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-accent">{property.status}</p>
-                    </div>
-                  </Link>
+                  <FeaturedCardBody property={property} badgeCopy={badgeCopy} detailHref={detailHref} cover={cover} interactive />
                   <div className="mt-auto flex flex-col gap-2 border-t border-brand-border/50 px-6 pb-6 pt-4 sm:flex-row sm:flex-wrap">
                     <Link
                       href={detailHref}
@@ -168,14 +219,28 @@ export function FeaturedPropertiesCarousel({
                     ) : null}
                   </div>
                 </article>
-              </div>
-            );
-          })}
-        </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  className="group block h-full w-full rounded-sm border border-brand-border/70 bg-brand-bg/95 text-left shadow-sm transition hover:border-brand-accent/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+                  aria-label={featuredCopy.carouselCenterAria}
+                >
+                  <article className="pointer-events-none flex h-full flex-col overflow-hidden rounded-sm">
+                    <FeaturedCardBody property={property} badgeCopy={badgeCopy} detailHref={detailHref} cover={cover} interactive={false} />
+                    <div className="border-t border-brand-border/40 px-6 py-3 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">
+                      {featuredCopy.carouselTapToCenter}
+                    </div>
+                  </article>
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {n > 1 ? (
-        <div className="mt-6 flex justify-center gap-2" aria-label={featuredCopy.title}>
+        <div className="mt-6 flex justify-center gap-2">
           {properties.map((_, i) => (
             <button
               key={i}

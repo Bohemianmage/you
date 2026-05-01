@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { saveSiteContent } from "@/app/actions/site-content";
+import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import { AdminListDisclosureRow } from "@/components/admin/admin-list-disclosure";
 import { SiteAssetUploadButton } from "@/components/admin/SiteAssetUploadButton";
 import type { CatalogProperty } from "@/data/catalog-properties";
@@ -104,24 +103,8 @@ const pillWrap =
 const pillSegment =
   "rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] transition sm:text-[11px]";
 
-function mapSaveErr(code: string): string {
-  const m: Record<string, string> = {
-    invalid_json: "JSON inválido.",
-    validation: "Validación incorrecta.",
-    write_failed: "No se pudo guardar en archivo.",
-    github_unauthorized: "GitHub: token.",
-    github_forbidden: "GitHub: permiso.",
-    github_not_found: "GitHub: repo/rama.",
-    github_conflict: "GitHub: conflicto.",
-    github_validation: "GitHub: rechazado.",
-    github_rate_limit: "GitHub: límite.",
-    github_unknown: "GitHub: error.",
-  };
-  return m[code] ?? "Error al guardar.";
-}
-
 export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEditorSeed; persistedBaseline: SiteContentFile }) {
-  const router = useRouter();
+  const edit = useSiteContentEditOptional();
   const [tab, setTab] = useState<TabId>("team");
   const [downloadLocale, setDownloadLocale] = useState<"es" | "en">("es");
 
@@ -131,9 +114,6 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
   const [downloadablesEs, setDownloadablesEs] = useState<DownloadableItem[]>(() => seed.downloadablesEs.map((d) => ({ ...d })));
   const [downloadablesEn, setDownloadablesEn] = useState<DownloadableItem[]>(() => seed.downloadablesEn.map((d) => ({ ...d })));
 
-  const [pending, startTransition] = useTransition();
-  const [saveModalOpen, setSaveModalOpen] = useState(false);
-  const [saveErr, setSaveErr] = useState<string | null>(null);
 
   const [dragTeamIdx, setDragTeamIdx] = useState<number | null>(null);
   const [dragFeaturedIdx, setDragFeaturedIdx] = useState<number | null>(null);
@@ -150,34 +130,37 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
     });
   }, []);
 
+  const baselineSigRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!saveModalOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setSaveModalOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [saveModalOpen]);
-
-  const payloadJson = useMemo(() => {
-    const base = structuredClone(persistedBaseline);
+    if (!edit?.patchWorking) {
+      baselineSigRef.current = null;
+      return;
+    }
     const normalizedFeatured = normalizeFeaturedIds(featuredCatalogIds, catalog);
-    const body: SiteContentFile = {
-      ...base,
-      version: 1,
+    const sig = JSON.stringify({
       team,
       featuredCatalogIds: normalizedFeatured,
       catalogProperties: catalog,
       downloadablesByLocale: { es: downloadablesEs, en: downloadablesEn },
-    };
-    delete body.featuredByLocale;
-    return JSON.stringify(body);
-  }, [persistedBaseline, team, featuredCatalogIds, catalog, downloadablesEs, downloadablesEn]);
+    });
+    if (baselineSigRef.current === null) {
+      baselineSigRef.current = sig;
+      return;
+    }
+    if (sig === baselineSigRef.current) return;
+    edit.patchWorking((w) => {
+      const next: SiteContentFile = {
+        ...w,
+        team,
+        featuredCatalogIds: normalizedFeatured,
+        catalogProperties: catalog,
+        downloadablesByLocale: { es: downloadablesEs, en: downloadablesEn },
+      };
+      delete next.featuredByLocale;
+      return next;
+    });
+    baselineSigRef.current = sig;
+  }, [edit, team, featuredCatalogIds, catalog, downloadablesEs, downloadablesEn]);
 
   function updateTeam(i: number, patch: Partial<TeamMember>) {
     setTeam((prev) => prev.map((m, j) => (j === i ? { ...m, ...patch } : m)));
@@ -217,23 +200,21 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
 
   return (
     <div className="mt-10 space-y-8">
-      {saveErr ? (
-        <p className="rounded-sm border border-brand-accent/40 bg-brand-accent/10 px-4 py-3 text-sm text-brand-accent-strong">{saveErr}</p>
+      {edit?.saveError ? (
+        <p className="rounded-sm border border-brand-accent/40 bg-brand-accent/10 px-4 py-3 text-sm text-brand-accent-strong">{edit.saveError}</p>
       ) : null}
 
-      <p className="text-sm text-brand-muted">
-        Contacto, textos del pie, aviso del hero y copy de secciones del home se editan en el sitio con la barra inferior en modo edición.
-      </p>
+      <p className="text-sm text-brand-muted">Los cambios se guardan con la barra inferior del sitio.</p>
 
       <div className="flex flex-wrap gap-2">
         <button type="button" className={`${tabBtn} ${tab === "team" ? tabActive : tabIdle}`} onClick={() => setTab("team")}>
           Equipo
         </button>
         <button type="button" className={`${tabBtn} ${tab === "featured" ? tabActive : tabIdle}`} onClick={() => setTab("featured")}>
-          Destacadas (inicio)
+          Destacadas
         </button>
         <button type="button" className={`${tabBtn} ${tab === "catalog" ? tabActive : tabIdle}`} onClick={() => setTab("catalog")}>
-          Catálogo /propiedades
+          Catálogo
         </button>
         <button type="button" className={`${tabBtn} ${tab === "downloadables" ? tabActive : tabIdle}`} onClick={() => setTab("downloadables")}>
           Descargables
@@ -948,70 +929,6 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
         </div>
       ) : null}
 
-      <div className="border-t border-brand-border pt-8">
-        <button
-          type="button"
-          disabled={pending}
-          className="rounded-sm bg-brand-accent px-8 py-3 text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong disabled:cursor-not-allowed disabled:opacity-45"
-          onClick={() => setSaveModalOpen(true)}
-        >
-          {pending ? "Guardando…" : "Guardar cambios"}
-        </button>
-      </div>
-
-      {saveModalOpen ? (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/45 backdrop-blur-[1px]"
-            aria-label="Cerrar diálogo"
-            onClick={() => setSaveModalOpen(false)}
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="save-confirm-title"
-            className="relative z-10 w-full max-w-md rounded-sm border border-brand-border bg-brand-bg p-6 shadow-xl ring-1 ring-brand-border/60"
-          >
-            <h2 id="save-confirm-title" className="font-heading text-lg font-semibold text-brand-text">
-              ¿Guardar los cambios?
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted">
-              Se actualizarán equipo, orden del catálogo, propiedades activas/inactivas, destacados del inicio (según catálogo) y descargables. Los textos del home no se modifican desde esta pantalla.
-            </p>
-            <div className="mt-6 flex flex-wrap justify-end gap-3">
-              <button
-                type="button"
-                className="rounded-sm border border-brand-border bg-brand-bg px-4 py-2 text-sm font-semibold text-brand-text transition hover:border-brand-accent hover:text-brand-accent-strong"
-                onClick={() => setSaveModalOpen(false)}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                disabled={pending}
-                className="rounded-sm bg-brand-accent px-4 py-2 text-sm font-semibold text-brand-white shadow-sm transition hover:bg-brand-accent-strong disabled:cursor-not-allowed disabled:opacity-45"
-                onClick={() => {
-                  setSaveModalOpen(false);
-                  setSaveErr(null);
-                  startTransition(() => {
-                    void (async () => {
-                      const res = await saveSiteContent(payloadJson);
-                      if (!res.ok) {
-                        setSaveErr(mapSaveErr(res.error));
-                        return;
-                      }
-                      router.refresh();
-                    })();
-                  });
-                }}
-              >
-                Guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

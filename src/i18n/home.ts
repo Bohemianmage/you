@@ -52,6 +52,8 @@ export interface HomeCopy {
     carouselNextAria: string;
     /** Dot buttons: slide index 1-based */
     carouselGoToAria: string;
+    carouselCenterAria: string;
+    carouselTapToCenter: string;
   };
   virtualTours: {
     title: string;
@@ -83,6 +85,7 @@ export interface HomeCopy {
     tagline: string;
     phoneLabel: string;
     copyright: string;
+    proposalLinkLabel: string;
   };
 }
 
@@ -163,6 +166,8 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       carouselPrevAria: "Propiedad anterior",
       carouselNextAria: "Propiedad siguiente",
       carouselGoToAria: "Ir a la propiedad {{n}}",
+      carouselCenterAria: "Centrar esta propiedad",
+      carouselTapToCenter: "Tocá para centrar",
     },
     virtualTours: {
       title: "Descubre nuestras experiencias 3D",
@@ -193,6 +198,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       tagline: "Comienza a escribir una nueva historia con nosotros.",
       phoneLabel: "Tel.",
       copyright: "Todos los derechos reservados.",
+      proposalLinkLabel: "Nuestra propuesta",
     },
   },
   en: {
@@ -246,6 +252,8 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       carouselPrevAria: "Previous listing",
       carouselNextAria: "Next listing",
       carouselGoToAria: "Go to listing {{n}}",
+      carouselCenterAria: "Center this listing",
+      carouselTapToCenter: "Tap to center",
     },
     virtualTours: {
       title: "Discover our 3D experiences",
@@ -275,6 +283,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       tagline: "Start writing a new story with us.",
       phoneLabel: "Phone",
       copyright: "All rights reserved.",
+      proposalLinkLabel: "Our proposal",
     },
   },
 };
