@@ -20,12 +20,6 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
       { section: "hero", key: "primaryCta", label: "Botón principal" },
       { section: "hero", key: "secondaryCta", label: "Botón secundario" },
       { section: "hero", key: "imageBadge", label: "Badge imagen" },
-      {
-        section: "hero",
-        key: "imageSrc",
-        label: "Poster del video (opcional, mientras carga)",
-        assetUpload: { kind: "image", subfolder: "hero" },
-      },
       { section: "modal", key: "title", label: "Modal · título" },
       { section: "modal", key: "message", label: "Modal · mensaje", multiline: true },
       { section: "modal", key: "close", label: "Modal · texto cerrar" },
@@ -100,7 +94,6 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
     fields: [
       { section: "footer", key: "tagline", label: "Tagline" },
       { section: "footer", key: "phoneLabel", label: "Etiqueta teléfono (solo texto de etiqueta)" },
-      { section: "footer", key: "emailLabel", label: "Etiqueta correo (solo texto de etiqueta)" },
       { section: "footer", key: "copyright", label: "Copyright" },
     ],
   },

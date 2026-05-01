@@ -15,8 +15,6 @@ export interface HomeCopy {
     primaryCta: string;
     secondaryCta: string;
     imageBadge: string;
-    /** Imagen lateral hero (`/public/...` o URL). */
-    imageSrc?: string;
   };
   modal: {
     title: string;
@@ -84,7 +82,6 @@ export interface HomeCopy {
   footer: {
     tagline: string;
     phoneLabel: string;
-    emailLabel: string;
     copyright: string;
     proposalLinkLabel: string;
   };
@@ -125,7 +122,6 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       primaryCta: "Ver propiedades",
       secondaryCta: "Contactar asesor",
       imageBadge: "Venta y renta · CDMX",
-      imageSrc: "/marketing/hero-logo-you.png",
     },
     modal: {
       title: "Sitio en desarrollo",
@@ -200,7 +196,6 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     footer: {
       tagline: "Empieza a escribir una nueva historia con nosotros.",
       phoneLabel: "Tel.",
-      emailLabel: "Correo",
       copyright: "Todos los derechos reservados.",
       proposalLinkLabel: "Nuestra propuesta",
     },
@@ -214,7 +209,6 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       primaryCta: "View properties",
       secondaryCta: "Contact an advisor",
       imageBadge: "Sales and rentals · Mexico City",
-      imageSrc: "/marketing/hero-logo-you.png",
     },
     modal: {
       title: "Site in progress",
@@ -288,7 +282,6 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     footer: {
       tagline: "Start writing a new story with us.",
       phoneLabel: "Phone",
-      emailLabel: "Email",
       copyright: "All rights reserved.",
       proposalLinkLabel: "Our proposal",
     },

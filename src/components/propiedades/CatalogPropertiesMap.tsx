@@ -27,8 +27,49 @@ function escapeHtml(s: string): string {
 }
 
 const CHUNK = 28;
+/** Centro aproximado de CDMX — vista inicial y cuando no hay puntos */
 const DEFAULT_CENTER: [number, number] = [19.4326, -99.1332];
+/** Zoom metro CDMX; mayoría de listados suelen verse sin alejar demasiado */
 const DEFAULT_ZOOM = 11;
+/** Para encuadrar el mapa se ignoran ~12% de puntos más alejados del centro denso (mediana) */
+const FOCUS_NEAREST_RATIO = 0.88;
+
+function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const R = 6371;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const lat1 = (aLat * Math.PI) / 180;
+  const lat2 = (bLat * Math.PI) / 180;
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(x)));
+}
+
+function median(nums: number[]): number {
+  const s = [...nums].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m]! : ((s[m - 1]! + s[m]!) / 2);
+}
+
+/** Bounds que encuadran la zona de mayor densidad (mayoría de puntos cerca de la mediana). */
+function densityFocusedBounds(points: GeoPoint[]): L.LatLngBounds {
+  const bounds = L.latLngBounds([]);
+  if (points.length === 0) return bounds;
+  if (points.length === 1) {
+    bounds.extend([points[0]!.lat, points[0]!.lng]);
+    return bounds;
+  }
+  const medianLat = median(points.map((p) => p.lat));
+  const medianLng = median(points.map((p) => p.lng));
+  const ranked = points
+    .map((p) => ({ p, d: haversineKm(medianLat, medianLng, p.lat, p.lng) }))
+    .sort((a, b) => a.d - b.d);
+  const keepCount = Math.max(3, Math.ceil(points.length * FOCUS_NEAREST_RATIO));
+  const subset = ranked.slice(0, keepCount).map((x) => x.p);
+  for (const pt of subset) bounds.extend([pt.lat, pt.lng]);
+  return bounds;
+}
 
 async function fetchGeoPoints(ids: string[], locale: Locale): Promise<GeoPoint[]> {
   const out: GeoPoint[] = [];
@@ -145,7 +186,6 @@ export function CatalogPropertiesMap({
       map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
       return;
     }
-    const bounds = L.latLngBounds([]);
     for (const pt of points) {
       const href = catalogDetailSegmentHref(locale, pt.segment);
       const marker = L.circleMarker([pt.lat, pt.lng], {
@@ -157,10 +197,15 @@ export function CatalogPropertiesMap({
       });
       marker.bindPopup(`<a href="${escapeHtml(href)}" style="font-weight:600">${escapeHtml(pt.title)}</a>`);
       marker.addTo(group);
-      bounds.extend([pt.lat, pt.lng]);
     }
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [28, 28], maxZoom: 15 });
+    if (points.length === 1) {
+      const p = points[0]!;
+      map.setView([p.lat, p.lng], 14);
+      return;
+    }
+    const focusBounds = densityFocusedBounds(points);
+    if (focusBounds.isValid()) {
+      map.fitBounds(focusBounds, { padding: [28, 28], maxZoom: 15 });
     }
   }, [mapReady, locale, points]);
 

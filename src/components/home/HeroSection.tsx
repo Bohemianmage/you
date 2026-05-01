@@ -49,7 +49,7 @@ export function HeroSection({ locale, copy, modalCopy, catalogHref, contactHref,
       </div>
 
       <div className="relative isolate min-h-[28rem] overflow-hidden sm:min-h-[32rem] lg:min-h-[36rem]">
-        <HeroBackdropVideo poster={copy.imageSrc} />
+        <HeroBackdropVideo />
         <div
           className="absolute inset-0 z-[1] bg-gradient-to-b from-brand-bg/93 via-brand-bg/82 to-brand-bg/88 lg:bg-gradient-to-r lg:from-brand-bg/94 lg:via-brand-bg/86 lg:to-brand-bg/74"
           aria-hidden

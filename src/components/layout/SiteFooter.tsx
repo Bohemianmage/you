@@ -36,7 +36,6 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
               </a>
             </p>
             <p className="text-sm text-brand-muted">
-              {footerCopy.emailLabel}{" "}
               <a href={contact.emailHref} className={TEXT_LINK_INLINE}>
                 {contact.emailDisplay}
               </a>

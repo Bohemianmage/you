@@ -8,7 +8,7 @@ const DEFAULT_SRC = "/videos/hero-mexico-city.mp4";
  * Video de fondo del bloque principal del hero (silenciado, loop).
  * Respeta `prefers-reduced-motion`: muestra degradado estático sin reproducir.
  */
-export function HeroBackdropVideo({ src = DEFAULT_SRC, poster }: { src?: string; poster?: string }) {
+export function HeroBackdropVideo({ src = DEFAULT_SRC }: { src?: string }) {
   const [reduceMotion, setReduceMotion] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,6 @@ export function HeroBackdropVideo({ src = DEFAULT_SRC, poster }: { src?: string;
     <video
       className="absolute inset-0 h-full min-h-full w-full min-w-full object-cover"
       src={src}
-      poster={poster?.trim() || undefined}
       muted
       playsInline
       loop
