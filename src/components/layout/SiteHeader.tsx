@@ -32,11 +32,13 @@ function scrollToSectionHash(hash: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+const SCROLL_TOP_SHOW_PX = 36;
+const SCROLL_DELTA_PX = 10;
+
 /**
- * Sticky header — pill nav en desktop, drawer en móvil; barra sin blur.
- * El overlay móvil se monta en `#marketing-mobile-menu-host` (columna bajo la barra): blur/dim ahí;
- * el panel empieza en `top: 0` del host — sin hueco duplicado bajo el navbar.
- * el navbar queda fuera para poder usar hamburguesa/X, idioma y logo.
+ * Fixed header + spacer (altura medida) — pill nav desktop, drawer móvil; sin blur en barra.
+ * Scroll abajo oculta la barra; scroll arriba la revela. Con menú móvil abierto no se oculta.
+ * Overlay en `#marketing-mobile-menu-host`; navbar usable (logo, idioma, hamburguesa).
  */
 export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const pathname = usePathname();
@@ -44,8 +46,50 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const [mobileOverlayRoot, setMobileOverlayRoot] = useState<HTMLElement | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const lastScrollY = useRef(0);
+  const [headerSpacerPx, setHeaderSpacerPx] = useState(0);
+  const [navHiddenByScroll, setNavHiddenByScroll] = useState(false);
 
   const isHome = pathname === "/";
+
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const measure = () => setHeaderSpacerPx(el.offsetHeight);
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  useEffect(() => {
+    lastScrollY.current = window.scrollY;
+    setNavHiddenByScroll(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      setNavHiddenByScroll(false);
+      return;
+    }
+    const onScroll = () => {
+      const y = window.scrollY;
+      const dy = y - lastScrollY.current;
+      lastScrollY.current = y;
+      if (y <= SCROLL_TOP_SHOW_PX) {
+        setNavHiddenByScroll(false);
+        return;
+      }
+      if (dy > SCROLL_DELTA_PX) setNavHiddenByScroll(true);
+      else if (dy < -SCROLL_DELTA_PX) setNavHiddenByScroll(false);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [mobileOpen]);
 
   useEffect(() => {
     if (!isHome) {
@@ -225,11 +269,17 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     </div>
   );
 
+  const navSlideClass =
+    navHiddenByScroll && !mobileOpen
+      ? "-translate-y-full pointer-events-none motion-reduce:transform-none motion-reduce:pointer-events-auto"
+      : "translate-y-0";
+
   return (
     <>
+      <div className="shrink-0" style={{ height: headerSpacerPx }} aria-hidden />
       <header
         ref={headerRef}
-        className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/90 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)]"
+        className={`fixed top-0 left-0 right-0 z-50 border-b border-brand-border/70 bg-brand-bg/90 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] transition-transform duration-300 ease-out motion-reduce:transition-none ${navSlideClass}`}
       >
       <div className="relative mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-1 sm:px-5 lg:gap-5 lg:px-6 xl:max-w-5xl">
         <Link

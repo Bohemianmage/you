@@ -45,6 +45,8 @@ type SlotsErr = {
   code: string;
 };
 
+type BookingWizardStep = 1 | 2 | 3;
+
 export function PropertyVisitBooking({
   locale,
   catalogId,
@@ -61,6 +63,7 @@ export function PropertyVisitBooking({
   const [slotsLoading, setSlotsLoading] = useState(true);
   const [pick, setPick] = useState<string | null>(null);
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
+  const [wizardStep, setWizardStep] = useState<BookingWizardStep>(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -74,12 +77,17 @@ export function PropertyVisitBooking({
   const [done, setDone] = useState(false);
   const [formErr, setFormErr] = useState<string | null>(null);
 
-  const fetchSlots = useCallback(async () => {
+  const fetchSlots = useCallback(async (opts?: { resetWizard?: boolean }) => {
+    const resetWizard = opts?.resetWizard !== false;
     setSlotsLoading(true);
     setSlotsRes(null);
     setPick(null);
     setDone(false);
     setFormErr(null);
+    if (resetWizard) {
+      setWizardStep(1);
+      setSelectedDayKey(null);
+    }
     try {
       const qParams = new URLSearchParams({
         catalogId,
@@ -114,7 +122,10 @@ export function PropertyVisitBooking({
   useEffect(() => {
     const keys = slotsByDay.orderedKeys;
     if (!slotsRes?.ok || keys.length === 0) return;
-    setSelectedDayKey((prev) => (prev && keys.includes(prev) ? prev : keys[0]));
+    setSelectedDayKey((prev) => {
+      if (!prev) return null;
+      return keys.includes(prev) ? prev : null;
+    });
   }, [slotsRes, slotsByDay]);
 
   const unavailableMessage = useMemo(() => {
@@ -160,8 +171,17 @@ export function PropertyVisitBooking({
     return slotsByDay.byDay.get(selectedDayKey) ?? [];
   }, [selectedDayKey, slotsByDay]);
 
+  const summaryDayLabel = useMemo(() => {
+    if (!selectedDayKey) return null;
+    const firstIso = slotsByDay.byDay.get(selectedDayKey)?.[0];
+    return firstIso ? dateFmt.format(new Date(firstIso)) : null;
+  }, [selectedDayKey, slotsByDay, dateFmt]);
+
+  const summaryTimeLabel = pick ? timeFmt.format(new Date(pick)) : null;
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (wizardStep !== 3) return;
     setFormErr(null);
     if (hp.trim()) return;
     if (!pick || !name.trim() || !email.trim()) {
@@ -200,7 +220,8 @@ export function PropertyVisitBooking({
       if (!res.ok || !data.ok) {
         if (data.code === "slot_taken" || data.code === "slot_unavailable") {
           setFormErr(copy.bookingErrConflict);
-          await fetchSlots();
+          await fetchSlots({ resetWizard: false });
+          setWizardStep(2);
         } else if (data.code === "docs_required") {
           setFormErr(copy.bookingErrDocsPickOne);
         } else if (data.code === "validation") {
@@ -285,52 +306,62 @@ export function PropertyVisitBooking({
       <form onSubmit={(e) => void onSubmit(e)} className="mt-6 space-y-6">
         <input type="text" name="website" value={hp} onChange={(e) => setHp(e.target.value)} className="hidden" tabIndex={-1} autoComplete="off" aria-hidden />
 
-        <div className="space-y-5">
-          <div id="booking-days">
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickDay}</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {slotsByDay.orderedKeys.map((key) => {
-                const firstIso = slotsByDay.byDay.get(key)?.[0];
-                const label = firstIso ? dateFmt.format(new Date(firstIso)) : key;
-                const active = selectedDayKey === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => {
-                      setSelectedDayKey(key);
-                      setPick(null);
-                    }}
-                    className={`rounded-sm border px-3 py-2 text-left text-xs font-semibold transition ${
-                      active
-                        ? "border-brand-accent bg-brand-accent text-brand-white"
-                        : "border-brand-border bg-brand-bg text-brand-text hover:border-brand-accent/50"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
+        {wizardStep === 1 ? (
+          <div id="booking-days" className="space-y-5">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickDay}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {slotsByDay.orderedKeys.map((key) => {
+                  const firstIso = slotsByDay.byDay.get(key)?.[0];
+                  const label = firstIso ? dateFmt.format(new Date(firstIso)) : key;
+                  const active = selectedDayKey === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => {
+                        setSelectedDayKey(key);
+                        setPick(null);
+                        setWizardStep(2);
+                      }}
+                      className={`rounded-sm border px-3 py-2 text-left text-xs font-semibold transition ${
+                        active
+                          ? "border-brand-accent bg-brand-accent text-brand-white"
+                          : "border-brand-border bg-brand-bg text-brand-text hover:border-brand-accent/50"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
+        ) : null}
 
-          {selectedDayKey && timesForDay.length > 0 ? (
+        {wizardStep === 2 && selectedDayKey && timesForDay.length > 0 ? (
+          <div className="space-y-5">
             <div>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickTime}</p>
-                {slotsByDay.orderedKeys.length > 1 ? (
-                  <button
-                    type="button"
-                    className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-accent hover:underline"
-                    onClick={() => {
-                      setPick(null);
+                <button
+                  type="button"
+                  className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                  onClick={() => {
+                    setWizardStep(1);
+                    setPick(null);
+                    requestAnimationFrame(() => {
                       document.getElementById("booking-days")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-                    }}
-                  >
-                    {copy.bookingChangeDay}
-                  </button>
-                ) : null}
+                    });
+                  }}
+                >
+                  {copy.bookingChangeDay}
+                </button>
               </div>
+              {summaryDayLabel ? (
+                <p className="mt-1.5 text-sm font-medium text-brand-text">{summaryDayLabel}</p>
+              ) : null}
+              <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickSlot}</p>
               <div className="mt-2 grid max-h-48 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4 md:grid-cols-5">
                 {timesForDay.map((iso) => {
                   const active = pick === iso;
@@ -339,7 +370,10 @@ export function PropertyVisitBooking({
                     <button
                       key={iso}
                       type="button"
-                      onClick={() => setPick(iso)}
+                      onClick={() => {
+                        setPick(iso);
+                        setWizardStep(3);
+                      }}
                       className={`rounded-sm border px-2 py-2 text-center text-xs font-semibold transition ${
                         active
                           ? "border-brand-accent bg-brand-accent text-brand-white"
@@ -352,103 +386,150 @@ export function PropertyVisitBooking({
                 })}
               </div>
             </div>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
-        <div className="rounded-sm border border-brand-border/70 bg-brand-bg/60 px-4 py-4">
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingDocHeading}</p>
-          <p className="mt-2 text-xs leading-relaxed text-brand-muted">{copy.bookingDocLead}</p>
-          <ul className="mt-4 space-y-3">
-            <li>
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
-                <input type="checkbox" checked={docIne} onChange={(e) => setDocIne(e.target.checked)} className={checkboxClass} />
-                <span>{copy.bookingDocIne}</span>
+        {wizardStep === 3 ? (
+          <div className="space-y-6">
+            <div className="rounded-sm border border-brand-border/80 bg-brand-bg/70 px-4 py-3">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingSummaryHeading}</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {summaryDayLabel ? (
+                  <span className="rounded-sm border border-brand-border bg-brand-surface/80 px-3 py-1.5 text-xs font-semibold text-brand-text">
+                    {summaryDayLabel}
+                  </span>
+                ) : null}
+                {summaryTimeLabel ? (
+                  <span className="rounded-sm border border-brand-accent/35 bg-brand-accent/10 px-3 py-1.5 text-xs font-semibold text-brand-accent-strong">
+                    {summaryTimeLabel}
+                  </span>
+                ) : null}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+                <button
+                  type="button"
+                  className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                  onClick={() => {
+                    setWizardStep(1);
+                    setPick(null);
+                  }}
+                >
+                  {copy.bookingChangeDay}
+                </button>
+                <button
+                  type="button"
+                  className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                  onClick={() => setWizardStep(2)}
+                >
+                  {copy.bookingChangeTime}
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-sm border border-brand-border/70 bg-brand-bg/60 px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingDocHeading}</p>
+              <p className="mt-2 text-xs leading-relaxed text-brand-muted">{copy.bookingDocLead}</p>
+              <ul className="mt-4 space-y-3">
+                <li>
+                  <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
+                    <input type="checkbox" checked={docIne} onChange={(e) => setDocIne(e.target.checked)} className={checkboxClass} />
+                    <span>{copy.bookingDocIne}</span>
+                  </label>
+                </li>
+                <li>
+                  <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
+                    <input type="checkbox" checked={docAddress} onChange={(e) => setDocAddress(e.target.checked)} className={checkboxClass} />
+                    <span>{copy.bookingDocAddressProof}</span>
+                  </label>
+                </li>
+                <li>
+                  <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
+                    <input type="checkbox" checked={docIncome} onChange={(e) => setDocIncome(e.target.checked)} className={checkboxClass} />
+                    <span>{copy.bookingDocIncomeProof}</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingContactHeading}</p>
+              <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">
+                  {copy.bookingNameLabel}
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
+                    autoComplete="name"
+                  />
+                </label>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">
+                  {copy.bookingEmailLabel}
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
+                    autoComplete="email"
+                  />
+                </label>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted sm:col-span-2">
+                  {copy.bookingPhoneLabel}
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
+                    autoComplete="tel"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="rounded-sm border border-brand-border/70 bg-brand-bg/40 px-4 py-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingAdditionalHeading}</p>
+              <label className="mt-3 block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">
+                {copy.bookingDocNotesLabel}
+                <textarea
+                  value={docNotes}
+                  onChange={(e) => setDocNotes(e.target.value)}
+                  rows={3}
+                  placeholder={copy.bookingDocNotesPlaceholder}
+                  className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
+                />
               </label>
-            </li>
-            <li>
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
-                <input type="checkbox" checked={docAddress} onChange={(e) => setDocAddress(e.target.checked)} className={checkboxClass} />
-                <span>{copy.bookingDocAddressProof}</span>
+              <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm leading-snug text-brand-text">
+                <input type="checkbox" checked={acceptLegal} onChange={(e) => setAcceptLegal(e.target.checked)} className={checkboxClass} />
+                <span>
+                  {copy.bookingLegalIntro}{" "}
+                  <Link href={`/terminos${q}`} className="font-semibold text-brand-accent underline-offset-2 hover:underline">
+                    {copy.bookingLegalTermsLink}
+                  </Link>{" "}
+                  {copy.bookingLegalMid}{" "}
+                  <Link href={`/privacidad${q}`} className="font-semibold text-brand-accent underline-offset-2 hover:underline">
+                    {copy.bookingLegalPrivacyLink}
+                  </Link>
+                  .
+                </span>
               </label>
-            </li>
-            <li>
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
-                <input type="checkbox" checked={docIncome} onChange={(e) => setDocIncome(e.target.checked)} className={checkboxClass} />
-                <span>{copy.bookingDocIncomeProof}</span>
-              </label>
-            </li>
-          </ul>
-          <label className="mt-4 block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">
-            {copy.bookingDocNotesLabel}
-            <textarea
-              value={docNotes}
-              onChange={(e) => setDocNotes(e.target.value)}
-              rows={3}
-              placeholder={copy.bookingDocNotesPlaceholder}
-              className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
-            />
-          </label>
-        </div>
+            </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">
-            {copy.bookingNameLabel}
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
-              autoComplete="name"
-            />
-          </label>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">
-            {copy.bookingEmailLabel}
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
-              autoComplete="email"
-            />
-          </label>
-          <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted sm:col-span-2">
-            {copy.bookingPhoneLabel}
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
-              autoComplete="tel"
-            />
-          </label>
-        </div>
+            {formErr ? <p className="text-sm font-medium text-brand-accent-strong">{formErr}</p> : null}
 
-        <label className="flex cursor-pointer items-start gap-3 text-sm leading-snug text-brand-text">
-          <input type="checkbox" checked={acceptLegal} onChange={(e) => setAcceptLegal(e.target.checked)} className={checkboxClass} />
-          <span>
-            {copy.bookingLegalIntro}{" "}
-            <Link href={`/terminos${q}`} className="font-semibold text-brand-accent underline-offset-2 hover:underline">
-              {copy.bookingLegalTermsLink}
-            </Link>{" "}
-            {copy.bookingLegalMid}{" "}
-            <Link href={`/privacidad${q}`} className="font-semibold text-brand-accent underline-offset-2 hover:underline">
-              {copy.bookingLegalPrivacyLink}
-            </Link>
-            .
-          </span>
-        </label>
+            <button
+              type="submit"
+              disabled={submitting || !pick}
+              className="inline-flex w-full items-center justify-center rounded-sm bg-brand-accent px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-brand-white shadow-sm transition hover:bg-brand-accent-strong disabled:opacity-45 sm:w-auto"
+            >
+              {submitting ? copy.bookingWorking : copy.bookingSubmit}
+            </button>
+          </div>
+        ) : null}
 
-        {formErr ? <p className="text-sm font-medium text-brand-accent-strong">{formErr}</p> : null}
-
-        <button
-          type="submit"
-          disabled={submitting || !pick}
-          className="inline-flex w-full items-center justify-center rounded-sm bg-brand-accent px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-brand-white shadow-sm transition hover:bg-brand-accent-strong disabled:opacity-45 sm:w-auto"
-        >
-          {submitting ? copy.bookingWorking : copy.bookingSubmit}
-        </button>
+        {wizardStep !== 3 && formErr ? <p className="text-sm font-medium text-brand-accent-strong">{formErr}</p> : null}
       </form>
     </section>
   );

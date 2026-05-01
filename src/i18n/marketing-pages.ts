@@ -217,6 +217,14 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingPickTime: string;
     /** Volver a la lista de días (accesible / móvil). */
     bookingChangeDay: string;
+    /** Volver al selector de hora desde el paso de datos. */
+    bookingChangeTime: string;
+    /** Encabezado del bloque día + hora ya elegidos. */
+    bookingSummaryHeading: string;
+    /** Datos de contacto en el paso final. */
+    bookingContactHeading: string;
+    /** Notas y aviso legal. */
+    bookingAdditionalHeading: string;
     bookingPickSlot: string;
     bookingNameLabel: string;
     bookingEmailLabel: string;
@@ -299,10 +307,14 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingSectionTitle: "Agendar visita",
     bookingLoading: "Cargando horarios disponibles…",
     bookingSectionHint:
-      "Elige día y hora. Tu visita queda como solicitud: el equipo te confirma por correo cuando esté aceptada (no es al instante).",
+      "Elige primero el día, luego la hora y por último documentación, tus datos e información adicional. La visita queda como solicitud hasta que el equipo la confirme por correo.",
     bookingPickDay: "Días disponibles",
     bookingPickTime: "Hora",
     bookingChangeDay: "Cambiar día",
+    bookingChangeTime: "Cambiar hora",
+    bookingSummaryHeading: "Tu selección",
+    bookingContactHeading: "Datos de contacto",
+    bookingAdditionalHeading: "Información adicional",
     bookingPickSlot: "Horarios disponibles",
     bookingNameLabel: "Nombre completo",
     bookingEmailLabel: "Correo electrónico",
@@ -388,10 +400,14 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingSectionTitle: "Schedule a visit",
     bookingLoading: "Loading available times…",
     bookingSectionHint:
-      "Pick a day and time. Your visit stays a request until we confirm it by email (confirmation isn’t automatic).",
+      "Pick a day, then a time, then documentation, your details, and any extra notes. Your visit stays a request until we confirm it by email.",
     bookingPickDay: "Available day",
     bookingPickTime: "Time",
     bookingChangeDay: "Change day",
+    bookingChangeTime: "Change time",
+    bookingSummaryHeading: "Your selection",
+    bookingContactHeading: "Contact details",
+    bookingAdditionalHeading: "Additional information",
     bookingPickSlot: "Available times",
     bookingNameLabel: "Full name",
     bookingEmailLabel: "Email",
