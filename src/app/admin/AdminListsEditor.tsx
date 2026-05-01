@@ -11,6 +11,10 @@ import type { DownloadableItem } from "@/data/downloadables";
 import type { TeamMember } from "@/data/team";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
 import type { SiteContentFile } from "@/lib/site-content/types";
+import type { TeamImageFocusPreset } from "@/lib/team-image-framing";
+import { clampTeamImageZoom, TEAM_IMAGE_FOCUS_OPTIONS } from "@/lib/team-image-framing";
+
+const DEFAULT_TEAM_IMAGE_FOCUS: TeamImageFocusPreset = "center";
 
 type TabId = "team" | "featured" | "catalog" | "downloadables";
 
@@ -324,6 +328,52 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       className={inputClass}
                     />
                     <SiteAssetUploadButton kind="image" subfolder="team" onUploaded={(url) => updateTeam(i, { imageSrc: url })} />
+                  </label>
+                  <label className={labelClass}>
+                    Encuadre de la foto
+                    <select
+                      value={member.imageFocus ?? DEFAULT_TEAM_IMAGE_FOCUS}
+                      onChange={(e) => updateTeam(i, { imageFocus: e.target.value as TeamImageFocusPreset })}
+                      className={`${inputClass} mt-2`}
+                    >
+                      {TEAM_IMAGE_FOCUS_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.value === "center" ? "Centro (predeterminado)" : o.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className={labelClass}>
+                    Posición CSS (opcional)
+                    <input
+                      type="text"
+                      value={member.imageObjectPosition ?? ""}
+                      onChange={(e) => updateTeam(i, { imageObjectPosition: e.target.value.trim() || undefined })}
+                      placeholder="ej. 52% 35%"
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Zoom foto (%)
+                    <input
+                      type="number"
+                      min={100}
+                      max={140}
+                      step={1}
+                      value={member.imageZoom ?? ""}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        if (!raw.trim()) {
+                          updateTeam(i, { imageZoom: undefined });
+                          return;
+                        }
+                        const n = Number(raw);
+                        if (!Number.isFinite(n)) return;
+                        updateTeam(i, { imageZoom: clampTeamImageZoom(n) });
+                      }}
+                      placeholder="100–140"
+                      className={inputClass}
+                    />
                   </label>
                   <label className={labelClass}>
                     Correo

@@ -7,6 +7,7 @@ import type { FeaturedProperty } from "@/data/properties";
 import { FEATURED_PROPERTIES_BY_LOCALE } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import { TEAM_MEMBERS } from "@/data/team";
+import { clampTeamImageZoom } from "@/lib/team-image-framing";
 import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 
@@ -60,11 +61,17 @@ export function mergeTeamFromFile(file: SiteContentFile): TeamMember[] {
     if (!base) return { ...m };
     const role = { ...base.role, ...m.role };
     const trimmedImg = m.imageSrc?.trim();
+    const trimmedObjPos = m.imageObjectPosition?.trim();
+    const zoomFromFile = m.imageZoom;
     return {
       ...base,
       ...m,
       role,
       imageSrc: trimmedImg ? trimmedImg : base.imageSrc,
+      imageFocus: m.imageFocus !== undefined ? m.imageFocus : base.imageFocus,
+      imageObjectPosition: trimmedObjPos ? trimmedObjPos : base.imageObjectPosition,
+      imageZoom:
+        zoomFromFile != null && Number.isFinite(zoomFromFile) ? clampTeamImageZoom(zoomFromFile) : base.imageZoom,
       email: m.email?.trim() ? m.email.trim() : base.email,
       phoneDisplay: m.phoneDisplay?.trim() ? m.phoneDisplay.trim() : base.phoneDisplay,
       phoneHref: m.phoneHref?.trim() ? m.phoneHref.trim() : base.phoneHref,

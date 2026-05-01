@@ -1,6 +1,10 @@
 import { z } from "zod";
 
+import { clampTeamImageZoom } from "@/lib/team-image-framing";
+
 import type { SiteContentFile } from "./types";
+
+const teamImageFocusEnum = z.enum(["center", "top", "face", "bottom", "left", "right"]);
 
 const teamMemberSchema = z.object({
   id: z.string().min(1),
@@ -10,6 +14,9 @@ const teamMemberSchema = z.object({
     en: z.string(),
   }),
   imageSrc: z.string().optional(),
+  imageFocus: teamImageFocusEnum.optional(),
+  imageObjectPosition: z.string().optional(),
+  imageZoom: z.number().min(100).max(140).optional(),
   email: z.string().optional(),
   phoneDisplay: z.string().optional(),
   phoneHref: z.string().optional(),
@@ -158,6 +165,9 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
     out.team = input.team.map((m) => ({
       ...m,
       imageSrc: m.imageSrc?.trim() || undefined,
+      imageFocus: m.imageFocus,
+      imageObjectPosition: m.imageObjectPosition?.trim() || undefined,
+      imageZoom: m.imageZoom != null ? clampTeamImageZoom(m.imageZoom) : undefined,
       email: m.email?.trim() || undefined,
       phoneDisplay: m.phoneDisplay?.trim() || undefined,
       phoneHref: m.phoneHref?.trim() || undefined,

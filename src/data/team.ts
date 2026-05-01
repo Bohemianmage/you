@@ -1,4 +1,7 @@
 import type { Locale } from "@/i18n/types";
+import type { TeamImageFocusPreset } from "@/lib/team-image-framing";
+
+export type { TeamImageFocusPreset } from "@/lib/team-image-framing";
 
 export interface TeamMemberSocial {
   facebook?: string;
@@ -12,6 +15,12 @@ export interface TeamMember {
   role: Record<Locale, string>;
   /** Add under `/public/team/…` when assets are available (see migration). */
   imageSrc?: string;
+  /** Encuadre con `object-cover` en la ficha (admin Listas → Equipo). */
+  imageFocus?: TeamImageFocusPreset;
+  /** Sobrescribe el preset; CSS `object-position`, ej. `52% 38%`. */
+  imageObjectPosition?: string;
+  /** Zoom 100–140 % sobre el área recortada (misma ficha para todos). */
+  imageZoom?: number;
   email?: string;
   phoneDisplay?: string;
   phoneHref?: string;

@@ -6,6 +6,11 @@ import { useCallback, useState } from "react";
 import { useLiveSite } from "@/components/layout/MarketingPageFrame";
 import type { TeamMember } from "@/data/team";
 import type { Locale } from "@/i18n/types";
+import {
+  clampTeamImageZoom,
+  teamImageObjectPosition,
+  teamImageTransformOrigin,
+} from "@/lib/team-image-framing";
 
 function memberInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -28,6 +33,10 @@ export function TeamMemberFlipCard({ member, locale }: { member: TeamMember; loc
 
   const a11yFlip = locale === "en" ? "Show contact details" : "Ver datos de contacto";
 
+  const photoZoom = clampTeamImageZoom(member.imageZoom) / 100;
+  const photoTransformOrigin = teamImageTransformOrigin(member);
+  const photoObjectPosition = teamImageObjectPosition(member);
+
   return (
     <li className="[perspective:1000px]">
       <div
@@ -47,15 +56,26 @@ export function TeamMemberFlipCard({ member, locale }: { member: TeamMember; loc
           className={`relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d] motion-reduce:transition-none ${flipped ? "[transform:rotateY(180deg)]" : ""}`}
         >
           <div className="absolute inset-0 flex flex-col overflow-hidden rounded-sm border border-brand-border bg-brand-bg shadow-[0_1px_4px_rgba(0,0,0,0.08)] [backface-visibility:hidden]">
-            <div className="relative min-h-0 flex-1 bg-brand-surface">
+            <div className="relative min-h-0 flex-1 overflow-hidden bg-brand-surface">
               {member.imageSrc ? (
-                <Image
-                  src={member.imageSrc}
-                  alt=""
-                  fill
-                  className="object-contain object-center"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
+                <div className="absolute inset-0">
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      transformOrigin: photoTransformOrigin,
+                      transform: photoZoom !== 1 ? `scale(${photoZoom})` : undefined,
+                    }}
+                  >
+                    <Image
+                      src={member.imageSrc}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      style={{ objectPosition: photoObjectPosition }}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
+                  </div>
+                </div>
               ) : (
                 <div className="flex h-full min-h-[14rem] w-full items-center justify-center bg-gradient-to-br from-brand-accent/15 via-brand-surface to-brand-accent/10">
                   <span className="font-heading text-2xl font-semibold tracking-wide text-brand-accent">{memberInitials(member.name)}</span>
