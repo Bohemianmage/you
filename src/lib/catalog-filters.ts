@@ -1,4 +1,5 @@
 import type { CatalogProperty } from "@/data/catalog-properties";
+import { resolveCatalogZoneGroup } from "@/lib/catalog-zone-group";
 import { getListingMetrics, getListingPrice } from "@/lib/catalog-metrics";
 import type { CatalogQueryFilters } from "@/lib/catalog-query";
 
@@ -46,8 +47,12 @@ export function inferListingDisplayType(p: {
   return null;
 }
 
-function zonesMatch(catalogZone: string, filterZone: string): boolean {
-  return catalogZone.trim().toLowerCase() === filterZone.trim().toLowerCase();
+/** Coincide con la ubicación completa o con la región agrupada (`zoneGroup` / derivada). */
+function zoneFilterMatches(p: CatalogProperty, filterZone: string): boolean {
+  const f = filterZone.trim().toLowerCase();
+  const z = p.zone.trim().toLowerCase();
+  const g = resolveCatalogZoneGroup(p.zone, p.zoneGroup).toLowerCase();
+  return z === f || g === f;
 }
 
 function inRange(
@@ -72,7 +77,7 @@ export function filterCatalogProperties(list: CatalogProperty[], opts: CatalogQu
 
   const zone = opts.zone?.trim();
   if (zone) {
-    out = out.filter((p) => zonesMatch(p.zone, zone));
+    out = out.filter((p) => zoneFilterMatches(p, zone));
   }
 
   const tipo = opts.tipo;

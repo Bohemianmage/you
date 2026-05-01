@@ -1,4 +1,5 @@
 import type { CatalogProperty } from "@/data/catalog-properties";
+import { deriveZoneGroup } from "@/lib/catalog-zone-group";
 import { inferListingTypeFromOperations } from "@/lib/catalog-filters";
 
 type EbOperation = {
@@ -252,6 +253,8 @@ export function mapEasyBrokerPropertyToCatalog(raw: Record<string, unknown>, mod
     parkingSpots,
   });
 
+  const zoneGroup = deriveZoneGroup(zone);
+
   const base: CatalogProperty = {
     id,
     slug: publicId || undefined,
@@ -260,7 +263,9 @@ export function mapEasyBrokerPropertyToCatalog(raw: Record<string, unknown>, mod
     price: price || "—",
     specs,
     zone,
+    zoneGroup,
     address,
+    status: "published",
     listingType,
     areaM2,
     bedrooms,
@@ -281,7 +286,6 @@ export function mapEasyBrokerPropertyToCatalog(raw: Record<string, unknown>, mod
   if (mode !== "detail") return base;
 
   const pdfUrls = propertyFileUrls(raw);
-  const ebListingUrl = str(raw.public_url)?.trim();
   const expenses = str(raw.expenses)?.trim();
   const floorsCount = num(raw.floors);
   const floorRaw = raw.floor;
@@ -294,19 +298,16 @@ export function mapEasyBrokerPropertyToCatalog(raw: Record<string, unknown>, mod
   const ebFeatures = ebFeaturesList(raw);
   const tagLabels = tagStrings(raw);
   const videoUrlsList = videoUrls(raw);
-  const collaborationNotes = str(raw.collaboration_notes)?.trim();
   const agentRec = asRecord(raw.agent);
   const agentName = agentRec ? str(agentRec.full_name)?.trim() || str(agentRec.name)?.trim() : undefined;
   const agentEmail = agentRec ? str(agentRec.email)?.trim() : undefined;
 
   const opDetail = operationsDetail(ops);
   const foreclosure = raw.foreclosure === true;
-  const exclusive = raw.exclusive === true;
 
   return {
     ...base,
     ebOperations: opDetail.length ? opDetail : undefined,
-    ebListingUrl: ebListingUrl || undefined,
     expenses: expenses || undefined,
     floorsCount: floorsCount != null ? Math.round(floorsCount) : undefined,
     floorNumber: floorNumber || undefined,
@@ -317,11 +318,9 @@ export function mapEasyBrokerPropertyToCatalog(raw: Record<string, unknown>, mod
     videoUrls: videoUrlsList.length ? videoUrlsList : undefined,
     brochureUrls: pdfUrls.length > 1 ? pdfUrls.slice(1) : undefined,
     brochureUrl: pdfUrls[0],
-    collaborationNotes: collaborationNotes || undefined,
     agentName: agentName || undefined,
     agentEmail: agentEmail || undefined,
     foreclosure: foreclosure || undefined,
-    exclusive: exclusive || undefined,
     bathroomsFull,
     halfBathrooms: half != null && half > 0 ? Math.round(half) : undefined,
   };

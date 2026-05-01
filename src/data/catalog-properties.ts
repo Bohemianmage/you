@@ -12,6 +12,8 @@ export interface CatalogProperty {
   price: string;
   specs: string;
   zone: string;
+  /** Ciudad + estado (o equivalente) para filtros; ver `deriveZoneGroup`. EasyBroker siempre lo envía; JSON antiguo puede omitirlo. */
+  zoneGroup?: string;
   address?: string;
   status?: string;
   /** Filtro catálogo renta vs venta (si falta, se infiere de `status` / texto). */
@@ -49,8 +51,6 @@ export interface CatalogProperty {
     period?: string;
     unit?: string;
   }[];
-  /** Enlace público al anuncio en EasyBroker. */
-  ebListingUrl?: string;
   /** Gastos / mantenimiento (texto del CRM). */
   expenses?: string;
   /** Niveles totales del inmueble. */
@@ -64,9 +64,7 @@ export interface CatalogProperty {
   videoUrls?: string[];
   /** Adjuntos (ej. PDF) desde `property_files`. */
   brochureUrls?: string[];
-  collaborationNotes?: string;
   agentName?: string;
   agentEmail?: string;
   foreclosure?: boolean;
-  exclusive?: boolean;
 }

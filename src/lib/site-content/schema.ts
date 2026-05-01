@@ -37,6 +37,7 @@ const catalogPropertySchema = z.object({
   price: z.string().min(1),
   specs: z.string().min(1),
   zone: z.string().min(1),
+  zoneGroup: z.string().min(1).optional(),
   address: z.string().optional(),
   status: z.string().optional(),
   description: z.string().optional(),

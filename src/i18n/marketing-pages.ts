@@ -7,6 +7,8 @@ export const CATALOG_PAGE_COPY: Record<
     title: string;
     subtitle: string;
     zoneLabel: string;
+    /** Texto de ayuda bajo el selector de región (agrupación). */
+    filterRegionHint: string;
     specsLabel: string;
     backHome: string;
     contactCta: string;
@@ -57,7 +59,9 @@ export const CATALOG_PAGE_COPY: Record<
   es: {
     title: "Propiedades",
     subtitle: "Portafolio disponible y referencias en zonas premium de CDMX.",
-    zoneLabel: "Zona",
+    zoneLabel: "Región",
+    filterRegionHint:
+      "Agrupamos por ciudad y estado (últimos segmentos de la ubicación) para filtrar más fácil; cada tarjeta sigue mostrando la ubicación completa.",
     specsLabel: "Superficie y distribución",
     backHome: "Volver al inicio",
     contactCta: "Platicar con un asesor",
@@ -69,7 +73,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterSale: "En venta",
     noResults: "No hay propiedades que coincidan con estos filtros.",
     filtersDetailHeading: "Filtros",
-    filterZoneAll: "Todas las zonas",
+    filterZoneAll: "Todas las regiones",
     filterM2Min: "m² mín.",
     filterM2Max: "m² máx.",
     filterBedMin: "Rec. mín.",
@@ -102,7 +106,9 @@ export const CATALOG_PAGE_COPY: Record<
   en: {
     title: "Properties",
     subtitle: "Available portfolio and references in Mexico City premium corridors.",
-    zoneLabel: "Area",
+    zoneLabel: "Region",
+    filterRegionHint:
+      "We group by city and state (last segments of the address) so filtering is easier; each card still shows the full location line.",
     specsLabel: "Size & layout",
     backHome: "Back to home",
     contactCta: "Talk to an advisor",
@@ -114,7 +120,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterSale: "For sale",
     noResults: "No listings match these filters.",
     filtersDetailHeading: "Filters",
-    filterZoneAll: "All areas",
+    filterZoneAll: "All regions",
     filterM2Min: "Min m²",
     filterM2Max: "Max m²",
     filterBedMin: "Min beds",
@@ -186,10 +192,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     videosHeading: string;
     documentsHeading: string;
     videoOpenLabel: string;
-    easyBrokerListingCta: string;
-    collaborationNotesHeading: string;
     agentHeading: string;
-    badgeExclusive: string;
     badgeForeclosure: string;
     locationHeading: string;
     openMaps: string;
@@ -236,10 +239,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     videosHeading: "Videos",
     documentsHeading: "Documentos",
     videoOpenLabel: "Ver video",
-    easyBrokerListingCta: "Ver anuncio completo en EasyBroker",
-    collaborationNotesHeading: "Notas de colaboración",
     agentHeading: "Agente",
-    badgeExclusive: "Exclusiva",
     badgeForeclosure: "Remate",
     locationHeading: "Ubicación",
     openMaps: "Ver en Google Maps",
@@ -285,10 +285,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     videosHeading: "Videos",
     documentsHeading: "Documents",
     videoOpenLabel: "Watch video",
-    easyBrokerListingCta: "View full listing on EasyBroker",
-    collaborationNotesHeading: "Collaboration notes",
     agentHeading: "Agent",
-    badgeExclusive: "Exclusive",
     badgeForeclosure: "Foreclosure",
     locationHeading: "Location",
     openMaps: "Open in Google Maps",

@@ -166,7 +166,6 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
                   sale: CATALOG_PAGE_COPY[locale].listingBadgeSale,
                 }}
               />
-              {property.exclusive ? <span className={badgeClass}>{copy.badgeExclusive}</span> : null}
               {property.foreclosure ? <span className={badgeClass}>{copy.badgeForeclosure}</span> : null}
             </div>
             <h1 className="font-heading text-3xl font-semibold tracking-tight text-brand-text sm:text-4xl">{property.title}</h1>
@@ -307,15 +306,6 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
             </section>
           ) : null}
 
-          {property.collaborationNotes?.trim() ? (
-            <section className="border-l-2 border-brand-accent/35 pl-4" aria-labelledby="prop-collab-heading">
-              <h2 id="prop-collab-heading" className="font-heading text-sm font-semibold text-brand-text">
-                {copy.collaborationNotesHeading}
-              </h2>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-brand-muted">{property.collaborationNotes.trim()}</p>
-            </section>
-          ) : null}
-
           {(property.agentName?.trim() || property.agentEmail?.trim()) ? (
             <section aria-labelledby="prop-agent-heading">
               <h2 id="prop-agent-heading" className="font-heading text-lg font-semibold text-brand-text">
@@ -378,16 +368,6 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
             >
               {copy.contactFormCta}
             </Link>
-            {property.ebListingUrl?.trim() ? (
-              <a
-                href={property.ebListingUrl.trim()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-[2.75rem] items-center justify-center rounded-sm border border-brand-border px-6 text-xs font-bold uppercase tracking-[0.12em] text-brand-muted transition hover:border-brand-accent hover:text-brand-text"
-              >
-                {copy.easyBrokerListingCta}
-              </a>
-            ) : null}
           </div>
         </div>
       </div>

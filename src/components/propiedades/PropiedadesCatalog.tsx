@@ -8,6 +8,7 @@ import { useSiteContentEditOptional } from "@/components/admin/site-content-edit
 import type { CatalogProperty } from "@/data/catalog-properties";
 import { filterCatalogProperties, inferListingDisplayType } from "@/lib/catalog-filters";
 import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
+import { resolveCatalogZoneGroup } from "@/lib/catalog-zone-group";
 import { catalogPageHref, type CatalogQueryFilters, type ListingTypeFilter } from "@/lib/catalog-query";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
 import type { Locale } from "@/i18n/types";
@@ -103,7 +104,8 @@ export function PropiedadesCatalog({
   const zones = useMemo(() => {
     const set = new Set<string>();
     for (const p of catalog) {
-      if (p.zone?.trim()) set.add(p.zone.trim());
+      const g = resolveCatalogZoneGroup(p.zone, p.zoneGroup);
+      if (g.trim()) set.add(g.trim());
     }
     return [...set].sort((a, b) => a.localeCompare(b, locale === "en" ? "en" : "es"));
   }, [catalog, locale]);
@@ -224,6 +226,7 @@ export function PropiedadesCatalog({
                   </select>
                   <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
                 </div>
+                <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterRegionHint}</p>
               </div>
             </div>
 

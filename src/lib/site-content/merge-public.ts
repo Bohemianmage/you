@@ -148,7 +148,6 @@ export function catalogAsFeaturedDetail(c: CatalogProperty, locale: Locale): Fea
     yearBuilt: c.yearBuilt,
     brochureUrl: c.brochureUrl?.trim() || undefined,
     ebOperations: c.ebOperations,
-    ebListingUrl: c.ebListingUrl?.trim() || undefined,
     expenses: c.expenses?.trim() || undefined,
     floorsCount: c.floorsCount,
     floorNumber: c.floorNumber?.trim() || undefined,
@@ -158,10 +157,8 @@ export function catalogAsFeaturedDetail(c: CatalogProperty, locale: Locale): Fea
     tagLabels: c.tagLabels,
     videoUrls: c.videoUrls,
     brochureUrls: c.brochureUrls,
-    collaborationNotes: c.collaborationNotes?.trim() || undefined,
     agentName: c.agentName?.trim() || undefined,
     agentEmail: c.agentEmail?.trim() || undefined,
     foreclosure: c.foreclosure,
-    exclusive: c.exclusive,
   };
 }

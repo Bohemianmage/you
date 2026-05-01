@@ -42,7 +42,6 @@ export interface FeaturedProperty {
     period?: string;
     unit?: string;
   }[];
-  ebListingUrl?: string;
   expenses?: string;
   floorsCount?: number;
   floorNumber?: string;
@@ -52,11 +51,9 @@ export interface FeaturedProperty {
   tagLabels?: string[];
   videoUrls?: string[];
   brochureUrls?: string[];
-  collaborationNotes?: string;
   agentName?: string;
   agentEmail?: string;
   foreclosure?: boolean;
-  exclusive?: boolean;
 }
 
 /**
