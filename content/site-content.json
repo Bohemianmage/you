@@ -39,8 +39,24 @@
       }
     },
     {
+      "id": "yael-attia",
+      "name": "Yael Attia",
+      "role": {
+        "es": "Broker especializado",
+        "en": "Specialized broker"
+      }
+    },
+    {
       "id": "jean-claude-martell",
       "name": "Jean Claude Martell",
+      "role": {
+        "es": "Broker especializado",
+        "en": "Specialized broker"
+      }
+    },
+    {
+      "id": "alejandra-rodriguez",
+      "name": "Alejandra Rodríguez",
       "role": {
         "es": "Broker especializado",
         "en": "Specialized broker"
