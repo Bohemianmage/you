@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "generate-favicon": "node scripts/generate-favicon.mjs",
-    "compress-hero-video": "node scripts/compress-hero-video.mjs"
+    "compress-videos": "node scripts/compress-web-videos.mjs"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.21",

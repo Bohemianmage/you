@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const DEFAULT_SRC = "/videos/hero-landing.mp4";
+const DEFAULT_SRC = "/videos/hero-mexico-city.mp4";
 
 /**
  * Video de fondo del bloque principal del hero (silenciado, loop).
