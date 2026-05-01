@@ -11,9 +11,6 @@ export default async function AdminListasPage() {
       <header className="flex flex-col gap-4 border-b border-brand-border pb-8 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-semibold text-brand-text">Listas de contenido</h1>
-          <p className="mt-1 max-w-xl text-sm text-brand-muted">
-            Equipo, destacadas y descargables. Guardá desde la barra inferior del sitio (modo edición).
-          </p>
         </div>
         <Link href="/" className="shrink-0 text-sm font-semibold text-brand-accent no-underline hover:underline">
           Ir al sitio

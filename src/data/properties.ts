@@ -8,6 +8,8 @@ export interface FeaturedProperty {
   title: string;
   price: string;
   address: string;
+  /** Resumen tipo catálogo (m², recámaras…), opcional en destacadas desde EasyBroker. */
+  specs?: string;
   status: string;
   ctaLabel: string;
   /** Long description on the property detail page (plain text, optional). */
@@ -24,6 +26,8 @@ export interface FeaturedProperty {
   propertyType?: string;
   bedrooms?: number;
   bathrooms?: number;
+  bathroomsFull?: number;
+  halfBathrooms?: number;
   /** Superficie construida (m²). */
   areaM2?: number;
   lotAreaM2?: number;
@@ -31,6 +35,28 @@ export interface FeaturedProperty {
   parkingSpots?: number;
   yearBuilt?: number;
   brochureUrl?: string;
+
+  ebOperations?: readonly {
+    type: string;
+    formatted_amount?: string;
+    period?: string;
+    unit?: string;
+  }[];
+  ebListingUrl?: string;
+  expenses?: string;
+  floorsCount?: number;
+  floorNumber?: string;
+  lotLengthM?: number;
+  lotWidthM?: number;
+  ebFeatures?: readonly { category: string; name: string }[];
+  tagLabels?: string[];
+  videoUrls?: string[];
+  brochureUrls?: string[];
+  collaborationNotes?: string;
+  agentName?: string;
+  agentEmail?: string;
+  foreclosure?: boolean;
+  exclusive?: boolean;
 }
 
 /**

@@ -8,8 +8,7 @@ export default async function AdminDashboardPage() {
     <div id="admin-main" className="mx-auto max-w-lg px-4 py-16 sm:px-6">
       <h1 className="font-heading text-2xl font-semibold text-brand-text">{withYouWordmark("Panel YOU")}</h1>
       <p className="mt-3 text-sm leading-relaxed text-brand-muted">
-        Entrá al sitio: vas a ver una barra inferior para guardar cambios y el botón <strong className="font-medium text-brand-text">Editar</strong>{" "}
-        en cada bloque del inicio.
+        Entra al sitio: verás la barra inferior para guardar y el botón <strong className="font-medium text-brand-text">Editar</strong> en cada bloque del inicio.
       </p>
       <ul className="mt-8 space-y-3 text-sm">
         <li>
@@ -19,7 +18,7 @@ export default async function AdminDashboardPage() {
         </li>
         <li>
           <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
-            Listas (equipo, destacadas, catálogo, descargables)
+            Contenidos del sitio (equipo, destacadas, descargables)
           </Link>
         </li>
       </ul>

@@ -118,7 +118,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
   es: {
     hero: {
       announcement:
-        "¿Buscas alojamiento o tu próxima inversión inmobiliaria en México? Haz clic aquí",
+        "¿Buscas hospedaje o tu próxima inversión inmobiliaria en México? Da clic aquí",
       title: "Encuentra el lugar perfecto para ti",
       subtitle: "Servicio profesional inmobiliario con sentido humano",
       primaryCta: "Ver propiedades",
@@ -143,12 +143,12 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       history: [
         "En 2019, con la firme convicción de ofrecer nuestros servicios a más clientes, nace YOU Soluciones Inmobiliarias.",
         "Con miras puestas en ayudar a quienes nos proporcionan su confianza para vender, rentar o encontrar un nuevo espacio para su hogar, oficina o negocio, en YOU simplificamos procesos y asesoramos a nuestros clientes de forma humana y responsable.",
-        "Nuestro compromiso es ofrecerte los mejores recursos tecnológicos, mercadológicos y legales disponibles para lograr tus objetivos de manera eficiente.",
+        "Nuestro compromiso es ofrecerte los mejores recursos tecnológicos, mercadológicos y legales disponibles para lograr tus objetivos de forma eficiente.",
         "Somos tu equipo, somos tus aliados, somos YOU.",
       ],
       teamTitle: "Nuestro equipo",
       clientsTitle: "Clientes",
-      clientsSubtitle: "Estamos para acompañarte; agenda una llamada o escríbenos cuando lo necesites.",
+      clientsSubtitle: "Estamos para acompañarte; agenda una llamada o contáctanos cuando lo necesites.",
       contactTitle: "Contacto",
       contactFormCta: "Ir al formulario de contacto",
     },
@@ -167,7 +167,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       carouselNextAria: "Propiedad siguiente",
       carouselGoToAria: "Ir a la propiedad {{n}}",
       carouselCenterAria: "Centrar esta propiedad",
-      carouselTapToCenter: "Tocá para centrar",
+      carouselTapToCenter: "Toca para centrar",
     },
     virtualTours: {
       title: "Descubre nuestras experiencias 3D",
@@ -190,12 +190,12 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     },
     downloadables: {
       title: "Descargables",
-      description: "Brochures, fichas técnicas y material comercial para descarga directa.",
+      description: "Folletos, fichas técnicas y material comercial para descarga directa.",
       downloadFileCta: "Descargar",
       noFileHint: "Archivo próximamente.",
     },
     footer: {
-      tagline: "Comienza a escribir una nueva historia con nosotros.",
+      tagline: "Empieza a escribir una nueva historia con nosotros.",
       phoneLabel: "Tel.",
       copyright: "Todos los derechos reservados.",
       proposalLinkLabel: "Nuestra propuesta",

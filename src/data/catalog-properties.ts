@@ -21,6 +21,10 @@ export interface CatalogProperty {
   bedrooms?: number;
   /** Permite medios baños (ej. 5.5). */
   bathrooms?: number;
+  /** Baños completos (solo detalle EB); filtros siguen usando `bathrooms` combinado. */
+  bathroomsFull?: number;
+  /** Cantidad de medios baños (detalle). */
+  halfBathrooms?: number;
   /** Monto numérico para filtros; si falta se parsea de `price`. */
   priceAmount?: number;
   priceCurrency?: "MXN" | "USD";
@@ -37,4 +41,32 @@ export interface CatalogProperty {
   parkingSpots?: number;
   yearBuilt?: number;
   brochureUrl?: string;
+
+  /** Operaciones adicionales (venta + renta, etc.) tal cual EasyBroker — para la ficha. */
+  ebOperations?: readonly {
+    type: string;
+    formatted_amount?: string;
+    period?: string;
+    unit?: string;
+  }[];
+  /** Enlace público al anuncio en EasyBroker. */
+  ebListingUrl?: string;
+  /** Gastos / mantenimiento (texto del CRM). */
+  expenses?: string;
+  /** Niveles totales del inmueble. */
+  floorsCount?: number;
+  /** Nivel o planta de la propiedad. */
+  floorNumber?: string;
+  lotLengthM?: number;
+  lotWidthM?: number;
+  ebFeatures?: readonly { category: string; name: string }[];
+  tagLabels?: string[];
+  videoUrls?: string[];
+  /** Adjuntos (ej. PDF) desde `property_files`. */
+  brochureUrls?: string[];
+  collaborationNotes?: string;
+  agentName?: string;
+  agentEmail?: string;
+  foreclosure?: boolean;
+  exclusive?: boolean;
 }

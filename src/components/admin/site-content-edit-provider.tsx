@@ -37,7 +37,7 @@ export function useSiteContentEditOptional() {
 function mapSaveError(e: string): string {
   const m: Record<string, string> = {
     invalid_json: "JSON inválido.",
-    validation: "Revisá los datos.",
+    validation: "Revisa los datos.",
     write_failed: "No se pudo escribir el archivo.",
     github_unauthorized: "GitHub: token inválido.",
     github_forbidden: "GitHub: sin permiso.",
@@ -98,7 +98,7 @@ function SiteAdminToolbar({
               href="/admin/listas"
               className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
             >
-              Listas
+              Contenidos del sitio
             </Link>
             <form action={logoutAdmin}>
               <button

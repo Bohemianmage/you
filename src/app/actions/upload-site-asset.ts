@@ -69,7 +69,7 @@ export async function uploadSiteAsset(formData: FormData): Promise<UploadSiteAss
   if (!gh) {
     return {
       ok: false,
-      error: "Configurá GITHUB_TOKEN y GITHUB_REPO (igual que para guardar el contenido del sitio).",
+      error: "Configura GITHUB_TOKEN y GITHUB_REPO (igual que para guardar el contenido del sitio).",
     };
   }
 
@@ -81,7 +81,7 @@ export async function uploadSiteAsset(formData: FormData): Promise<UploadSiteAss
 
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, error: "Seleccioná un archivo." };
+    return { ok: false, error: "Selecciona un archivo." };
   }
 
   const verr = validateFile(kind, file);

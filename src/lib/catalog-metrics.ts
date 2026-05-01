@@ -4,11 +4,21 @@ export type ParsedPrice = { amount: number; currency: "MXN" | "USD" };
 
 /** Extrae m², recámaras y baños desde texto tipo `240 m² · 3 rec. · 3 baños`. */
 export function parseSpecsMetrics(specs: string): { m2?: number; beds?: number; baths?: number } {
-  const m2 = specs.match(/(\d+)\s*m²/i);
+  let m2: number | undefined;
+  for (const re of [/(\d+)\s*m²/i, /(\d+)\s*m2/i, /(\d+)m²/i, /(\d+)m2/i]) {
+    const hit = specs.match(re);
+    if (hit?.[1]) {
+      const n = Number(hit[1]);
+      if (Number.isFinite(n)) {
+        m2 = n;
+        break;
+      }
+    }
+  }
   const beds = specs.match(/(\d+)\s*rec/i);
   const baths = specs.match(/(\d+(?:\.\d+)?)\s*bañ/i);
   return {
-    m2: m2 ? Number(m2[1]) : undefined,
+    m2,
     beds: beds ? Number(beds[1]) : undefined,
     baths: baths ? Number(baths[1]) : undefined,
   };
@@ -22,13 +32,14 @@ function extractPrimaryNumber(s: string): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
-/** Interpreta montos visibles (`US$ …`, `… MXN`, `$…`). */
+/** Interpreta montos visibles (`US$ …`, `… MXN`, `$…` pesos mexicanos). */
 export function parsePriceString(price: string): ParsedPrice | undefined {
   const t = price.trim();
   const n = extractPrimaryNumber(t);
   if (n == null) return undefined;
-  if (/US\s*\$|USD/i.test(t)) return { amount: n, currency: "USD" };
-  if (/MXN/i.test(t)) return { amount: n, currency: "MXN" };
+  if (/US\s*\$|USD|US\s*D/i.test(t)) return { amount: n, currency: "USD" };
+  if (/MXN|MX\s*\$|pesos?\s*mex/i.test(t)) return { amount: n, currency: "MXN" };
+  if (/^\s*\$\s*[\d,.]+/i.test(t) && !/US|USD/i.test(t)) return { amount: n, currency: "MXN" };
   if (/\$\s*[\d,]+.*USD/i.test(t)) return { amount: n, currency: "USD" };
   return { amount: n, currency: "MXN" };
 }
@@ -45,6 +56,11 @@ export function getListingMetrics(p: CatalogProperty): { m2?: number; beds?: num
 export function getListingPrice(p: CatalogProperty): ParsedPrice | undefined {
   if (p.priceAmount != null && (p.priceCurrency === "MXN" || p.priceCurrency === "USD")) {
     return { amount: p.priceAmount, currency: p.priceCurrency };
+  }
+  if (p.priceAmount != null && p.priceCurrency == null) {
+    const parsed = parsePriceString(p.price);
+    const currency = parsed?.currency ?? "MXN";
+    return { amount: p.priceAmount, currency };
   }
   return parsePriceString(p.price);
 }

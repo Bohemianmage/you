@@ -88,7 +88,7 @@ export function TeamPhotoFramingEditor({
 
       <div
         ref={viewportRef}
-        aria-label={member.imageSrc ? "Arrastrá para elegir qué parte de la foto se ve centrada" : undefined}
+        aria-label={member.imageSrc ? "Arrastra para elegir qué parte de la foto se ve centrada" : undefined}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}

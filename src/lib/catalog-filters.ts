@@ -2,8 +2,24 @@ import type { CatalogProperty } from "@/data/catalog-properties";
 import { getListingMetrics, getListingPrice } from "@/lib/catalog-metrics";
 import type { CatalogQueryFilters } from "@/lib/catalog-query";
 
+/** Alineado con EasyBroker: recorre todas las operaciones (no solo la «primaria»). */
+export function inferListingTypeFromOperations(ops: readonly { type?: string }[]): "rent" | "sale" | undefined {
+  if (!ops.length) return undefined;
+  for (const o of ops) {
+    const t = String(o.type ?? "").toLowerCase();
+    if (t === "sale") return "sale";
+  }
+  for (const o of ops) {
+    const t = String(o.type ?? "").toLowerCase();
+    if (t === "rental" || t === "rent" || t === "temporary_rental" || t === "lease" || t === "room_rental") return "rent";
+  }
+  return undefined;
+}
+
 export function inferListingType(p: CatalogProperty): "rent" | "sale" | null {
   if (p.listingType === "rent" || p.listingType === "sale") return p.listingType;
+  const fromOps = inferListingTypeFromOperations(p.ebOperations ?? []);
+  if (fromOps) return fromOps;
   const s = (p.status ?? "").toLowerCase();
   if (s.includes("renta")) return "rent";
   if (s.includes("venta")) return "sale";
@@ -19,8 +35,11 @@ export function inferListingDisplayType(p: {
   status?: string;
   title?: string;
   specs?: string;
+  ebOperations?: readonly { type?: string }[];
 }): "rent" | "sale" | null {
   if (p.listingType === "rent" || p.listingType === "sale") return p.listingType;
+  const fromOps = inferListingTypeFromOperations(p.ebOperations ?? []);
+  if (fromOps) return fromOps;
   const blob = `${p.status ?? ""} ${p.title ?? ""} ${p.specs ?? ""}`.toLowerCase();
   if (blob.includes("renta")) return "rent";
   if (blob.includes("venta")) return "sale";
@@ -76,9 +95,9 @@ export function filterCatalogProperties(list: CatalogProperty[], opts: CatalogQu
   if (hasM2 || hasRec || hasBan) {
     out = out.filter((p) => {
       const m = getListingMetrics(p);
-      if (hasM2 && !inRange(m.m2, m2Lo, opts.m2Max)) return false;
-      if (hasRec && !inRange(m.beds, recLo, opts.recMax)) return false;
-      if (hasBan && !inRange(m.baths, banLo, opts.banMax)) return false;
+      if (hasM2 && m.m2 != null && !inRange(m.m2, m2Lo, opts.m2Max)) return false;
+      if (hasRec && m.beds != null && !inRange(m.beds, recLo, opts.recMax)) return false;
+      if (hasBan && m.baths != null && !inRange(m.baths, banLo, opts.banMax)) return false;
       return true;
     });
   }

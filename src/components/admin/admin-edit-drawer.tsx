@@ -202,7 +202,7 @@ export function AdminEditDrawer() {
             <>
               {active === "footer" ? (
                 <p className="text-sm leading-relaxed text-brand-muted">
-                  Editá el texto del pie y la dirección o teléfono; se actualizan en el footer de todo el sitio y en la sección contacto del inicio.
+                  Edita el texto del pie y la dirección o teléfono; se actualizan en el pie de todo el sitio y en la sección de contacto del inicio.
                 </p>
               ) : null}
               {meta.fields.map((f) => {
@@ -238,7 +238,7 @@ export function AdminEditDrawer() {
               {active === "footer" ? (
                 <>
                   <div className="border-t border-brand-border pt-2">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Datos globales (contact)</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Datos globales de contacto</p>
                   </div>
                   <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
                     Dirección

@@ -336,7 +336,7 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
             <ul className="mt-4 space-y-4">
               {featuredCatalogIds.length === 0 ? (
                 <li className="rounded-sm border border-dashed border-brand-border bg-brand-bg px-4 py-6 text-sm text-brand-muted">
-                  Ninguna propiedad destacada. Agregá desde el listado inferior.
+                  Ninguna propiedad destacada. Agrega una desde el listado inferior.
                 </li>
               ) : null}
               {featuredCatalogIds.map((id, idx) => {
@@ -397,7 +397,7 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
                       }
                     >
                       <p className="border-t border-brand-border/60 pt-4 text-xs text-brand-muted">
-                        Cambios de ficha en EasyBroker: actualizá esta página para verlos aquí.
+                        Si cambias datos en EasyBroker, actualiza esta página para verlos aquí.
                       </p>
                     </AdminListDisclosureRow>
                   </li>

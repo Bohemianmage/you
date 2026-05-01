@@ -50,6 +50,24 @@ function countAdvancedFilters(f: CatalogQueryFilters): number {
   return n;
 }
 
+function readNumberInput(v: string): number | undefined {
+  const t = v.trim();
+  if (!t) return undefined;
+  const n = Number(t);
+  return Number.isFinite(n) && n >= 0 ? n : undefined;
+}
+
+/** Alinea `moneda` / precios con la misma lógica que la query (`parseCatalogFiltersFromSearchParams`). */
+function withPriceSanity(f: CatalogQueryFilters): CatalogQueryFilters {
+  const precioMin = f.precioMin === 0 ? undefined : f.precioMin;
+  const wantsPrice = precioMin != null || f.precioMax != null;
+  if (!wantsPrice) {
+    return { ...f, precioMin: undefined, precioMax: undefined, moneda: undefined };
+  }
+  const moneda = f.moneda === "MXN" || f.moneda === "USD" ? f.moneda : "MXN";
+  return { ...f, precioMin, moneda };
+}
+
 export function PropiedadesCatalog({
   locale,
   serverCatalog,
@@ -66,10 +84,21 @@ export function PropiedadesCatalog({
   const edit = useSiteContentEditOptional();
   const catalog = edit ? [...edit.previewEbCatalog].filter((p) => p.active !== false) : serverCatalog;
 
-  const filtered = useMemo(() => filterCatalogProperties(catalog, filters), [catalog, filters]);
+  const filtersKeyFromUrl = useMemo(() => JSON.stringify(filters), [filters]);
+  const [live, setLive] = useState<CatalogQueryFilters>(filters);
+  useEffect(() => {
+    setLive(filters);
+  }, [filtersKeyFromUrl]);
 
-  const tipo: ListingTypeFilter =
-    filters.tipo === "rent" || filters.tipo === "sale" ? filters.tipo : "";
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const href = catalogPageHref(locale, live);
+    window.history.replaceState(null, "", href);
+  }, [live, locale]);
+
+  const filtered = useMemo(() => filterCatalogProperties(catalog, live), [catalog, live]);
+
+  const tipo: ListingTypeFilter = live.tipo === "rent" || live.tipo === "sale" ? live.tipo : "";
 
   const zones = useMemo(() => {
     const set = new Set<string>();
@@ -79,26 +108,25 @@ export function PropiedadesCatalog({
     return [...set].sort((a, b) => a.localeCompare(b, locale === "en" ? "en" : "es"));
   }, [catalog, locale]);
 
-  const filterFormKey = JSON.stringify(filters);
-  const detailFilterCount = useMemo(() => countDetailFilters(filters), [filters]);
-  const advancedFilterCount = useMemo(() => countAdvancedFilters(filters), [filters]);
+  const detailFilterCount = useMemo(() => countDetailFilters(live), [live]);
+  const advancedFilterCount = useMemo(() => countAdvancedFilters(live), [live]);
 
-  const [filtersPanelOpen, setFiltersPanelOpen] = useState(() => detailFilterCount > 0);
-  const [advancedOpen, setAdvancedOpen] = useState(() => advancedFilterCount > 0);
+  const [filtersPanelOpen, setFiltersPanelOpen] = useState(() => countDetailFilters(filters) > 0);
+  const [advancedOpen, setAdvancedOpen] = useState(() => countAdvancedFilters(filters) > 0);
 
-  /** Solo al cambiar la URL de filtros: evita cerrar el panel principal al colapsar «Más opciones». */
-  const prevFilterKeyRef = useRef<string | null>(null);
+  /** Solo al llegar filtros por URL (enlace externo / «Limpiar»): no reaccionar a cada tecla en vivo. */
+  const prevUrlFiltersRef = useRef<string | null>(null);
   useEffect(() => {
-    if (prevFilterKeyRef.current === null) {
-      prevFilterKeyRef.current = filterFormKey;
+    if (prevUrlFiltersRef.current === null) {
+      prevUrlFiltersRef.current = filtersKeyFromUrl;
       return;
     }
-    if (prevFilterKeyRef.current !== filterFormKey) {
-      prevFilterKeyRef.current = filterFormKey;
-      setFiltersPanelOpen(detailFilterCount > 0);
-      setAdvancedOpen(advancedFilterCount > 0);
+    if (prevUrlFiltersRef.current !== filtersKeyFromUrl) {
+      prevUrlFiltersRef.current = filtersKeyFromUrl;
+      setFiltersPanelOpen(countDetailFilters(filters) > 0);
+      setAdvancedOpen(countAdvancedFilters(filters) > 0);
     }
-  }, [filterFormKey, detailFilterCount, advancedFilterCount]);
+  }, [filtersKeyFromUrl, filters]);
 
   const totalInCatalog = catalog.length;
   const countCaption = useMemo(() => {
@@ -146,16 +174,25 @@ export function PropiedadesCatalog({
             </p>
           ) : null}
 
-          <form key={filterFormKey} method="get" action="/propiedades" className="space-y-5 px-4 py-5 sm:px-6 sm:py-6">
-            {locale === "en" ? <input type="hidden" name="lang" value="en" /> : null}
-
+          <div className="space-y-5 px-4 py-5 sm:px-6 sm:py-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="min-w-0 space-y-2">
                 <label htmlFor="filter-tipo" className={fieldLabel}>
                   {copy.filterHeading}
                 </label>
                 <div className="relative">
-                  <select id="filter-tipo" name="tipo" defaultValue={tipo} className={`${fieldInput} appearance-none pr-11`}>
+                  <select
+                    id="filter-tipo"
+                    value={tipo}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setLive((prev) => ({
+                        ...prev,
+                        tipo: v === "rent" || v === "sale" ? v : "",
+                      }));
+                    }}
+                    className={`${fieldInput} appearance-none pr-11`}
+                  >
                     <option value="">{copy.filterAll}</option>
                     <option value="rent">{copy.filterRent}</option>
                     <option value="sale">{copy.filterSale}</option>
@@ -169,7 +206,15 @@ export function PropiedadesCatalog({
                   {copy.zoneLabel}
                 </label>
                 <div className="relative">
-                  <select id="filter-zone" name="zone" defaultValue={filters.zone ?? ""} className={`${fieldInput} appearance-none pr-11`}>
+                  <select
+                    id="filter-zone"
+                    value={live.zone ?? ""}
+                    onChange={(e) => {
+                      const z = e.target.value.trim();
+                      setLive((prev) => ({ ...prev, zone: z || undefined }));
+                    }}
+                    className={`${fieldInput} appearance-none pr-11`}
+                  >
                     <option value="">{copy.filterZoneAll}</option>
                     {zones.map((z) => (
                       <option key={z} value={z}>
@@ -210,13 +255,18 @@ export function PropiedadesCatalog({
                     </label>
                     <input
                       id="filter-m2min"
-                      name="m2Min"
                       type="number"
                       inputMode="numeric"
                       min={0}
                       step={1}
                       placeholder="—"
-                      defaultValue={filters.m2Min ?? ""}
+                      value={live.m2Min ?? ""}
+                      onChange={(e) =>
+                        setLive((prev) => ({
+                          ...prev,
+                          m2Min: readNumberInput(e.target.value),
+                        }))
+                      }
                       className={fieldInput}
                     />
                   </div>
@@ -226,13 +276,18 @@ export function PropiedadesCatalog({
                     </label>
                     <input
                       id="filter-m2max"
-                      name="m2Max"
                       type="number"
                       inputMode="numeric"
                       min={0}
                       step={1}
                       placeholder="—"
-                      defaultValue={filters.m2Max ?? ""}
+                      value={live.m2Max ?? ""}
+                      onChange={(e) =>
+                        setLive((prev) => ({
+                          ...prev,
+                          m2Max: readNumberInput(e.target.value),
+                        }))
+                      }
                       className={fieldInput}
                     />
                   </div>
@@ -242,13 +297,18 @@ export function PropiedadesCatalog({
                     </label>
                     <input
                       id="filter-recmin"
-                      name="recMin"
                       type="number"
                       inputMode="numeric"
                       min={0}
                       step={1}
                       placeholder="—"
-                      defaultValue={filters.recMin ?? ""}
+                      value={live.recMin ?? ""}
+                      onChange={(e) =>
+                        setLive((prev) => ({
+                          ...prev,
+                          recMin: readNumberInput(e.target.value),
+                        }))
+                      }
                       className={fieldInput}
                     />
                   </div>
@@ -258,13 +318,18 @@ export function PropiedadesCatalog({
                     </label>
                     <input
                       id="filter-recmax"
-                      name="recMax"
                       type="number"
                       inputMode="numeric"
                       min={0}
                       step={1}
                       placeholder="—"
-                      defaultValue={filters.recMax ?? ""}
+                      value={live.recMax ?? ""}
+                      onChange={(e) =>
+                        setLive((prev) => ({
+                          ...prev,
+                          recMax: readNumberInput(e.target.value),
+                        }))
+                      }
                       className={fieldInput}
                     />
                   </div>
@@ -274,13 +339,18 @@ export function PropiedadesCatalog({
                     </label>
                     <input
                       id="filter-banmin"
-                      name="banMin"
                       type="number"
                       inputMode="numeric"
                       min={0}
                       step={1}
                       placeholder="—"
-                      defaultValue={filters.banMin ?? ""}
+                      value={live.banMin ?? ""}
+                      onChange={(e) =>
+                        setLive((prev) => ({
+                          ...prev,
+                          banMin: readNumberInput(e.target.value),
+                        }))
+                      }
                       className={fieldInput}
                     />
                   </div>
@@ -290,13 +360,18 @@ export function PropiedadesCatalog({
                     </label>
                     <input
                       id="filter-banmax"
-                      name="banMax"
                       type="number"
                       inputMode="numeric"
                       min={0}
                       step={1}
                       placeholder="—"
-                      defaultValue={filters.banMax ?? ""}
+                      value={live.banMax ?? ""}
+                      onChange={(e) =>
+                        setLive((prev) => ({
+                          ...prev,
+                          banMax: readNumberInput(e.target.value),
+                        }))
+                      }
                       className={fieldInput}
                     />
                   </div>
@@ -309,13 +384,20 @@ export function PropiedadesCatalog({
                     </label>
                     <input
                       id="filter-preciomin"
-                      name="precioMin"
                       type="number"
                       inputMode="decimal"
                       min={0}
                       step="any"
                       placeholder="—"
-                      defaultValue={filters.precioMin ?? ""}
+                      value={live.precioMin ?? ""}
+                      onChange={(e) =>
+                        setLive((prev) =>
+                          withPriceSanity({
+                            ...prev,
+                            precioMin: readNumberInput(e.target.value),
+                          }),
+                        )
+                      }
                       className={fieldInput}
                     />
                   </div>
@@ -325,13 +407,20 @@ export function PropiedadesCatalog({
                     </label>
                     <input
                       id="filter-preciomax"
-                      name="precioMax"
                       type="number"
                       inputMode="decimal"
                       min={0}
                       step="any"
                       placeholder="—"
-                      defaultValue={filters.precioMax ?? ""}
+                      value={live.precioMax ?? ""}
+                      onChange={(e) =>
+                        setLive((prev) =>
+                          withPriceSanity({
+                            ...prev,
+                            precioMax: readNumberInput(e.target.value),
+                          }),
+                        )
+                      }
                       className={fieldInput}
                     />
                   </div>
@@ -342,8 +431,16 @@ export function PropiedadesCatalog({
                     <div className="relative max-w-xs">
                       <select
                         id="filter-moneda"
-                        name="moneda"
-                        defaultValue={filters.moneda ?? "MXN"}
+                        value={live.moneda ?? "MXN"}
+                        onChange={(e) => {
+                          const m = e.target.value;
+                          setLive((prev) =>
+                            withPriceSanity({
+                              ...prev,
+                              moneda: m === "USD" || m === "MXN" ? m : "MXN",
+                            }),
+                          );
+                        }}
                         className={`${fieldInput} appearance-none pr-11`}
                       >
                         <option value="MXN">{copy.filterCurrencyMXN}</option>
@@ -357,21 +454,16 @@ export function PropiedadesCatalog({
               ) : null}
             </div>
 
-            <div className="flex flex-col gap-3 border-t border-brand-border/45 pt-4 sm:flex-row sm:flex-wrap sm:items-center">
-              <button
-                type="submit"
-                className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-full bg-brand-accent px-8 text-sm font-semibold text-brand-white shadow-[0_4px_14px_-4px_rgba(26,30,97,0.35)] transition hover:bg-brand-accent-strong sm:flex-none"
-              >
-                {copy.filterApply}
-              </button>
+            <div className="flex flex-col gap-3 border-t border-brand-border/45 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+              <p className="text-xs leading-relaxed text-brand-muted">{copy.filterLiveHint}</p>
               <Link
                 href={catalogPageHref(locale, {})}
-                className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-full border border-brand-border/90 bg-transparent px-6 text-sm font-semibold text-brand-muted transition hover:border-brand-accent/50 hover:bg-brand-surface/80 hover:text-brand-text sm:flex-none"
+                className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-full border border-brand-border/90 bg-transparent px-6 text-sm font-semibold text-brand-muted transition hover:border-brand-accent/50 hover:bg-brand-surface/80 hover:text-brand-text sm:flex-none sm:flex-initial"
               >
                 {copy.filterReset}
               </Link>
             </div>
-          </form>
+          </div>
         </details>
       </section>
 
@@ -414,6 +506,7 @@ export function PropiedadesCatalog({
                             status: p.status,
                             title: p.title,
                             specs: p.specs,
+                            ebOperations: p.ebOperations,
                           })}
                           labels={{ rent: copy.listingBadgeRent, sale: copy.listingBadgeSale }}
                         />

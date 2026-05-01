@@ -75,6 +75,8 @@ function FeaturedCardBody({
               listingType: property.listingType,
               status: property.status,
               title: property.title,
+              specs: property.specs,
+              ebOperations: property.ebOperations,
             })}
             labels={{ rent: badgeCopy.listingBadgeRent, sale: badgeCopy.listingBadgeSale }}
           />
@@ -86,7 +88,6 @@ function FeaturedCardBody({
         </h3>
         <p className="font-heading text-2xl font-semibold text-brand-text">{property.price}</p>
         <p className="text-sm leading-relaxed text-brand-muted">{property.address}</p>
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-accent">{property.status}</p>
       </div>
     </>
   );

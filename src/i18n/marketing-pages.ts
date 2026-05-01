@@ -31,6 +31,8 @@ export const CATALOG_PAGE_COPY: Record<
     filterCurrencyMXN: string;
     filterCurrencyUSD: string;
     filterApply: string;
+    /** Texto bajo filtros cuando se aplican en vivo (sin botón «Aplicar»). */
+    filterLiveHint: string;
     filterReset: string;
     filterPriceNote: string;
     filtersDetailSubtitle: string;
@@ -80,6 +82,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterCurrencyMXN: "MXN",
     filterCurrencyUSD: "USD",
     filterApply: "Aplicar filtros",
+    filterLiveHint: "Los resultados se actualizan al instante al cambiar los filtros.",
     filterReset: "Limpiar todo",
     filterPriceNote: "El filtro por precio usa la moneda indicada y los datos numéricos de cada propiedad.",
     filtersDetailSubtitle: "",
@@ -124,6 +127,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterCurrencyMXN: "MXN",
     filterCurrencyUSD: "USD",
     filterApply: "Apply filters",
+    filterLiveHint: "Results update instantly as you change filters.",
     filterReset: "Clear all",
     filterPriceNote: "Price filtering uses the selected currency and each listing’s numeric amount.",
     filtersDetailSubtitle: "",
@@ -155,11 +159,38 @@ export const PROPERTY_DETAIL_COPY: Record<
     neighborhoodLabel: string;
     bedroomsLabel: string;
     bathroomsLabel: string;
+    fullBathroomsLabel: string;
+    halfBathroomsLabel: string;
     builtLabel: string;
     lotLabel: string;
     gardenLabel: string;
     parkingLabel: string;
     yearLabel: string;
+    expensesLabel: string;
+    floorsLabel: string;
+    floorUnitLabel: string;
+    lotDimensionsLabel: string;
+    operationsHeading: string;
+    operationTypeSale: string;
+    operationTypeRental: string;
+    operationTypeTemporaryRental: string;
+    operationTypeRent: string;
+    operationTypeFallback: string;
+    operationPeriodMonthly: string;
+    operationPeriodDaily: string;
+    operationPeriodWeekly: string;
+    operationPeriodYearly: string;
+    featuresHeading: string;
+    featuresUncategorized: string;
+    tagsHeading: string;
+    videosHeading: string;
+    documentsHeading: string;
+    videoOpenLabel: string;
+    easyBrokerListingCta: string;
+    collaborationNotesHeading: string;
+    agentHeading: string;
+    badgeExclusive: string;
+    badgeForeclosure: string;
     locationHeading: string;
     openMaps: string;
     brochureCta: string;
@@ -178,11 +209,38 @@ export const PROPERTY_DETAIL_COPY: Record<
     neighborhoodLabel: "Colonia / zona",
     bedroomsLabel: "Recámaras",
     bathroomsLabel: "Baños",
+    fullBathroomsLabel: "Baños completos",
+    halfBathroomsLabel: "Medios baños",
     builtLabel: "Construcción",
     lotLabel: "Terreno",
     gardenLabel: "Jardín",
     parkingLabel: "Estacionamiento",
     yearLabel: "Año",
+    expensesLabel: "Gastos / mantenimiento",
+    floorsLabel: "Niveles",
+    floorUnitLabel: "Nivel / planta",
+    lotDimensionsLabel: "Medidas del terreno (frente × fondo)",
+    operationsHeading: "Precios y operaciones",
+    operationTypeSale: "Venta",
+    operationTypeRental: "Renta",
+    operationTypeTemporaryRental: "Renta temporal",
+    operationTypeRent: "Renta",
+    operationTypeFallback: "Operación",
+    operationPeriodMonthly: "mensual",
+    operationPeriodDaily: "diaria",
+    operationPeriodWeekly: "semanal",
+    operationPeriodYearly: "anual",
+    featuresHeading: "Características",
+    featuresUncategorized: "General",
+    tagsHeading: "Etiquetas",
+    videosHeading: "Videos",
+    documentsHeading: "Documentos",
+    videoOpenLabel: "Ver video",
+    easyBrokerListingCta: "Ver anuncio completo en EasyBroker",
+    collaborationNotesHeading: "Notas de colaboración",
+    agentHeading: "Agente",
+    badgeExclusive: "Exclusiva",
+    badgeForeclosure: "Remate",
     locationHeading: "Ubicación",
     openMaps: "Ver en Google Maps",
     brochureCta: "Descargar folleto",
@@ -200,11 +258,38 @@ export const PROPERTY_DETAIL_COPY: Record<
     neighborhoodLabel: "Neighborhood",
     bedroomsLabel: "Bedrooms",
     bathroomsLabel: "Bathrooms",
+    fullBathroomsLabel: "Full bathrooms",
+    halfBathroomsLabel: "Half bathrooms",
     builtLabel: "Built area",
     lotLabel: "Lot size",
     gardenLabel: "Garden",
     parkingLabel: "Parking",
     yearLabel: "Year built",
+    expensesLabel: "Expenses / HOA",
+    floorsLabel: "Floors (levels)",
+    floorUnitLabel: "Floor / level",
+    lotDimensionsLabel: "Lot dimensions (front × depth)",
+    operationsHeading: "Pricing & operations",
+    operationTypeSale: "Sale",
+    operationTypeRental: "Rent",
+    operationTypeTemporaryRental: "Short-term rent",
+    operationTypeRent: "Rent",
+    operationTypeFallback: "Operation",
+    operationPeriodMonthly: "monthly",
+    operationPeriodDaily: "daily",
+    operationPeriodWeekly: "weekly",
+    operationPeriodYearly: "yearly",
+    featuresHeading: "Features",
+    featuresUncategorized: "General",
+    tagsHeading: "Tags",
+    videosHeading: "Videos",
+    documentsHeading: "Documents",
+    videoOpenLabel: "Watch video",
+    easyBrokerListingCta: "View full listing on EasyBroker",
+    collaborationNotesHeading: "Collaboration notes",
+    agentHeading: "Agent",
+    badgeExclusive: "Exclusive",
+    badgeForeclosure: "Foreclosure",
     locationHeading: "Location",
     openMaps: "Open in Google Maps",
     brochureCta: "Download brochure",
@@ -212,6 +297,41 @@ export const PROPERTY_DETAIL_COPY: Record<
     contactFormCta: "Contact form",
   },
 };
+
+export function ebOperationTypeLabel(type: string, locale: Locale): string {
+  const c = PROPERTY_DETAIL_COPY[locale];
+  switch (type) {
+    case "sale":
+      return c.operationTypeSale;
+    case "rental":
+      return c.operationTypeRental;
+    case "temporary_rental":
+      return c.operationTypeTemporaryRental;
+    case "rent":
+      return c.operationTypeRent;
+    default:
+      return c.operationTypeFallback;
+  }
+}
+
+export function ebOperationPeriodNote(period: string | undefined, locale: Locale): string | undefined {
+  const raw = period?.trim();
+  if (!raw) return undefined;
+  const p = raw.toLowerCase();
+  const c = PROPERTY_DETAIL_COPY[locale];
+  switch (p) {
+    case "monthly":
+      return c.operationPeriodMonthly;
+    case "daily":
+      return c.operationPeriodDaily;
+    case "weekly":
+      return c.operationPeriodWeekly;
+    case "yearly":
+      return c.operationPeriodYearly;
+    default:
+      return raw;
+  }
+}
 
 /** `/nuestra-propuesta` — propuesta para propietarios / arrendadores. */
 export const PROPOSAL_PAGE_COPY: Record<
@@ -233,7 +353,7 @@ export const PROPOSAL_PAGE_COPY: Record<
       "Te ayudamos a fijar un costo competitivo para el mercado inmobiliario.",
       "Resolvemos todas tus dudas respecto al proceso de venta o renta.",
       "Captura de recorridos virtuales: acercamos a más clientes potenciales sin salir de casa.",
-      "Fotografía profesional: en la carrera por el clic nos aseguramos de que tu propiedad sea la primera.",
+      "Fotografía profesional: ayudamos a que tu propiedad destaque entre los anuncios.",
       "Brindamos asesoría jurídica gratuita para una decisión informada.",
       "Promocionamos tu propiedad en los más importantes portales web inmobiliarios.",
     ],
@@ -285,7 +405,7 @@ export const CONTACT_FORM_COPY: Record<
 > = {
   es: {
     sectionTitle: "Contacto",
-    sectionSubtitle: "Cuéntanos qué buscas; un asesor te responderá a la brevedad.",
+    sectionSubtitle: "Cuéntanos qué necesitas; un asesor te responderá pronto.",
     name: "Nombre",
     email: "Correo electrónico",
     phone: "Teléfono (opcional)",
@@ -302,10 +422,10 @@ export const CONTACT_FORM_COPY: Record<
     submit: "Enviar",
     sending: "Enviando…",
     success: "Gracias. Hemos recibido tu mensaje y te contactaremos pronto.",
-    errorValidation: "Por favor completa nombre, correo y mensaje.",
+    errorValidation: "Completa nombre, correo y mensaje.",
     errorNoConfig:
-      "El formulario no está configurado para correo aún. Llámanos al 55-92-21-73-28 o escribe a nuestros canales en redes.",
-    errorSend: "No pudimos enviar tu mensaje. Intenta de nuevo o contáctanos por teléfono.",
+      "El formulario aún no envía correo. Llámanos al 55-92-21-73-28 o escríbenos por redes sociales.",
+    errorSend: "No pudimos enviar tu mensaje. Vuelve a intentarlo o contáctanos por teléfono.",
     honeypotLabel: "Empresa",
   },
   en: {
