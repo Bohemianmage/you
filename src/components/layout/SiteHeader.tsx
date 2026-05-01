@@ -32,7 +32,7 @@ function scrollToSectionHash(hash: string) {
 }
 
 /**
- * Sticky header — refined chrome: pill nav on desktop, drawer on small screens, blurred surface.
+ * Sticky header — pill nav en desktop, drawer en móvil; barra sin blur para que el contenido detrás se lea claro.
  * Scroll espaciado en anclas del home, estado activo por ruta/sección y panel móvil animado.
  */
 export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
@@ -245,7 +245,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     <>
       <header
         ref={headerRef}
-        className={`sticky top-0 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] backdrop-blur-md ${
+        className={`sticky top-0 border-b border-brand-border/70 bg-brand-bg/90 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] ${
           mobileOpen ? "z-[201]" : "z-50"
         }`}
       >
