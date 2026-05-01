@@ -14,6 +14,8 @@ export interface FeaturedProperty {
   description?: string;
   /** Matterport / external tour — when absent, CTA scrolls to `#virtual-tours`. */
   tourUrl?: string;
+  /** Opcional; si falta se infiere de `status` / título. */
+  listingType?: "rent" | "sale";
   /** Optional hero image under `/public`. */
   imageSrc?: string;
   /** Varias rutas / URLs para carrusel en ficha y cover usa la primera. */

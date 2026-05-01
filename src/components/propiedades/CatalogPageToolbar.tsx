@@ -50,7 +50,7 @@ export function CatalogPageToolbar({
       </Link>
       <Link
         href={contactHref}
-        className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center gap-2 rounded-full bg-brand-accent px-5 text-sm font-semibold text-brand-white shadow-[0_4px_16px_-6px_rgba(97,110,137,0.65)] transition hover:bg-brand-accent-strong sm:flex-none sm:px-6"
+        className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center gap-2 rounded-full bg-brand-accent px-5 text-sm font-semibold text-brand-white shadow-[0_4px_16px_-6px_rgba(26,30,97,0.38)] transition hover:bg-brand-accent-strong sm:flex-none sm:px-6"
       >
         <IconChat className="shrink-0 opacity-95" />
         {contactLabel}

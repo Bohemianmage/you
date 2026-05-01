@@ -134,7 +134,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const desktopPillBase =
     "block rounded-full px-5 py-2.5 text-[13px] font-bold uppercase tracking-[0.1em] no-underline transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none";
   const desktopPillActive =
-    "scale-[1.02] bg-brand-accent text-brand-white shadow-[0_2px_10px_rgba(97,110,137,0.35)] ring-1 ring-brand-accent/45";
+    "scale-[1.02] bg-brand-accent text-brand-white shadow-[0_2px_10px_rgba(26,30,97,0.32)] ring-1 ring-brand-accent/45";
   const desktopPillIdle =
     "text-brand-text hover:bg-brand-bg hover:text-brand-accent-strong hover:shadow-sm active:scale-[0.98]";
 

@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import type { CatalogProperty } from "@/data/catalog-properties";
-import { filterCatalogProperties } from "@/lib/catalog-filters";
+import { filterCatalogProperties, inferListingDisplayType } from "@/lib/catalog-filters";
+import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import { catalogPageHref, type CatalogQueryFilters, type ListingTypeFilter } from "@/lib/catalog-query";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
 import type { Locale } from "@/i18n/types";
@@ -73,6 +74,11 @@ export function PropiedadesCatalog({
   const filterFormKey = JSON.stringify(filters);
   const detailFilterCount = useMemo(() => countDetailFilters(filters), [filters]);
 
+  const [filtersPanelOpen, setFiltersPanelOpen] = useState(() => detailFilterCount > 0);
+  useEffect(() => {
+    setFiltersPanelOpen(detailFilterCount > 0);
+  }, [detailFilterCount]);
+
   return (
     <div className="space-y-10">
       {edit ? (
@@ -84,22 +90,34 @@ export function PropiedadesCatalog({
         </p>
       ) : null}
 
-      <section className="overflow-hidden rounded-2xl border border-brand-border/60 bg-gradient-to-b from-brand-bg via-brand-bg to-brand-surface/25 shadow-[0_8px_40px_-24px_rgba(26,30,97,0.18)] ring-1 ring-brand-border/40">
-        <div className="border-b border-brand-border/40 bg-brand-bg/40 px-4 py-4 sm:px-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0 space-y-1">
-              <h2 className="font-heading text-lg font-semibold tracking-tight text-brand-text">{copy.filtersDetailHeading}</h2>
-              <p className="max-w-xl text-sm leading-relaxed text-brand-muted">{copy.filtersDetailSubtitle}</p>
-            </div>
-            {detailFilterCount > 0 ? (
-              <span className="shrink-0 rounded-full bg-brand-you/10 px-3 py-1 text-xs font-semibold text-brand-you ring-1 ring-brand-you/15">
-                {detailFilterCount} {copy.filterActiveLabel}
+      <section className="overflow-hidden rounded-2xl border border-brand-border/70 bg-gradient-to-b from-brand-bg via-brand-bg to-brand-surface/40 shadow-[0_8px_36px_-22px_rgba(26,30,97,0.16)] ring-1 ring-brand-border/50">
+        <details
+          className="group/filter"
+          open={filtersPanelOpen}
+          onToggle={(e) => setFiltersPanelOpen((e.target as HTMLDetailsElement).open)}
+        >
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 border-b border-brand-border/50 bg-brand-surface/30 px-4 py-4 transition-colors hover:bg-brand-surface/55 sm:px-6 [&::-webkit-details-marker]:hidden">
+            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+              <span className="font-heading text-base font-semibold tracking-tight text-brand-text">
+                {copy.filtersDetailHeading}
               </span>
-            ) : null}
-          </div>
-        </div>
+              {detailFilterCount > 0 ? (
+                <span className="inline-flex shrink-0 items-center rounded-full bg-brand-you/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand-you ring-1 ring-brand-you/18">
+                  {detailFilterCount}{" "}
+                  {detailFilterCount === 1 ? copy.filterActiveSingular : copy.filterActivePlural}
+                </span>
+              ) : null}
+            </div>
+            <SelectChevron className="shrink-0 text-brand-muted transition-transform duration-200 group-open/filter:rotate-180" />
+          </summary>
 
-        <form key={filterFormKey} method="get" action="/propiedades" className="space-y-8 px-4 py-6 sm:px-6 sm:py-8">
+          {copy.filtersDetailSubtitle.trim() ? (
+            <p className="border-b border-brand-border/40 bg-brand-bg/50 px-4 py-3 text-sm leading-relaxed text-brand-muted sm:px-6">
+              {copy.filtersDetailSubtitle}
+            </p>
+          ) : null}
+
+          <form key={filterFormKey} method="get" action="/propiedades" className="space-y-8 px-4 py-6 sm:px-6 sm:py-8">
           {locale === "en" ? <input type="hidden" name="lang" value="en" /> : null}
 
           <div className="space-y-8">
@@ -336,7 +354,7 @@ export function PropiedadesCatalog({
             <div className="flex flex-wrap gap-3">
               <button
                 type="submit"
-                className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-full bg-brand-accent px-8 text-sm font-semibold text-brand-white shadow-[0_4px_14px_-4px_rgba(97,110,137,0.55)] transition hover:bg-brand-accent-strong sm:flex-none"
+                className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-full bg-brand-accent px-8 text-sm font-semibold text-brand-white shadow-[0_4px_14px_-4px_rgba(26,30,97,0.35)] transition hover:bg-brand-accent-strong sm:flex-none"
               >
                 {copy.filterApply}
               </button>
@@ -349,6 +367,7 @@ export function PropiedadesCatalog({
             </div>
           </div>
         </form>
+        </details>
       </section>
 
       {filtered.length === 0 ? (
@@ -381,9 +400,20 @@ export function PropiedadesCatalog({
                       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.06),transparent)]" />
                     </div>
                     <div className="p-6">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent">
-                        {copy.zoneLabel}: {p.zone}
-                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ListingTypeBadge
+                          kind={inferListingDisplayType({
+                            listingType: p.listingType,
+                            status: p.status,
+                            title: p.title,
+                            specs: p.specs,
+                          })}
+                          labels={{ rent: copy.listingBadgeRent, sale: copy.listingBadgeSale }}
+                        />
+                        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent">
+                          {copy.zoneLabel}: {p.zone}
+                        </p>
+                      </div>
                       <h2 className="mt-2 font-heading text-xl font-semibold text-brand-text group-hover:text-brand-accent-strong">
                         {p.title}
                       </h2>

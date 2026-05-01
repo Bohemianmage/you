@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      /* Portafolio: miniaturas remotas hasta migrar a Blob/CDN propio */
+      {
+        protocol: "https",
+        hostname: "static.wixstatic.com",
+        pathname: "/**",
+      },
     ],
   },
 };

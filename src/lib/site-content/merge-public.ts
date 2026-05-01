@@ -6,6 +6,7 @@ import { DOWNLOADABLE_ITEMS_BY_LOCALE } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
 import { FEATURED_PROPERTIES_BY_LOCALE } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
+import { inferListingType } from "@/lib/catalog-filters";
 import { TEAM_MEMBERS } from "@/data/team";
 import { clampTeamImageZoom } from "@/lib/team-image-framing";
 import type { HomeCopy } from "@/i18n/home";
@@ -122,6 +123,8 @@ export function catalogAsFeaturedDetail(c: CatalogProperty, locale: Locale): Fea
 
   const gallery = c.imageGallery?.map((u) => u.trim()).filter(Boolean);
 
+  const listingType = c.listingType ?? inferListingType(c);
+
   return {
     id: c.id,
     slug: c.slug,
@@ -129,6 +132,7 @@ export function catalogAsFeaturedDetail(c: CatalogProperty, locale: Locale): Fea
     price: c.price,
     address: c.address?.trim() || c.zone,
     status: c.status?.trim() || defaultStatus,
+    listingType: listingType ?? undefined,
     ctaLabel: c.ctaLabel?.trim() || defaultCta,
     description: c.description?.trim() || fallbackDesc,
     imageSrc: c.imageSrc,

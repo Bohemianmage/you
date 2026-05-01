@@ -34,12 +34,16 @@ export const CATALOG_PAGE_COPY: Record<
     filterReset: string;
     filterPriceNote: string;
     filtersDetailSubtitle: string;
-    filterActiveLabel: string;
+    /** Tras el número en el chip (ej. «3 filtros activos» / «1 filtro activo»). */
+    filterActivePlural: string;
+    filterActiveSingular: string;
     filterGroupZone: string;
     filterGroupSize: string;
     filterGroupLayout: string;
     filterGroupPrice: string;
     filterListingTypeHint: string;
+    listingBadgeRent: string;
+    listingBadgeSale: string;
   }
 > = {
   es: {
@@ -56,7 +60,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterRent: "En renta",
     filterSale: "En venta",
     noResults: "No hay propiedades que coincidan con estos filtros.",
-    filtersDetailHeading: "Más criterios",
+    filtersDetailHeading: "Filtros",
     filterZoneAll: "Todas las zonas",
     filterM2Min: "m² mín.",
     filterM2Max: "m² máx.",
@@ -72,13 +76,16 @@ export const CATALOG_PAGE_COPY: Record<
     filterApply: "Aplicar filtros",
     filterReset: "Limpiar todo",
     filterPriceNote: "El filtro por precio usa la moneda indicada y los datos numéricos de cada propiedad.",
-    filtersDetailSubtitle: "Combiná criterios y tocá aplicar para actualizar el listado.",
-    filterActiveLabel: "criterios activos",
+    filtersDetailSubtitle: "",
+    filterActivePlural: "filtros activos",
+    filterActiveSingular: "filtro activo",
     filterGroupZone: "Ubicación",
     filterGroupSize: "Superficie",
     filterGroupLayout: "Recámaras y baños",
     filterGroupPrice: "Precio",
     filterListingTypeHint: "Todas las operaciones, solo renta o solo venta.",
+    listingBadgeRent: "Renta",
+    listingBadgeSale: "Venta",
   },
   en: {
     title: "Properties",
@@ -94,7 +101,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterRent: "For rent",
     filterSale: "For sale",
     noResults: "No listings match these filters.",
-    filtersDetailHeading: "More criteria",
+    filtersDetailHeading: "Filters",
     filterZoneAll: "All areas",
     filterM2Min: "Min m²",
     filterM2Max: "Max m²",
@@ -110,13 +117,16 @@ export const CATALOG_PAGE_COPY: Record<
     filterApply: "Apply filters",
     filterReset: "Clear all",
     filterPriceNote: "Price filtering uses the selected currency and each listing’s numeric amount.",
-    filtersDetailSubtitle: "Combine criteria, then apply to refresh the list.",
-    filterActiveLabel: "active filters",
+    filtersDetailSubtitle: "",
+    filterActivePlural: "active filters",
+    filterActiveSingular: "active filter",
     filterGroupZone: "Location",
     filterGroupSize: "Floor area",
     filterGroupLayout: "Beds & baths",
     filterGroupPrice: "Price",
     filterListingTypeHint: "All listings, rentals only, or sales only.",
+    listingBadgeRent: "Rent",
+    listingBadgeSale: "Sale",
   },
 };
 
@@ -125,7 +135,6 @@ export const PROPERTY_DETAIL_COPY: Record<
   Locale,
   {
     interestCta: string;
-    backFeatured: string;
     backCatalog: string;
     descriptionFallback: string;
     virtualTourCta: string;
@@ -148,7 +157,6 @@ export const PROPERTY_DETAIL_COPY: Record<
 > = {
   es: {
     interestCta: "Me interesa",
-    backFeatured: "Volver a destacadas",
     backCatalog: "Ver catálogo",
     descriptionFallback:
       "Para más detalle y disponibilidad actual, escribinos o agenda una visita con un asesor YOU.",
@@ -171,7 +179,6 @@ export const PROPERTY_DETAIL_COPY: Record<
   },
   en: {
     interestCta: "I’m interested",
-    backFeatured: "Back to featured",
     backCatalog: "Browse listings",
     descriptionFallback:
       "For availability and full detail, contact us or schedule a visit with a YOU advisor.",

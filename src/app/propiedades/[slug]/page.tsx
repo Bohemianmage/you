@@ -3,11 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { withYouWordmark } from "@/components/brand/you-wordmark";
+import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import { PropertyImageGallery } from "@/components/propiedades/PropertyImageGallery";
-import { PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
-import { homePath, localeQuery } from "@/i18n/home";
+import { CATALOG_PAGE_COPY, PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
+import { localeQuery } from "@/i18n/home";
 import { resolveMarketingLocale } from "@/lib/marketing-locale";
+import { inferListingDisplayType } from "@/lib/catalog-filters";
 import { appendContactParams } from "@/lib/contact-url";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import { propertyGalleryImages } from "@/lib/property-media";
@@ -49,7 +51,6 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
 
   const q = localeQuery(locale);
   const copy = PROPERTY_DETAIL_COPY[locale];
-  const featuredHref = `${homePath(locale)}#featured-properties`;
   const catalogHref = `/propiedades${q}`;
   const contactInterestHref = appendContactParams(`/contacto${q}`, { topic: "visita" });
 
@@ -82,20 +83,27 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
     <MarketingLayout locale={locale}>
       <div className="border-b border-brand-border bg-brand-bg px-4 py-10 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl space-y-10">
-          <nav className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
-            <Link href={featuredHref} className={TEXT_LINK_INLINE}>
-              {copy.backFeatured}
-            </Link>
-            <span className="text-brand-border" aria-hidden>
-              ·
-            </span>
+          <nav className="text-sm font-semibold">
             <Link href={catalogHref} className={TEXT_LINK_INLINE}>
               {copy.backCatalog}
             </Link>
           </nav>
 
           <header className="space-y-4">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-accent">{property.status}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <ListingTypeBadge
+                kind={inferListingDisplayType({
+                  listingType: property.listingType,
+                  status: property.status,
+                  title: property.title,
+                })}
+                labels={{
+                  rent: CATALOG_PAGE_COPY[locale].listingBadgeRent,
+                  sale: CATALOG_PAGE_COPY[locale].listingBadgeSale,
+                }}
+              />
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-accent">{property.status}</p>
+            </div>
             <h1 className="font-heading text-3xl font-semibold tracking-tight text-brand-text sm:text-4xl">{property.title}</h1>
             <p className="font-heading text-2xl font-semibold text-brand-text">{property.price}</p>
             <p className="text-sm leading-relaxed text-brand-muted">{property.address}</p>

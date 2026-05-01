@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 /**
- * Tokens de marca YOU: superficie clara, texto carbón, acento pizarra, wordmark azul #1a1e61.
+ * Tokens YOU: neutros ligeramente fríos para emparentar con el wordmark #1a1e61;
+ * acentos en escala azul-pizarra (sin perder la sutileza del UI claro).
  */
 :root {
   --background: #ffffff;
-  --foreground: #2f2e2e;
+  --foreground: #2a2d38;
 }
 
 @theme inline {
@@ -15,14 +16,15 @@
   --font-heading: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
 
   --color-brand-bg: #ffffff;
-  --color-brand-surface: #f7f7f7;
-  --color-brand-text: #2f2e2e;
-  --color-brand-muted: #605e5e;
-  --color-brand-subtle: #a0a09f;
-  --color-brand-border: #cccccc;
-  --color-brand-accent: #616e89;
-  --color-brand-accent-hover: #8e99b1;
-  --color-brand-accent-strong: #283b62;
+  --color-brand-surface: #f4f5f9;
+  --color-brand-text: #2a2d38;
+  --color-brand-muted: #5c6170;
+  --color-brand-subtle: #8b92a3;
+  --color-brand-border: #dfe2ea;
+  /** Puente entre UI y el azul marca; hovers un poco más claros. */
+  --color-brand-accent: #55607a;
+  --color-brand-accent-hover: #6e7892;
+  --color-brand-accent-strong: #2a3358;
   /** Palabra marca "YOU" en copy (negritas en componentes). */
   --color-brand-you: #1a1e61;
   --color-brand-white: #ffffff;
@@ -56,6 +58,6 @@ body {
 }
 
 ::selection {
-  background-color: rgba(97, 110, 137, 0.28);
-  color: #2f2e2e;
+  background-color: rgba(26, 30, 97, 0.2);
+  color: var(--foreground);
 }

@@ -13,6 +13,20 @@ export function inferListingType(p: CatalogProperty): "rent" | "sale" | null {
   return null;
 }
 
+/** Para fichas/destacadas sin todos los campos del catálogo. */
+export function inferListingDisplayType(p: {
+  listingType?: "rent" | "sale";
+  status?: string;
+  title?: string;
+  specs?: string;
+}): "rent" | "sale" | null {
+  if (p.listingType === "rent" || p.listingType === "sale") return p.listingType;
+  const blob = `${p.status ?? ""} ${p.title ?? ""} ${p.specs ?? ""}`.toLowerCase();
+  if (blob.includes("renta")) return "rent";
+  if (blob.includes("venta")) return "sale";
+  return null;
+}
+
 function zonesMatch(catalogZone: string, filterZone: string): boolean {
   return catalogZone.trim().toLowerCase() === filterZone.trim().toLowerCase();
 }

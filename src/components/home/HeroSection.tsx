@@ -77,7 +77,7 @@ export function HeroSection({ locale, copy, modalCopy, catalogHref, contactHref,
               </Link>
               <Link
                 href={contactHref}
-                className="inline-flex items-center justify-center rounded-sm border border-brand-accent bg-brand-bg/90 px-7 py-3.5 text-center text-sm font-semibold text-brand-accent shadow-sm backdrop-blur-sm transition hover:bg-[rgba(97,110,137,0.12)]"
+                className="inline-flex items-center justify-center rounded-sm border border-brand-accent bg-brand-bg/90 px-7 py-3.5 text-center text-sm font-semibold text-brand-accent shadow-sm backdrop-blur-sm transition hover:bg-brand-accent/12"
               >
                 {copy.secondaryCta}
               </Link>

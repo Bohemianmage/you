@@ -2,10 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { withYouWordmark } from "@/components/brand/you-wordmark";
+import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import type { FeaturedProperty } from "@/data/properties";
 import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
+import { inferListingDisplayType } from "@/lib/catalog-filters";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
+import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
 import { propertyCoverImage } from "@/lib/property-media";
 import { featuredPropertyDetailHref } from "@/lib/property-routes";
 
@@ -27,6 +30,8 @@ export function FeaturedPropertiesSection({
   catalogHref,
   contactHref,
 }: FeaturedPropertiesSectionProps) {
+  const badgeCopy = CATALOG_PAGE_COPY[locale];
+
   return (
     <section id="featured-properties" className="border-b border-brand-border bg-brand-bg py-16 sm:py-20 md:py-24" aria-labelledby="featured-heading">
       <div className="mx-auto max-w-6xl space-y-12 px-4 sm:px-6 lg:px-8">
@@ -71,6 +76,16 @@ export function FeaturedPropertiesSection({
                       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.08),transparent)]" />
                     </div>
                     <div className="flex flex-1 flex-col gap-4 p-6">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ListingTypeBadge
+                          kind={inferListingDisplayType({
+                            listingType: property.listingType,
+                            status: property.status,
+                            title: property.title,
+                          })}
+                          labels={{ rent: badgeCopy.listingBadgeRent, sale: badgeCopy.listingBadgeSale }}
+                        />
+                      </div>
                       <h3 className="font-heading text-lg font-semibold leading-snug text-brand-text group-hover:text-brand-accent-strong">{property.title}</h3>
                       <p className="font-heading text-2xl font-semibold text-brand-text">{property.price}</p>
                       <p className="text-sm leading-relaxed text-brand-muted">{property.address}</p>

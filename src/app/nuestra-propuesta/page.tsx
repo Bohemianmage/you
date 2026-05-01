@@ -57,7 +57,7 @@ export default async function NuestraPropuestaPage({ searchParams }: PropuestaPa
             </Link>
             <Link
               href={catalogHref}
-              className="inline-flex items-center justify-center rounded-sm border border-brand-accent px-8 py-3.5 text-sm font-semibold text-brand-accent transition hover:bg-[rgba(97,110,137,0.08)]"
+              className="inline-flex items-center justify-center rounded-sm border border-brand-accent px-8 py-3.5 text-sm font-semibold text-brand-accent transition hover:bg-brand-accent/10"
             >
               {copy.catalogCta}
             </Link>
