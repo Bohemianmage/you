@@ -32,7 +32,18 @@ export function VirtualToursSection({ copy, contactHref, embedUrl }: VirtualTour
           <div className="aspect-video w-full max-w-md shrink-0 overflow-hidden rounded-sm border border-brand-border bg-brand-surface lg:max-w-sm">
             {embedUrl ? (
               <iframe title={copy.title} src={embedUrl} className="h-full w-full border-0" allowFullScreen loading="lazy" />
-            ) : null}
+            ) : (
+              <video
+                className="h-full w-full object-cover"
+                src="/videos/hero-landing.mp4"
+                muted
+                playsInline
+                loop
+                autoPlay
+                preload="metadata"
+                aria-label={copy.title}
+              />
+            )}
           </div>
         </div>
       </div>

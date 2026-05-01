@@ -87,7 +87,7 @@ export function HeroSection({ locale, copy, modalCopy, catalogHref, contactHref,
           <div className="flex w-full flex-1 justify-center lg:justify-end">
             <div className="flex w-full max-w-md flex-col items-center justify-center gap-4 rounded-sm border border-white/25 bg-brand-bg/40 px-8 py-10 shadow-[0_8px_32px_rgba(47,46,46,0.12)] backdrop-blur-md backdrop-saturate-150">
               <Image
-                src="/logo-you-full.png"
+                src="/marketing/hero-logo-you.png"
                 alt="YOU Soluciones Inmobiliarias"
                 width={320}
                 height={140}

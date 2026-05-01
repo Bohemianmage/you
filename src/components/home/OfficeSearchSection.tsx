@@ -20,7 +20,7 @@ export function OfficeSearchSection({ copy, proposalHref }: OfficeSearchSectionP
             {copy.imageSrc ? (
               <Image
                 src={copy.imageSrc}
-                alt=""
+                alt={copy.title}
                 fill
                 unoptimized={copy.imageSrc.startsWith("http")}
                 className="object-cover"

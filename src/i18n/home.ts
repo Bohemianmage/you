@@ -125,6 +125,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       primaryCta: "Ver propiedades",
       secondaryCta: "Contactar asesor",
       imageBadge: "Venta y renta · CDMX",
+      imageSrc: "/marketing/hero-logo-you.png",
     },
     modal: {
       title: "Sitio en desarrollo",
@@ -182,6 +183,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     },
     offices: {
       imageLabel: "Ilustración / foto oficinas",
+      imageSrc: "/marketing/offices-building.png",
       title: "¿Estás buscando OFICINA?",
       description:
         "Te ayudamos a encontrar el lugar perfecto para ti y tus colaboradores.",
@@ -212,6 +214,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       primaryCta: "View properties",
       secondaryCta: "Contact an advisor",
       imageBadge: "Sales and rentals · Mexico City",
+      imageSrc: "/marketing/hero-logo-you.png",
     },
     modal: {
       title: "Site in progress",
@@ -269,6 +272,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     },
     offices: {
       imageLabel: "Office photo placeholder",
+      imageSrc: "/marketing/offices-building.png",
       title: "Looking for an OFFICE?",
       description: "We help you find the perfect place for you and your team.",
       supportText:

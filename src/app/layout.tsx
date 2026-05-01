@@ -33,9 +33,12 @@ export const metadata: Metadata = {
     "Servicio profesional inmobiliario con sentido humano en Ciudad de México y zonas corporativas clave.",
   metadataBase: new URL("https://yousoluciones.com"),
   icons: {
-    icon: [{ url: "/logo-you.svg", type: "image/svg+xml" }],
-    shortcut: "/logo-you.svg",
-    apple: [{ url: "/logo-you.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 
