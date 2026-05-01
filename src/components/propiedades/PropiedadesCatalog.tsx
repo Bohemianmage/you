@@ -6,7 +6,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import type { CatalogProperty } from "@/data/catalog-properties";
-import { filterCatalogProperties, normalizeCatalogFeatureKey } from "@/lib/catalog-filters";
+import { filterCatalogProperties, inferListingDisplayType, normalizeCatalogFeatureKey } from "@/lib/catalog-filters";
+import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import { CatalogPropertiesMap } from "@/components/propiedades/CatalogPropertiesMap";
 import { distinctCatalogZoneFilterKeys } from "@/lib/catalog-zone-filter";
 import { catalogPageHref, type CatalogQueryFilters, type ListingTypeFilter } from "@/lib/catalog-query";
@@ -568,11 +569,23 @@ export function PropiedadesCatalog({
                       ) : null}
                       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.06),transparent)]" />
                     </div>
-                    <div className="p-6">
+                    <div className="space-y-2 p-6">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ListingTypeBadge
+                          kind={inferListingDisplayType({
+                            listingType: p.listingType,
+                            status: p.status,
+                            title: p.title,
+                            specs: p.specs,
+                            ebOperations: p.ebOperations,
+                          })}
+                          labels={{ rent: copy.listingBadgeRent, sale: copy.listingBadgeSale }}
+                        />
+                      </div>
                       {p.zone?.trim() ? (
                         <p className="text-sm font-medium leading-snug text-brand-muted line-clamp-2">{p.zone.trim()}</p>
                       ) : null}
-                      <h2 className="mt-2 font-heading text-xl font-semibold text-brand-text group-hover:text-brand-accent-strong">
+                      <h2 className="font-heading text-xl font-semibold text-brand-text group-hover:text-brand-accent-strong">
                         {p.title}
                       </h2>
                       <p className="mt-3 font-heading text-2xl font-semibold text-brand-text">{p.price}</p>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { AboutSection } from "@/components/home/AboutSection";
+import { BuilderSection } from "@/components/home/BuilderSection";
 import { DownloadablesSection } from "@/components/home/DownloadablesSection";
 import { FeaturedPropertiesSection } from "@/components/home/FeaturedPropertiesSection";
 import { HeroSection } from "@/components/home/HeroSection";
@@ -78,6 +79,10 @@ export function HomePageContent({
 
       <EditableSection sectionId="zones" label="Editar">
         <ZonesSection title={copy.zones.title} zones={catalogZones} locale={locale} />
+      </EditableSection>
+
+      <EditableSection sectionId="builder" label="Editar">
+        <BuilderSection copy={copy.builder} />
       </EditableSection>
 
       <EditableSection sectionId="featured" label="Editar">

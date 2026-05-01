@@ -5,18 +5,22 @@ import Link from "next/link";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { PropertyVisitBooking } from "@/components/propiedades/PropertyVisitBooking";
+import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import type { FeaturedProperty } from "@/data/properties";
 import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
-import { PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
+import { CATALOG_PAGE_COPY, PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
+import { inferListingDisplayType } from "@/lib/catalog-filters";
 import { propertyCoverImage } from "@/lib/property-media";
 import { featuredPropertyDetailHref, featuredPropertySegment } from "@/lib/property-routes";
 
 const ROTATION_MS = 6500;
 
-/** Ancho uniforme por slide; `snap-start` alinea la primera propiedad a la izquierda. */
-const SLIDE_WIDTH_CLASS =
-  "w-[min(88vw,26rem)] sm:w-[min(52vw,28rem)] md:w-[min(48vw,30rem)] lg:w-[min(42rem,calc(100vw-14rem))]";
+/** Ancho del slide; mitad del min() coincide con scroll-padding para peek simétrico y tarjeta centrada (`snap-center`). */
+const SLIDE_WIDTH_CLASS = "w-[min(78vw,22rem)] shrink-0 snap-center";
+/** Padding horizontal del carril = (viewport − ancho slide) / 2 → misma porción visible a izquierda y derecha del centro. */
+const SCROLL_SYMMETRIC_PAD =
+  "scroll-pl-[calc(50%_-_min(39vw,11rem))] scroll-pr-[calc(50%_-_min(39vw,11rem))]";
 
 type ExtSlide = {
   property: FeaturedProperty;
@@ -70,8 +74,8 @@ function CarouselChevron({ dir }: { dir: "prev" | "next" }) {
 }
 
 /**
- * Carrusel con snap al inicio (primera propiedad a la izquierda), clones para bucle visual,
- * y formulario de agenda en línea debajo de la propiedad activa.
+ * Carrusel con tarjeta activa centrada, laterales con el mismo “peek” visible, clones para bucle,
+ * y agenda debajo de la propiedad activa.
  */
 export function FeaturedPropertiesCarousel({
   locale,
@@ -83,6 +87,7 @@ export function FeaturedPropertiesCarousel({
   properties: readonly FeaturedProperty[];
 }) {
   const bookingCopy = PROPERTY_DETAIL_COPY[locale];
+  const badgeCopy = CATALOG_PAGE_COPY[locale];
   const reducedMotion = usePrefersReducedMotion();
   const n = properties.length;
   const extSlides = useMemo(() => buildExtSlides(properties), [properties]);
@@ -103,7 +108,7 @@ export function FeaturedPropertiesCarousel({
       const el = itemRefs.current[extIdx];
       if (!el) return;
       el.scrollIntoView({
-        inline: "start",
+        inline: "center",
         block: "nearest",
         behavior: reducedMotion || !smooth ? "auto" : "smooth",
       });
@@ -114,14 +119,14 @@ export function FeaturedPropertiesCarousel({
   const readNearestExtIndex = useCallback((): number => {
     const scrollEl = scrollRef.current;
     if (!scrollEl || extLen === 0) return n > 1 ? 1 : 0;
-    const pad = 12;
-    const x = scrollEl.scrollLeft + pad;
+    const cx = scrollEl.scrollLeft + scrollEl.clientWidth / 2;
     let best = 0;
     let bestDist = Infinity;
     for (let i = 0; i < extLen; i++) {
       const slide = itemRefs.current[i];
       if (!slide) continue;
-      const dist = Math.abs(slide.offsetLeft - x);
+      const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+      const dist = Math.abs(slideCenter - cx);
       if (dist < bestDist) {
         bestDist = dist;
         best = i;
@@ -296,11 +301,13 @@ export function FeaturedPropertiesCarousel({
                 ref={(el) => {
                   itemRefs.current[i] = el;
                 }}
-                className={`${SLIDE_WIDTH_CLASS} shrink-0 snap-start`}
+                className={SLIDE_WIDTH_CLASS}
               >
                 <article
-                  className={`flex h-full flex-col overflow-hidden rounded-sm border bg-brand-bg shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] ${
-                    isActive ? "border-brand-accent ring-2 ring-brand-accent/35" : "border-brand-border"
+                  className={`flex h-full flex-col overflow-hidden rounded-sm border bg-brand-bg shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition-[transform,box-shadow,opacity,border-color] duration-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] motion-reduce:transition-none ${
+                    isActive
+                      ? "scale-100 border-brand-accent opacity-100 ring-2 ring-brand-accent/35"
+                      : "scale-[0.96] border-brand-border opacity-[0.92]"
                   }`}
                 >
                   <Link
@@ -315,12 +322,24 @@ export function FeaturedPropertiesCarousel({
                           fill
                           unoptimized={cover.startsWith("http")}
                           className="object-cover transition duration-300 group-hover:scale-[1.02]"
-                          sizes="(max-width: 768px) 88vw, 50vw"
+                          sizes="(max-width: 768px) 78vw, 22rem"
                         />
                       ) : null}
                       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.08),transparent)]" />
                     </div>
                     <div className="flex flex-1 flex-col gap-3 p-6">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <ListingTypeBadge
+                          kind={inferListingDisplayType({
+                            listingType: slide.property.listingType,
+                            status: slide.property.status,
+                            title: slide.property.title,
+                            specs: slide.property.specs,
+                            ebOperations: slide.property.ebOperations,
+                          })}
+                          labels={{ rent: badgeCopy.listingBadgeRent, sale: badgeCopy.listingBadgeSale }}
+                        />
+                      </div>
                       <h3 className="font-heading text-lg font-semibold leading-snug text-brand-text group-hover:text-brand-accent-strong">
                         {slide.property.title}
                       </h3>

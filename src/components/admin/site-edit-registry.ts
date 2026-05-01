@@ -43,6 +43,15 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
     title: "Zonas",
     fields: [{ section: "zones", key: "title", label: "Título", multiline: true }],
   },
+  builder: {
+    title: "Constructora (landing)",
+    fields: [
+      { section: "builder", key: "kicker", label: "Línea superior (rótulo)" },
+      { section: "builder", key: "title", label: "Título" },
+      { section: "builder", key: "body", label: "Texto principal", multiline: true },
+      { section: "builder", key: "statusBadge", label: "Estado (badge)" },
+    ],
+  },
   featured: {
     title: "Propiedades destacadas (textos)",
     fields: [

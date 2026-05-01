@@ -62,6 +62,13 @@ export interface HomeCopy {
     title: string;
     cta: string;
   };
+  /** Línea constructora (misma marca; espacio propio en el landing). */
+  builder: {
+    kicker: string;
+    title: string;
+    body: string;
+    statusBadge: string;
+  };
   offices: {
     imageLabel: string;
     title: string;
@@ -179,6 +186,12 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       title: "¿Quieres vender o rentar tu propiedad?",
       cta: "Da clic aquí",
     },
+    builder: {
+      kicker: "Línea constructora",
+      title: "YOU Constructora",
+      body: "Este espacio está en preparación. Muy pronto compartiremos desarrollos y obra ligados a la misma filosofía YOU.",
+      statusBadge: "En proceso",
+    },
     offices: {
       imageLabel: "Ilustración / foto oficinas",
       imageSrc: "/marketing/offices-building.png",
@@ -267,6 +280,12 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     owner: {
       title: "Do you want to sell or rent your property?",
       cta: "Click here",
+    },
+    builder: {
+      kicker: "Construction line",
+      title: "YOU Constructora",
+      body: "This space is getting ready. Soon we'll share developments and construction aligned with the same YOU philosophy.",
+      statusBadge: "In progress",
     },
     offices: {
       imageLabel: "Office photo placeholder",

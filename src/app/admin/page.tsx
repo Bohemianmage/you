@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
       <ul className="mt-8 space-y-3 text-sm">
         <li>
           <Link href="/" className="font-semibold text-brand-accent no-underline hover:underline">
-            Abrir sitio (modo edición)
+            Abrir sitio con barra de admin
           </Link>
         </li>
         <li>

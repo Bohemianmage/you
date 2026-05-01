@@ -13,7 +13,7 @@ import type { SiteContentFile } from "@/lib/site-content/types";
 
 type EditContextValue = {
   working: SiteContentFile;
-  /** Inventario EasyBroker (solo servidor); vista previa en modo edición. */
+  /** Inventario EasyBroker (solo servidor); vista previa con barra de admin. */
   previewEbCatalog: readonly CatalogProperty[];
   patchWorking: (fn: (w: SiteContentFile) => SiteContentFile) => void;
   openSection: (id: string) => void;
@@ -91,51 +91,66 @@ function SiteAdminToolbar({
         </div>
       ) : null}
       <div className="fixed bottom-0 left-0 right-0 z-[190] border-t border-brand-border bg-brand-bg/95 px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-muted">Modo edición</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href="/admin/listas"
-              className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
-            >
-              Contenidos del sitio
-            </Link>
-            <Link
-              href="/admin/analytics"
-              className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
-            >
-              Analíticas
-            </Link>
-            <Link
-              href="/admin/calendario"
-              className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
-            >
-              Calendario
-            </Link>
-            <form action={logoutAdmin}>
-              <button
-                type="submit"
-                className="rounded-sm border border-brand-border px-3 py-2 text-xs font-semibold text-brand-muted hover:text-brand-text"
-              >
-                Cerrar sesión
-              </button>
-            </form>
-            <button
-              type="button"
-              className="rounded-sm border border-brand-border px-4 py-2 text-xs font-semibold text-brand-text disabled:opacity-40"
-              disabled={!dirty || saving}
-              onClick={discard}
-            >
-              Descartar
-            </button>
-            <button
-              type="button"
-              className="rounded-sm bg-brand-accent px-4 py-2 text-xs font-semibold text-brand-white shadow-sm disabled:opacity-40"
-              disabled={!dirty || saving}
-              onClick={() => void save()}
-            >
-              {saving ? "Guardando…" : "Guardar"}
-            </button>
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-between sm:gap-x-6 sm:gap-y-3">
+          <div className="flex min-w-0 flex-col gap-0.5 sm:max-w-[11rem]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent-strong">Admin</p>
+            <p className="text-[11px] leading-snug text-brand-muted">Vista previa pública con cambios locales hasta guardar.</p>
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col gap-3 border-t border-brand-border/70 pt-3 sm:flex-row sm:items-start sm:justify-end sm:gap-0 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+            <div className="flex flex-col gap-1.5 sm:pr-4">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-subtle">Modificaciones</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="rounded-sm border border-brand-border px-3 py-2 text-xs font-semibold text-brand-text disabled:opacity-40"
+                  disabled={!dirty || saving}
+                  onClick={discard}
+                >
+                  Descartar
+                </button>
+                <button
+                  type="button"
+                  className="rounded-sm bg-brand-accent px-4 py-2 text-xs font-semibold text-brand-white shadow-sm disabled:opacity-40"
+                  disabled={!dirty || saving}
+                  onClick={() => void save()}
+                >
+                  {saving ? "Guardando…" : "Guardar"}
+                </button>
+              </div>
+            </div>
+
+            <nav className="flex flex-col gap-1.5 sm:border-l sm:pl-6 sm:border-brand-border" aria-label="Herramientas admin">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-subtle">Herramientas</p>
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href="/admin/listas"
+                  className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
+                >
+                  Contenidos
+                </Link>
+                <Link
+                  href="/admin/analytics"
+                  className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
+                >
+                  Analíticas
+                </Link>
+                <Link
+                  href="/admin/calendario"
+                  className="rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-xs font-semibold text-brand-text no-underline hover:border-brand-accent"
+                >
+                  Calendario
+                </Link>
+                <form action={logoutAdmin} className="inline">
+                  <button
+                    type="submit"
+                    className="rounded-sm border border-brand-border px-3 py-2 text-xs font-semibold text-brand-muted hover:text-brand-text"
+                  >
+                    Cerrar sesión
+                  </button>
+                </form>
+              </div>
+            </nav>
           </div>
         </div>
         {saveError ? <p className="mx-auto mt-2 max-w-6xl text-center text-xs text-brand-accent-strong">{saveError}</p> : null}

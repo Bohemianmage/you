@@ -43,11 +43,6 @@ export default function AdminAnalyticsPage() {
         Analíticas
       </p>
       <h1 className="mt-2 font-heading text-2xl font-semibold text-brand-text">{withYouWordmark("Analíticas del sitio")}</h1>
-      <p className="mt-3 text-sm leading-relaxed text-brand-muted">
-        Visitas a páginas, fichas más vistas, país aproximado y muestra de calor de clics en el viewport. Requiere{" "}
-        <span className="font-medium text-brand-text">Upstash Redis</span> (<code className="text-xs">UPSTASH_REDIS_REST_URL</code>,{" "}
-        <code className="text-xs">UPSTASH_REDIS_REST_TOKEN</code>).
-      </p>
 
       {error ? (
         <p className="mt-8 rounded-sm border border-brand-border bg-brand-surface px-4 py-3 text-sm text-brand-muted">{error}</p>
