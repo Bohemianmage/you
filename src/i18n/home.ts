@@ -48,6 +48,10 @@ export interface HomeCopy {
     detailCta: string;
     /** CTA tour externo cuando hay `tourUrl`. */
     virtualTourCta: string;
+    carouselPrevAria: string;
+    carouselNextAria: string;
+    /** Dot buttons: slide index 1-based */
+    carouselGoToAria: string;
   };
   virtualTours: {
     title: string;
@@ -156,6 +160,9 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       catalogCta: "Catálogo completo",
       detailCta: "Ver propiedad",
       virtualTourCta: "Tour virtual",
+      carouselPrevAria: "Propiedad anterior",
+      carouselNextAria: "Propiedad siguiente",
+      carouselGoToAria: "Ir a la propiedad {{n}}",
     },
     virtualTours: {
       title: "Descubre nuestras experiencias 3D",
@@ -236,6 +243,9 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       catalogCta: "Full catalog",
       detailCta: "View listing",
       virtualTourCta: "Virtual tour",
+      carouselPrevAria: "Previous listing",
+      carouselNextAria: "Next listing",
+      carouselGoToAria: "Go to listing {{n}}",
     },
     virtualTours: {
       title: "Discover our 3D experiences",

@@ -42,6 +42,16 @@ function countDetailFilters(f: CatalogQueryFilters): number {
   return n;
 }
 
+function countAdvancedFilters(f: CatalogQueryFilters): number {
+  let n = 0;
+  const nums: (keyof CatalogQueryFilters)[] = ["m2Min", "m2Max", "recMin", "recMax", "banMin", "banMax", "precioMin", "precioMax"];
+  for (const k of nums) {
+    const v = f[k];
+    if (typeof v === "number" && !Number.isNaN(v)) n++;
+  }
+  return n;
+}
+
 export function PropiedadesCatalog({
   locale,
   serverCatalog,
@@ -73,11 +83,25 @@ export function PropiedadesCatalog({
 
   const filterFormKey = JSON.stringify(filters);
   const detailFilterCount = useMemo(() => countDetailFilters(filters), [filters]);
+  const advancedFilterCount = useMemo(() => countAdvancedFilters(filters), [filters]);
 
   const [filtersPanelOpen, setFiltersPanelOpen] = useState(() => detailFilterCount > 0);
   useEffect(() => {
     setFiltersPanelOpen(detailFilterCount > 0);
   }, [detailFilterCount]);
+
+  const [advancedOpen, setAdvancedOpen] = useState(() => advancedFilterCount > 0);
+  useEffect(() => {
+    setAdvancedOpen(advancedFilterCount > 0);
+  }, [advancedFilterCount]);
+
+  const totalInCatalog = catalog.length;
+  const countCaption = useMemo(() => {
+    if (detailFilterCount > 0) {
+      return copy.catalogCountFiltered.replace("{{shown}}", String(filtered.length)).replace("{{total}}", String(totalInCatalog));
+    }
+    return copy.catalogCountAll.replace("{{count}}", String(filtered.length));
+  }, [copy, detailFilterCount, filtered.length, totalInCatalog]);
 
   return (
     <div className="space-y-10">
@@ -117,101 +141,92 @@ export function PropiedadesCatalog({
             </p>
           ) : null}
 
-          <form key={filterFormKey} method="get" action="/propiedades" className="space-y-8 px-4 py-6 sm:px-6 sm:py-8">
-          {locale === "en" ? <input type="hidden" name="lang" value="en" /> : null}
+          <form key={filterFormKey} method="get" action="/propiedades" className="space-y-5 px-4 py-5 sm:px-6 sm:py-6">
+            {locale === "en" ? <input type="hidden" name="lang" value="en" /> : null}
 
-          <div className="space-y-8">
-            <fieldset className="min-w-0 space-y-3 border-0 p-0">
-              <legend className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-accent-strong">
-                {copy.filterHeading}
-              </legend>
-              <label htmlFor="filter-tipo" className={fieldLabel}>
-                {copy.filterListingTypeHint}
-              </label>
-              <div className="relative max-w-md">
-                <select
-                  id="filter-tipo"
-                  name="tipo"
-                  defaultValue={tipo}
-                  className={`${fieldInput} appearance-none pr-11`}
-                >
-                  <option value="">{copy.filterAll}</option>
-                  <option value="rent">{copy.filterRent}</option>
-                  <option value="sale">{copy.filterSale}</option>
-                </select>
-                <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
-              </div>
-            </fieldset>
-
-            <fieldset className="min-w-0 space-y-3 border-0 border-t border-brand-border/35 p-0 pt-8">
-              <legend className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-accent-strong">
-                {copy.filterGroupZone}
-              </legend>
-              <label htmlFor="filter-zone" className={fieldLabel}>
-                {copy.zoneLabel}
-              </label>
-              <div className="relative max-w-xl">
-                <select id="filter-zone" name="zone" defaultValue={filters.zone ?? ""} className={`${fieldInput} appearance-none pr-11`}>
-                  <option value="">{copy.filterZoneAll}</option>
-                  {zones.map((z) => (
-                    <option key={z} value={z}>
-                      {z}
-                    </option>
-                  ))}
-                </select>
-                <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
-              </div>
-            </fieldset>
-
-            <fieldset className="min-w-0 space-y-4 border-0 border-t border-brand-border/35 p-0 pt-8">
-              <legend className="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-accent-strong">
-                {copy.filterGroupSize}
-              </legend>
-              <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
-                <div>
-                  <label htmlFor="filter-m2min" className={fieldLabel}>
-                    {copy.filterM2Min}
-                  </label>
-                  <input
-                    id="filter-m2min"
-                    name="m2Min"
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    step={1}
-                    placeholder="—"
-                    defaultValue={filters.m2Min ?? ""}
-                    className={fieldInput}
-                  />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="min-w-0 space-y-2">
+                <label htmlFor="filter-tipo" className={fieldLabel}>
+                  {copy.filterHeading}
+                </label>
+                <div className="relative">
+                  <select id="filter-tipo" name="tipo" defaultValue={tipo} className={`${fieldInput} appearance-none pr-11`}>
+                    <option value="">{copy.filterAll}</option>
+                    <option value="rent">{copy.filterRent}</option>
+                    <option value="sale">{copy.filterSale}</option>
+                  </select>
+                  <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
                 </div>
-                <span className="hidden pb-3 text-center text-sm font-medium text-brand-subtle sm:block" aria-hidden>
-                  —
+                <p className="text-[11px] leading-snug text-brand-subtle">{copy.filterListingTypeHint}</p>
+              </div>
+              <div className="min-w-0 space-y-2">
+                <label htmlFor="filter-zone" className={fieldLabel}>
+                  {copy.zoneLabel}
+                </label>
+                <div className="relative">
+                  <select id="filter-zone" name="zone" defaultValue={filters.zone ?? ""} className={`${fieldInput} appearance-none pr-11`}>
+                    <option value="">{copy.filterZoneAll}</option>
+                    {zones.map((z) => (
+                      <option key={z} value={z}>
+                        {z}
+                      </option>
+                    ))}
+                  </select>
+                  <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
+                </div>
+              </div>
+            </div>
+
+            <details
+              className="group/adv overflow-hidden rounded-xl border border-brand-border/60 bg-brand-surface/25"
+              open={advancedOpen}
+              onToggle={(e) => setAdvancedOpen((e.target as HTMLDetailsElement).open)}
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-brand-text transition-colors hover:bg-brand-surface/50 [&::-webkit-details-marker]:hidden">
+                <span className="text-left">{copy.filterMoreOptionsHeading}</span>
+                <span className="flex shrink-0 items-center gap-2">
+                  {advancedFilterCount > 0 ? (
+                    <span className="rounded-full bg-brand-you/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-you ring-1 ring-brand-you/15">
+                      {advancedFilterCount}
+                    </span>
+                  ) : null}
+                  <SelectChevron className="text-brand-muted transition-transform duration-200 group-open/adv:rotate-180" />
                 </span>
-                <div>
-                  <label htmlFor="filter-m2max" className={fieldLabel}>
-                    {copy.filterM2Max}
-                  </label>
-                  <input
-                    id="filter-m2max"
-                    name="m2Max"
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    step={1}
-                    placeholder="—"
-                    defaultValue={filters.m2Max ?? ""}
-                    className={fieldInput}
-                  />
-                </div>
-              </div>
-            </fieldset>
-
-            <fieldset className="min-w-0 space-y-4 border-0 border-t border-brand-border/35 p-0 pt-8">
-              <legend className="mb-3 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-accent-strong">
-                {copy.filterGroupLayout}
-              </legend>
-              <div className="grid gap-6 sm:grid-cols-2 lg:gap-8">
-                <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
+              </summary>
+              <div className="space-y-4 border-t border-brand-border/45 px-4 py-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="filter-m2min" className={fieldLabel}>
+                      {copy.filterM2Min}
+                    </label>
+                    <input
+                      id="filter-m2min"
+                      name="m2Min"
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      step={1}
+                      placeholder="—"
+                      defaultValue={filters.m2Min ?? ""}
+                      className={fieldInput}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="filter-m2max" className={fieldLabel}>
+                      {copy.filterM2Max}
+                    </label>
+                    <input
+                      id="filter-m2max"
+                      name="m2Max"
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      step={1}
+                      placeholder="—"
+                      defaultValue={filters.m2Max ?? ""}
+                      className={fieldInput}
+                    />
+                  </div>
                   <div>
                     <label htmlFor="filter-recmin" className={fieldLabel}>
                       {copy.filterBedMin}
@@ -228,9 +243,6 @@ export function PropiedadesCatalog({
                       className={fieldInput}
                     />
                   </div>
-                  <span className="hidden pb-3 text-center text-sm text-brand-subtle sm:block" aria-hidden>
-                    —
-                  </span>
                   <div>
                     <label htmlFor="filter-recmax" className={fieldLabel}>
                       {copy.filterBedMax}
@@ -247,8 +259,6 @@ export function PropiedadesCatalog({
                       className={fieldInput}
                     />
                   </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
                   <div>
                     <label htmlFor="filter-banmin" className={fieldLabel}>
                       {copy.filterBathMin}
@@ -265,9 +275,6 @@ export function PropiedadesCatalog({
                       className={fieldInput}
                     />
                   </div>
-                  <span className="hidden pb-3 text-center text-sm text-brand-subtle sm:block" aria-hidden>
-                    —
-                  </span>
                   <div>
                     <label htmlFor="filter-banmax" className={fieldLabel}>
                       {copy.filterBathMax}
@@ -285,73 +292,62 @@ export function PropiedadesCatalog({
                     />
                   </div>
                 </div>
-              </div>
-            </fieldset>
-
-            <fieldset className="min-w-0 space-y-4 border-0 border-t border-brand-border/35 p-0 pt-8">
-              <legend className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-accent-strong">
-                {copy.filterGroupPrice}
-              </legend>
-              <p className="text-xs leading-relaxed text-brand-muted">{copy.filterPriceNote}</p>
-              <div className="grid gap-6 lg:grid-cols-[1fr_auto_1fr_minmax(0,10rem)] lg:items-end lg:gap-4">
-                <div>
-                  <label htmlFor="filter-preciomin" className={fieldLabel}>
-                    {copy.filterPriceMin}
-                  </label>
-                  <input
-                    id="filter-preciomin"
-                    name="precioMin"
-                    type="number"
-                    inputMode="decimal"
-                    min={0}
-                    step="any"
-                    placeholder="—"
-                    defaultValue={filters.precioMin ?? ""}
-                    className={fieldInput}
-                  />
-                </div>
-                <span className="hidden pb-3 text-center text-sm text-brand-subtle lg:block" aria-hidden>
-                  —
-                </span>
-                <div>
-                  <label htmlFor="filter-preciomax" className={fieldLabel}>
-                    {copy.filterPriceMax}
-                  </label>
-                  <input
-                    id="filter-preciomax"
-                    name="precioMax"
-                    type="number"
-                    inputMode="decimal"
-                    min={0}
-                    step="any"
-                    placeholder="—"
-                    defaultValue={filters.precioMax ?? ""}
-                    className={fieldInput}
-                  />
-                </div>
-                <div className="lg:max-w-[11rem]">
-                  <label htmlFor="filter-moneda" className={fieldLabel}>
-                    {copy.filterCurrency}
-                  </label>
-                  <div className="relative">
-                    <select
-                      id="filter-moneda"
-                      name="moneda"
-                      defaultValue={filters.moneda ?? "MXN"}
-                      className={`${fieldInput} appearance-none pr-11`}
-                    >
-                      <option value="MXN">{copy.filterCurrencyMXN}</option>
-                      <option value="USD">{copy.filterCurrencyUSD}</option>
-                    </select>
-                    <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
+                <p className="text-[11px] leading-relaxed text-brand-subtle">{copy.filterPriceNote}</p>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
+                  <div className="lg:col-span-1">
+                    <label htmlFor="filter-preciomin" className={fieldLabel}>
+                      {copy.filterPriceMin}
+                    </label>
+                    <input
+                      id="filter-preciomin"
+                      name="precioMin"
+                      type="number"
+                      inputMode="decimal"
+                      min={0}
+                      step="any"
+                      placeholder="—"
+                      defaultValue={filters.precioMin ?? ""}
+                      className={fieldInput}
+                    />
+                  </div>
+                  <div className="lg:col-span-1">
+                    <label htmlFor="filter-preciomax" className={fieldLabel}>
+                      {copy.filterPriceMax}
+                    </label>
+                    <input
+                      id="filter-preciomax"
+                      name="precioMax"
+                      type="number"
+                      inputMode="decimal"
+                      min={0}
+                      step="any"
+                      placeholder="—"
+                      defaultValue={filters.precioMax ?? ""}
+                      className={fieldInput}
+                    />
+                  </div>
+                  <div className="lg:col-span-2">
+                    <label htmlFor="filter-moneda" className={fieldLabel}>
+                      {copy.filterCurrency}
+                    </label>
+                    <div className="relative max-w-xs">
+                      <select
+                        id="filter-moneda"
+                        name="moneda"
+                        defaultValue={filters.moneda ?? "MXN"}
+                        className={`${fieldInput} appearance-none pr-11`}
+                      >
+                        <option value="MXN">{copy.filterCurrencyMXN}</option>
+                        <option value="USD">{copy.filterCurrencyUSD}</option>
+                      </select>
+                      <SelectChevron className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-brand-muted" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </fieldset>
-          </div>
+            </details>
 
-          <div className="flex flex-col gap-3 border-t border-brand-border/45 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col gap-3 border-t border-brand-border/45 pt-4 sm:flex-row sm:flex-wrap sm:items-center">
               <button
                 type="submit"
                 className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-full bg-brand-accent px-8 text-sm font-semibold text-brand-white shadow-[0_4px_14px_-4px_rgba(26,30,97,0.35)] transition hover:bg-brand-accent-strong sm:flex-none"
@@ -365,10 +361,11 @@ export function PropiedadesCatalog({
                 {copy.filterReset}
               </Link>
             </div>
-          </div>
-        </form>
+          </form>
         </details>
       </section>
+
+      <p className="text-center text-sm font-medium text-brand-muted sm:text-left">{countCaption}</p>
 
       {filtered.length === 0 ? (
         <p className="rounded-sm border border-dashed border-brand-border bg-brand-surface/80 px-6 py-10 text-center text-sm text-brand-muted">

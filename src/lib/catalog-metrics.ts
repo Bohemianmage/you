@@ -6,7 +6,7 @@ export type ParsedPrice = { amount: number; currency: "MXN" | "USD" };
 export function parseSpecsMetrics(specs: string): { m2?: number; beds?: number; baths?: number } {
   const m2 = specs.match(/(\d+)\s*m²/i);
   const beds = specs.match(/(\d+)\s*rec/i);
-  const baths = specs.match(/(\d+)\s*bañ/i);
+  const baths = specs.match(/(\d+(?:\.\d+)?)\s*bañ/i);
   return {
     m2: m2 ? Number(m2[1]) : undefined,
     beds: beds ? Number(beds[1]) : undefined,

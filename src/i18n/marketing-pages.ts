@@ -42,6 +42,12 @@ export const CATALOG_PAGE_COPY: Record<
     filterGroupLayout: string;
     filterGroupPrice: string;
     filterListingTypeHint: string;
+    /** Detalle opcional (m², recámaras, precio…) dentro del panel de filtros. */
+    filterMoreOptionsHeading: string;
+    /** Sin filtros de listado: "{{count}}" */
+    catalogCountAll: string;
+    /** Con filtros activos: "{{shown}}" / "{{total}}" */
+    catalogCountFiltered: string;
     listingBadgeRent: string;
     listingBadgeSale: string;
   }
@@ -84,6 +90,9 @@ export const CATALOG_PAGE_COPY: Record<
     filterGroupLayout: "Recámaras y baños",
     filterGroupPrice: "Precio",
     filterListingTypeHint: "Todas las operaciones, solo renta o solo venta.",
+    filterMoreOptionsHeading: "Más opciones (tamaño, recámaras, precio)",
+    catalogCountAll: "{{count}} propiedades",
+    catalogCountFiltered: "{{shown}} de {{total}} propiedades",
     listingBadgeRent: "Renta",
     listingBadgeSale: "Venta",
   },
@@ -125,6 +134,9 @@ export const CATALOG_PAGE_COPY: Record<
     filterGroupLayout: "Beds & baths",
     filterGroupPrice: "Price",
     filterListingTypeHint: "All listings, rentals only, or sales only.",
+    filterMoreOptionsHeading: "More options (size, beds, price)",
+    catalogCountAll: "{{count}} listings",
+    catalogCountFiltered: "{{shown}} of {{total}} listings",
     listingBadgeRent: "Rent",
     listingBadgeSale: "Sale",
   },
