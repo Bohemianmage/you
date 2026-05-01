@@ -60,39 +60,57 @@ export function getGithubPublishConfig(): GithubPublishConfig | null {
   return { token, owner, repo, branch, path, commitPrefix };
 }
 
-function contentsUrl(cfg: GithubPublishConfig): string {
-  const pathEnc = encodeURIComponent(cfg.path);
-  return `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${pathEnc}`;
+/** Carpeta en el repo para PDF/imágenes subidos por admin (ruta bajo la raíz del proyecto). */
+export function getGithubSiteAssetsPrefix(): string {
+  return process.env.GITHUB_SITE_ASSETS_PREFIX?.trim().replace(/\/$/, "") || "public/site-uploads";
+}
+
+function githubContentsApiUrl(owner: string, repo: string, filePath: string): string {
+  const encoded = filePath
+    .split("/")
+    .filter(Boolean)
+    .map((seg) => encodeURIComponent(seg))
+    .join("/");
+  return `https://api.github.com/repos/${owner}/${repo}/contents/${encoded}`;
+}
+
+async function fetchExistingSha(
+  owner: string,
+  repo: string,
+  branch: string,
+  token: string,
+  filePath: string,
+): Promise<string | undefined> {
+  const url = `${githubContentsApiUrl(owner, repo, filePath)}?ref=${encodeURIComponent(branch)}`;
+  const getRes = await fetch(url, { headers: githubHeaders(token) });
+  if (getRes.status === 200) {
+    const meta = (await getRes.json()) as { sha?: string };
+    return meta.sha;
+  }
+  if (getRes.status === 404) return undefined;
+  const text = await getRes.text();
+  console.error("[github-publish] GET sha", getRes.status, text);
+  throw new GithubPublishError(mapStatus(getRes.status), text);
 }
 
 /**
- * Crea o actualiza el archivo en GitHub (un commit vía REST Contents API).
- * @see https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents
+ * Sube o reemplaza un binario en el repo (mismo flujo que el JSON del sitio).
+ * La URL pública en el sitio será `/…` si la ruta empieza por `public/`.
  */
-export async function publishSiteContentToGithub(content: SiteContentFile, cfg: GithubPublishConfig): Promise<void> {
-  const raw = `${JSON.stringify(content, null, 2)}\n`;
-  const base64 = Buffer.from(raw, "utf-8").toString("base64");
-  const message = `${cfg.commitPrefix} · ${new Date().toISOString().slice(0, 19).replace("T", " ")} UTC`;
-
-  const url = contentsUrl(cfg);
+export async function publishBinaryFileToGithub(
+  repoRelativePath: string,
+  bytes: Buffer,
+  cfg: GithubPublishConfig,
+  message: string,
+): Promise<void> {
+  const base64 = bytes.toString("base64");
+  const url = githubContentsApiUrl(cfg.owner, cfg.repo, repoRelativePath);
   const headers = {
     ...githubHeaders(cfg.token),
     "Content-Type": "application/json",
   };
 
-  let sha: string | undefined;
-  const getRes = await fetch(`${url}?ref=${encodeURIComponent(cfg.branch)}`, {
-    headers: githubHeaders(cfg.token),
-  });
-
-  if (getRes.status === 200) {
-    const meta = (await getRes.json()) as { sha?: string };
-    sha = meta.sha;
-  } else if (getRes.status !== 404) {
-    const text = await getRes.text();
-    console.error("[github-publish] GET", getRes.status, text);
-    throw new GithubPublishError(mapStatus(getRes.status), text);
-  }
+  const sha = await fetchExistingSha(cfg.owner, cfg.repo, cfg.branch, cfg.token, repoRelativePath);
 
   const putBody: Record<string, string> = {
     message,
@@ -109,7 +127,18 @@ export async function publishSiteContentToGithub(content: SiteContentFile, cfg: 
 
   if (!putRes.ok) {
     const text = await putRes.text();
-    console.error("[github-publish] PUT", putRes.status, text);
+    console.error("[github-publish] PUT binary", putRes.status, text);
     throw new GithubPublishError(mapStatus(putRes.status), text);
   }
+}
+
+/**
+ * Crea o actualiza el archivo en GitHub (un commit vía REST Contents API).
+ * @see https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents
+ */
+export async function publishSiteContentToGithub(content: SiteContentFile, cfg: GithubPublishConfig): Promise<void> {
+  const raw = `${JSON.stringify(content, null, 2)}\n`;
+  const bytes = Buffer.from(raw, "utf-8");
+  const message = `${cfg.commitPrefix} · ${new Date().toISOString().slice(0, 19).replace("T", " ")} UTC`;
+  await publishBinaryFileToGithub(cfg.path, bytes, cfg, message);
 }

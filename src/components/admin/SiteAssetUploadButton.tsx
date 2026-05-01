@@ -2,25 +2,19 @@
 
 import { useRef, useState } from "react";
 
-import { upload } from "@vercel/blob/client";
+import { uploadSiteAsset } from "@/app/actions/upload-site-asset";
 
-function safeFilename(name: string): string {
-  const base = name.replace(/^.*[/\\]/, "").replace(/[^a-zA-Z0-9._-]+/g, "-");
-  return base.slice(0, 160) || "file";
-}
+type UploadKind = "pdf" | "image";
 
-type BlobUploadKind = "pdf" | "image";
-
-export function BlobUploadButton({
+export function SiteAssetUploadButton({
   kind,
   subfolder,
   onUploaded,
   label,
 }: {
-  kind: BlobUploadKind;
-  /** Carpeta lógica bajo `marketing/` (auditable en el storage). */
+  kind: UploadKind;
   subfolder: string;
-  onUploaded: (url: string) => void;
+  onUploaded: (publicPath: string) => void;
   label?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -35,22 +29,19 @@ export function BlobUploadButton({
     setPending(true);
     setMessage(null);
 
-    const pathname = `marketing/${subfolder}/${Date.now()}-${safeFilename(file.name)}`;
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("kind", kind);
+    fd.append("subfolder", subfolder);
 
-    try {
-      const result = await upload(pathname, file, {
-        access: "public",
-        handleUploadUrl: "/api/admin/blob-upload",
-        clientPayload: JSON.stringify({ kind }),
-        multipart: file.size > 4 * 1024 * 1024,
-      });
-      onUploaded(result.url);
-      setMessage("OK");
-    } catch (err) {
-      const text = err instanceof Error ? err.message : "Error al subir";
-      setMessage(text);
-    } finally {
-      setPending(false);
+    const res = await uploadSiteAsset(fd);
+    setPending(false);
+
+    if (res.ok) {
+      onUploaded(res.publicPath);
+      setMessage("Guardado en Git");
+    } else {
+      setMessage(res.error);
     }
   }
 
@@ -65,10 +56,14 @@ export function BlobUploadButton({
         onClick={() => inputRef.current?.click()}
         className="rounded-sm border border-brand-border bg-brand-surface px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-accent transition hover:border-brand-accent hover:bg-brand-accent/10 disabled:opacity-45"
       >
-        {pending ? "Subiendo…" : label ?? (kind === "pdf" ? "Subir PDF" : "Subir imagen")}
+        {pending ? "Subiendo…" : label ?? (kind === "pdf" ? "Subir PDF (Git)" : "Subir imagen (Git)")}
       </button>
       {message ? (
-        <span className={`text-[11px] ${message === "OK" ? "text-brand-muted" : "text-brand-accent-strong"}`}>{message}</span>
+        <span
+          className={`max-w-[220px] text-[11px] leading-snug ${message.startsWith("Guardado") ? "text-brand-muted" : "text-brand-accent-strong"}`}
+        >
+          {message}
+        </span>
       ) : null}
     </div>
   );

@@ -10,7 +10,6 @@
     "generate-favicon": "node scripts/generate-favicon.mjs"
   },
   "dependencies": {
-    "@vercel/blob": "^2.3.3",
     "jose": "^6.2.3",
     "next": "16.2.4",
     "react": "19.2.4",

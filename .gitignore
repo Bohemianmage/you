@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Uploads reflejados en disco local (el origen es el commit en GitHub)
+/public/site-uploads/*
+!/public/site-uploads/.gitkeep

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { saveSiteContent } from "@/app/actions/site-content";
-import { BlobUploadButton } from "@/components/admin/BlobUploadButton";
+import { SiteAssetUploadButton } from "@/components/admin/SiteAssetUploadButton";
 import type { CatalogProperty } from "@/data/catalog-properties";
 import type { DownloadableItem } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
@@ -324,7 +324,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       placeholder="/team/ejemplo.jpg"
                       className={inputClass}
                     />
-                    <BlobUploadButton kind="image" subfolder="team" onUploaded={(url) => updateTeam(i, { imageSrc: url })} />
+                    <SiteAssetUploadButton kind="image" subfolder="team" onUploaded={(url) => updateTeam(i, { imageSrc: url })} />
                   </label>
                   <label className={labelClass}>
                     Facebook URL
@@ -468,7 +468,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       onChange={(e) => updateFeatured(idx, { imageSrc: e.target.value || undefined })}
                       className={inputClass}
                     />
-                    <BlobUploadButton kind="image" subfolder="featured" onUploaded={(url) => updateFeatured(idx, { imageSrc: url })} />
+                    <SiteAssetUploadButton kind="image" subfolder="featured" onUploaded={(url) => updateFeatured(idx, { imageSrc: url })} />
                   </label>
                 </div>
               </li>
@@ -553,7 +553,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       onChange={(e) => updateCatalog(idx, { imageSrc: e.target.value || undefined })}
                       className={inputClass}
                     />
-                    <BlobUploadButton kind="image" subfolder="catalog" onUploaded={(url) => updateCatalog(idx, { imageSrc: url })} />
+                    <SiteAssetUploadButton kind="image" subfolder="catalog" onUploaded={(url) => updateCatalog(idx, { imageSrc: url })} />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
                     Tour URL (opcional)
@@ -588,9 +588,10 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
             </button>
           </div>
           <p className="text-sm text-brand-muted">
-            <strong className="text-brand-text">Subida:</strong> usá &quot;Subir PDF&quot; / &quot;Subir imagen&quot; (Vercel Blob, requiere{" "}
-            <code className="text-xs">BLOB_READ_WRITE_TOKEN</code> en el servidor). También podés pegar una URL o ruta bajo{" "}
-            <code className="text-xs">/public</code>.
+            <strong className="text-brand-text">Subida:</strong> los archivos van al repositorio Git (misma configuración{" "}
+            <code className="text-xs">GITHUB_TOKEN</code> / <code className="text-xs">GITHUB_REPO</code> que el JSON del sitio). Tras subir,
+            hace falta un nuevo deploy para que queden servidos bajo <code className="text-xs">/site-uploads/…</code>. También podés pegar una
+            ruta estática existente.
           </p>
           <ul className="space-y-8">
             {downloadList.map((item, idx) => (
@@ -627,7 +628,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       placeholder="/docs/brochure.pdf"
                       className={inputClass}
                     />
-                    <BlobUploadButton kind="pdf" subfolder="downloadables" onUploaded={(url) => updateDownloadable(idx, { fileUrl: url })} />
+                    <SiteAssetUploadButton kind="pdf" subfolder="downloadables" onUploaded={(url) => updateDownloadable(idx, { fileUrl: url })} />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
                     Imagen tarjeta (opcional)
@@ -637,7 +638,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       onChange={(e) => updateDownloadable(idx, { imageSrc: e.target.value || undefined })}
                       className={inputClass}
                     />
-                    <BlobUploadButton
+                    <SiteAssetUploadButton
                       kind="image"
                       subfolder="downloadables"
                       label="Subir miniatura"
