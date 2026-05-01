@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 
 import { iconClasses } from "@/components/icons/SocialIcons";
 import { LangSwitcher, LangSwitcherFallback } from "@/components/layout/LangSwitcher";
+import { MARKETING_MOBILE_MENU_HOST_ID } from "@/constants/marketing-mobile-menu-host";
 import { MARKETING_SOCIAL_LINKS } from "@/constants/marketing-social";
 import { homePath } from "@/i18n/home";
 import type { NavItem } from "@/i18n/home";
@@ -32,13 +33,14 @@ function scrollToSectionHash(hash: string) {
 }
 
 /**
- * Sticky header — pill nav en desktop, drawer en móvil; barra sin blur para que el contenido detrás se lea claro.
- * Scroll espaciado en anclas del home, estado activo por ruta/sección y panel móvil animado.
+ * Sticky header — pill nav en desktop, drawer en móvil; barra sin blur.
+ * El overlay móvil se monta en `#marketing-mobile-menu-host` (solo bajo la barra): ahí sí hay blur/dim;
+ * el navbar queda fuera para poder usar hamburguesa/X, idioma y logo.
  */
 export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileNavMounted, setMobileNavMounted] = useState(false);
+  const [mobileOverlayRoot, setMobileOverlayRoot] = useState<HTMLElement | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
   /** Altura real del navbar (px) para anclar el panel móvil justo debajo, sin solaparlo. */
@@ -117,9 +119,10 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     };
   }, [mobileOpen]);
 
-  useEffect(() => {
-    setMobileNavMounted(true);
-  }, []);
+  useLayoutEffect(() => {
+    const el = document.getElementById(MARKETING_MOBILE_MENU_HOST_ID);
+    setMobileOverlayRoot(el ?? document.body);
+  }, [pathname]);
 
   function handleInPageNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
     if (typeof window === "undefined") return;
@@ -169,7 +172,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const mobileNavPanel = (
     <div
       id="mobile-nav-panel"
-      className={`fixed inset-0 z-[200] lg:hidden ${mobileOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+      className={`absolute inset-0 z-[30] lg:hidden ${mobileOpen ? "pointer-events-auto" : "pointer-events-none"}`}
       aria-hidden={!mobileOpen}
     >
       <button
@@ -245,9 +248,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     <>
       <header
         ref={headerRef}
-        className={`sticky top-0 border-b border-brand-border/70 bg-brand-bg/90 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] ${
-          mobileOpen ? "z-[201]" : "z-50"
-        }`}
+        className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/90 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)]"
       >
       <div className="relative mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-1 sm:px-5 lg:gap-5 lg:px-6 xl:max-w-5xl">
         <Link
@@ -342,7 +343,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
       </div>
 
       </header>
-      {mobileNavMounted ? createPortal(mobileNavPanel, document.body) : null}
+      {mobileOverlayRoot ? createPortal(mobileNavPanel, mobileOverlayRoot) : null}
     </>
   );
 }
