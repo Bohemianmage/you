@@ -105,6 +105,8 @@ export const siteContentFileSchema = z
         addressLine: z.string().optional(),
         phoneDisplay: z.string().optional(),
         phoneHref: z.string().optional(),
+        emailDisplay: z.string().optional(),
+        emailHref: z.string().optional(),
       })
       .optional(),
     footerTagline: z

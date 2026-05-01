@@ -35,6 +35,12 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
                 {contact.phoneDisplay}
               </a>
             </p>
+            <p className="text-sm text-brand-muted">
+              {footerCopy.emailLabel}{" "}
+              <a href={contact.emailHref} className={TEXT_LINK_INLINE}>
+                {contact.emailDisplay}
+              </a>
+            </p>
             <div className="flex flex-wrap gap-2 pt-1">
               {MARKETING_SOCIAL_LINKS.map(({ label, href, Icon }) => (
                 <a

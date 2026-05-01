@@ -84,6 +84,7 @@ export interface HomeCopy {
   footer: {
     tagline: string;
     phoneLabel: string;
+    emailLabel: string;
     copyright: string;
     proposalLinkLabel: string;
   };
@@ -197,6 +198,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     footer: {
       tagline: "Empieza a escribir una nueva historia con nosotros.",
       phoneLabel: "Tel.",
+      emailLabel: "Correo",
       copyright: "Todos los derechos reservados.",
       proposalLinkLabel: "Nuestra propuesta",
     },
@@ -282,6 +284,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     footer: {
       tagline: "Start writing a new story with us.",
       phoneLabel: "Phone",
+      emailLabel: "Email",
       copyright: "All rights reserved.",
       proposalLinkLabel: "Our proposal",
     },

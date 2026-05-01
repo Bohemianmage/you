@@ -6,6 +6,8 @@ export type SiteSettingsPayload = {
     addressLine: string;
     phoneDisplay: string;
     phoneHref: string;
+    emailDisplay: string;
+    emailHref: string;
   }>;
   footerTagline?: Partial<Record<Locale, string>>;
   heroAnnouncement?: Partial<Record<Locale, string>>;

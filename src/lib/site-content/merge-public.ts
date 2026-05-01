@@ -19,6 +19,8 @@ export function mergeSiteContact(file: SiteContentFile): SiteContact {
     addressLine: file.contact?.addressLine ?? SITE_CONTACT.addressLine,
     phoneDisplay: file.contact?.phoneDisplay ?? SITE_CONTACT.phoneDisplay,
     phoneHref: file.contact?.phoneHref ?? SITE_CONTACT.phoneHref,
+    emailDisplay: file.contact?.emailDisplay ?? SITE_CONTACT.emailDisplay,
+    emailHref: file.contact?.emailHref ?? SITE_CONTACT.emailHref,
   };
 }
 

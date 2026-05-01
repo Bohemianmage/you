@@ -50,6 +50,8 @@ export function AdminEditDrawer() {
         addressLine: m.addressLine,
         phoneDisplay: m.phoneDisplay,
         phoneHref: m.phoneHref,
+        emailDisplay: m.emailDisplay,
+        emailHref: m.emailHref,
       });
       return;
     }
@@ -101,6 +103,8 @@ export function AdminEditDrawer() {
           addressLine: draft.addressLine ?? "",
           phoneDisplay: draft.phoneDisplay ?? "",
           phoneHref: draft.phoneHref ?? "",
+          emailDisplay: draft.emailDisplay ?? "",
+          emailHref: draft.emailHref ?? "",
         },
       }));
       edit.closeDrawer();
@@ -138,6 +142,18 @@ export function AdminEditDrawer() {
 
       hl[locale] = curLoc;
       next.homeCopyByLocale = hl as SiteContentFile["homeCopyByLocale"];
+
+      if (active === "footer") {
+        next.contact = {
+          ...next.contact,
+          addressLine: draft.addressLine ?? "",
+          phoneDisplay: draft.phoneDisplay ?? "",
+          phoneHref: draft.phoneHref ?? "",
+          emailDisplay: draft.emailDisplay ?? "",
+          emailHref: draft.emailHref ?? "",
+        };
+      }
+
       return next;
     });
     edit.closeDrawer();
@@ -167,7 +183,7 @@ export function AdminEditDrawer() {
           {active === "contact" ? (
             <>
               <p className="text-sm leading-relaxed text-brand-muted">
-                Dirección y teléfono del pie en todas las páginas. El bloque de contacto del inicio usa los mismos datos.
+                Dirección, teléfono y correo del pie en todas las páginas. El bloque de contacto del inicio usa los mismos datos.
               </p>
               <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
                 Dirección
@@ -265,6 +281,26 @@ export function AdminEditDrawer() {
                       value={draft.phoneHref ?? ""}
                       onChange={(e) => setDraft((d) => ({ ...d, phoneHref: e.target.value }))}
                       placeholder={SITE_CONTACT.phoneHref}
+                      className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
+                    />
+                  </label>
+                  <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
+                    Correo (visible)
+                    <input
+                      type="text"
+                      value={draft.emailDisplay ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, emailDisplay: e.target.value }))}
+                      placeholder={SITE_CONTACT.emailDisplay}
+                      className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
+                    />
+                  </label>
+                  <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
+                    Enlace (mailto:…)
+                    <input
+                      type="text"
+                      value={draft.emailHref ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, emailHref: e.target.value }))}
+                      placeholder={SITE_CONTACT.emailHref}
                       className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
                     />
                   </label>

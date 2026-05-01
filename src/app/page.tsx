@@ -2,7 +2,7 @@ import { HomePageContent } from "@/components/home/HomePageContent";
 import { MarketingPageFrame } from "@/components/layout/MarketingPageFrame";
 import { localeQuery } from "@/i18n/home";
 import { resolveMarketingLocale } from "@/lib/marketing-locale";
-import { distinctCatalogZoneFilterKeys } from "@/lib/catalog-zone-filter";
+import { distinctLandingCatalogZones } from "@/lib/catalog-zone-filter";
 import {
   getMergedCatalog,
   getMergedClientLogos,
@@ -31,7 +31,7 @@ export default async function Home({ searchParams }: HomePageProps) {
       getMergedClientLogos(),
       getMergedCatalog(locale),
     ]);
-  const catalogZones = distinctCatalogZoneFilterKeys(catalog, locale === "en" ? "en" : "es");
+  const catalogZones = distinctLandingCatalogZones(catalog, locale === "en" ? "en" : "es", 5);
   const q = localeQuery(locale);
   const catalogHref = `/propiedades${q}`;
   const contactHref = `/contacto${q}`;
