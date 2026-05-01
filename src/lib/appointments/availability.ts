@@ -1,12 +1,21 @@
 import "server-only";
 
+import type { SiteContentFile } from "@/lib/site-content/types";
+
 import { bookingSlotMinutes } from "./config";
-import { filterSlotsByBusy, generateCandidateSlots, type BusyInterval } from "./slots";
+import { filterSlotsByBusy, generateCandidateSlots, isWeekendInBookingTz, type BusyInterval } from "./slots";
 import { listAdvisorAppointmentsBetween } from "./store";
 
-export async function getAvailableSlotStartsForAdvisor(advisorId: string, now = new Date()): Promise<Date[]> {
+function advisorSkipsWeekends(file: SiteContentFile, advisorId: string): boolean {
+  return file.advisorNoWeekendAvailability?.includes(advisorId) ?? false;
+}
+
+export async function getAvailableSlotStartsForAdvisor(advisorId: string, file: SiteContentFile, now = new Date()): Promise<Date[]> {
   const slotMs = bookingSlotMinutes() * 60_000;
-  const candidates = generateCandidateSlots(now);
+  let candidates = generateCandidateSlots(now);
+  if (advisorSkipsWeekends(file, advisorId)) {
+    candidates = candidates.filter((d) => !isWeekendInBookingTz(d));
+  }
   const horizonMs = now.getTime() + 86400000 * 62;
   const busyRows = await listAdvisorAppointmentsBetween(advisorId, now.getTime() - slotMs, horizonMs);
   const busy: BusyInterval[] = busyRows.map((a) => ({

@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import type { StoredAppointment } from "@/lib/appointments/types";
+import { resolvedAppointmentStatus } from "@/lib/appointments/types";
 import type { TeamMember } from "@/data/team";
 
 function fmt(iso: string, tz: string): string {
@@ -18,6 +20,19 @@ function fmt(iso: string, tz: string): string {
   }).format(d);
 }
 
+function statusLabel(s: ReturnType<typeof resolvedAppointmentStatus>): string {
+  switch (s) {
+    case "pending":
+      return "Pendiente confirmación";
+    case "confirmed":
+      return "Confirmada";
+    case "rejected":
+      return "Rechazada";
+    default:
+      return s;
+  }
+}
+
 export function AdminCalendarView({
   appointments,
   teamById,
@@ -27,7 +42,10 @@ export function AdminCalendarView({
   teamById: Record<string, TeamMember | undefined>;
   redisConfigured: boolean;
 }) {
+  const router = useRouter();
   const [advisorFilter, setAdvisorFilter] = useState<string>("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [docJson, setDocJson] = useState<string | null>(null);
 
   const advisors = useMemo(() => {
     const ids = new Set<string>();
@@ -42,6 +60,50 @@ export function AdminCalendarView({
 
   const tz = "America/Mexico_City";
 
+  async function confirmVisit(id: string) {
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/admin/appointments/${encodeURIComponent(id)}/confirm`, { method: "POST" });
+      if (!res.ok) {
+        alert("No se pudo confirmar (¿ya estaba confirmada?).");
+        return;
+      }
+      router.refresh();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function rejectVisit(id: string) {
+    if (!confirm("¿Rechazar esta solicitud y liberar el horario?")) return;
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/admin/appointments/${encodeURIComponent(id)}/reject`, { method: "POST" });
+      if (!res.ok) {
+        alert("No se pudo rechazar.");
+        return;
+      }
+      router.refresh();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function loadDocs(id: string) {
+    setBusyId(id);
+    try {
+      const res = await fetch(`/api/admin/appointments/${encodeURIComponent(id)}/documents`);
+      const data = (await res.json()) as { ok?: boolean; payload?: unknown; error?: string };
+      if (!res.ok || !data.ok) {
+        setDocJson(JSON.stringify({ error: data.error ?? "fetch_failed" }, null, 2));
+        return;
+      }
+      setDocJson(JSON.stringify(data.payload ?? null, null, 2));
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   return (
     <div className="mt-8 space-y-6">
       {!redisConfigured ? (
@@ -50,6 +112,18 @@ export function AdminCalendarView({
           <code className="rounded bg-brand-bg px-1">UPSTASH_REDIS_REST_URL</code> y{" "}
           <code className="rounded bg-brand-bg px-1">UPSTASH_REDIS_REST_TOKEN</code>.
         </p>
+      ) : null}
+
+      {docJson ? (
+        <div className="rounded-sm border border-brand-border bg-brand-bg p-4">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">Documentación declarada (descifrada)</p>
+            <button type="button" className="text-xs font-semibold text-brand-accent hover:underline" onClick={() => setDocJson(null)}>
+              Cerrar
+            </button>
+          </div>
+          <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-sm bg-brand-surface/50 p-3 text-xs text-brand-text">{docJson}</pre>
+        </div>
       ) : null}
 
       <div className="flex flex-wrap items-end gap-4">
@@ -69,7 +143,7 @@ export function AdminCalendarView({
           </select>
         </label>
         <p className="text-xs text-brand-muted">
-          {filtered.length} cita{filtered.length === 1 ? "" : "s"} · Horarios en {tz}
+          {filtered.length} registro{filtered.length === 1 ? "" : "s"} · Horarios en {tz}
         </p>
       </div>
 
@@ -80,42 +154,95 @@ export function AdminCalendarView({
           <table className="min-w-full divide-y divide-brand-border text-sm">
             <thead className="bg-brand-surface/80">
               <tr>
+                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Estado</th>
                 <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Inicio</th>
                 <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Asesor</th>
                 <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Propiedad</th>
                 <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Cliente</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Acciones</th>
                 <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Recordatorio</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-brand-border bg-brand-bg">
-              {filtered.map((a) => (
-                <tr key={a.id} className="align-top">
-                  <td className="whitespace-nowrap px-4 py-3 font-medium text-brand-text">{fmt(a.startIso, tz)}</td>
-                  <td className="px-4 py-3 text-brand-text">{teamById[a.advisorId]?.name ?? a.advisorId}</td>
-                  <td className="max-w-[280px] px-4 py-3">
-                    <span className="line-clamp-2 font-medium text-brand-text">{a.propertyTitle}</span>
-                    <span className="mt-1 block truncate text-xs text-brand-muted">{a.catalogPropertyId}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-brand-text">{a.guestName}</div>
-                    <a href={`mailto:${encodeURIComponent(a.guestEmail)}`} className="text-xs text-brand-accent hover:underline">
-                      {a.guestEmail}
-                    </a>
-                    {a.guestPhone.trim() ? <div className="text-xs text-brand-muted">{a.guestPhone}</div> : null}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-xs text-brand-muted">
-                    {a.reminderSentAt ? `Enviado ${fmt(new Date(a.reminderSentAt).toISOString(), tz)}` : "Pendiente"}
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((a) => {
+                const st = resolvedAppointmentStatus(a);
+                const pending = st === "pending";
+                return (
+                  <tr key={a.id} className="align-top">
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] ${
+                          pending ? "bg-amber-500/15 text-amber-900" : st === "confirmed" ? "bg-emerald-500/15 text-emerald-900" : "bg-brand-border/40 text-brand-muted"
+                        }`}
+                      >
+                        {statusLabel(st)}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 font-medium text-brand-text">{fmt(a.startIso, tz)}</td>
+                    <td className="px-4 py-3 text-brand-text">{teamById[a.advisorId]?.name ?? a.advisorId}</td>
+                    <td className="max-w-[220px] px-4 py-3">
+                      <span className="line-clamp-2 font-medium text-brand-text">{a.propertyTitle}</span>
+                      <span className="mt-1 block truncate text-xs text-brand-muted">{a.catalogPropertyId}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-brand-text">{a.guestName}</div>
+                      <a href={`mailto:${encodeURIComponent(a.guestEmail)}`} className="text-xs text-brand-accent hover:underline">
+                        {a.guestEmail}
+                      </a>
+                      {a.guestPhone.trim() ? <div className="text-xs text-brand-muted">{a.guestPhone}</div> : null}
+                    </td>
+                    <td className="min-w-[140px] px-4 py-3">
+                      <div className="flex flex-col gap-2">
+                        {pending ? (
+                          <>
+                            <button
+                              type="button"
+                              disabled={busyId === a.id}
+                              className="rounded-sm bg-brand-accent px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-brand-white disabled:opacity-40"
+                              onClick={() => void confirmVisit(a.id)}
+                            >
+                              Confirmar
+                            </button>
+                            <button
+                              type="button"
+                              disabled={busyId === a.id}
+                              className="rounded-sm border border-brand-border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-brand-muted hover:border-brand-accent"
+                              onClick={() => void rejectVisit(a.id)}
+                            >
+                              Rechazar
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-xs text-brand-muted">—</span>
+                        )}
+                        <button
+                          type="button"
+                          disabled={busyId === a.id}
+                          className="text-left text-[10px] font-bold uppercase tracking-[0.1em] text-brand-accent hover:underline disabled:opacity-40"
+                          onClick={() => void loadDocs(a.id)}
+                        >
+                          Ver docs.
+                        </button>
+                      </div>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-xs text-brand-muted">
+                      {st !== "confirmed"
+                        ? "—"
+                        : a.reminderSentAt
+                          ? `Enviado ${fmt(new Date(a.reminderSentAt).toISOString(), tz)}`
+                          : "Pendiente"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
 
       <p className="text-xs leading-relaxed text-brand-muted">
-        Los recordatorios al asesor se envían por correo unas ~24 h antes de cada cita si configuraste{" "}
-        <code className="rounded bg-brand-surface px-1">CRON_SECRET</code>, cron en Vercel y correo del asesor en Equipo.
+        Las solicitudes entran en estado pendiente hasta que confirmás o rechazás en esta tabla. Al confirmar, el cliente recibe el correo de cita confirmada. Los recordatorios ~24 h solo aplican a citas confirmadas (cron +{" "}
+        <code className="rounded bg-brand-surface px-1">CRON_SECRET</code>).
       </p>
     </div>
   );

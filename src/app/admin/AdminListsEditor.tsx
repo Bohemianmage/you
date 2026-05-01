@@ -66,6 +66,11 @@ function normalizeAdvisorMap(map: Record<string, string>, catalog: readonly Cata
   return out;
 }
 
+function normalizeAdvisorNoWeekend(ids: readonly string[], teamList: readonly TeamMember[]): string[] {
+  const teamIds = new Set(teamList.map((m) => m.id));
+  return [...new Set(ids.filter((id) => teamIds.has(id)))].sort();
+}
+
 const tabBtn =
   "rounded-sm border px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition-all duration-200 ease-out motion-reduce:transition-none";
 const tabActive = "border-brand-accent bg-brand-accent/15 text-brand-accent-strong";
@@ -101,6 +106,9 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
   const [dragDlIdx, setDragDlIdx] = useState<number | null>(null);
 
   const [advisorMap, setAdvisorMap] = useState<Record<string, string>>(() => ({ ...seed.propertyAdvisorByCatalogId }));
+  const [advisorNoWeekendIds, setAdvisorNoWeekendIds] = useState<string[]>(() =>
+    [...seed.advisorNoWeekendAvailability].filter(Boolean).sort(),
+  );
   const [advisorSearch, setAdvisorSearch] = useState("");
 
   const [expandedRows, setExpandedRows] = useState<Set<string>>(() => new Set());
@@ -121,11 +129,13 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
     }
     const normalizedFeatured = normalizeFeaturedIds(featuredCatalogIds, catalog);
     const normalizedAdvisors = normalizeAdvisorMap(advisorMap, catalog);
+    const normalizedNoWeekend = normalizeAdvisorNoWeekend(advisorNoWeekendIds, team);
     const sig = JSON.stringify({
       team,
       featuredCatalogIds: normalizedFeatured,
       downloadablesByLocale: { es: downloadablesEs, en: downloadablesEn },
       propertyAdvisorByCatalogId: normalizedAdvisors,
+      advisorNoWeekendAvailability: normalizedNoWeekend,
     });
     if (baselineSigRef.current === null) {
       baselineSigRef.current = sig;
@@ -145,10 +155,15 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
       } else {
         delete next.propertyAdvisorByCatalogId;
       }
+      if (normalizedNoWeekend.length > 0) {
+        next.advisorNoWeekendAvailability = normalizedNoWeekend;
+      } else {
+        delete next.advisorNoWeekendAvailability;
+      }
       return next;
     });
     baselineSigRef.current = sig;
-  }, [edit, team, featuredCatalogIds, catalog, downloadablesEs, downloadablesEn, advisorMap]);
+  }, [edit, team, featuredCatalogIds, catalog, downloadablesEs, downloadablesEn, advisorMap, advisorNoWeekendIds]);
 
   function updateTeam(i: number, patch: Partial<TeamMember>) {
     setTeam((prev) => prev.map((m, j) => (j === i ? { ...m, ...patch } : m)));
@@ -514,6 +529,44 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
               </li>
             ))}
           </ul>
+
+          <div className="rounded-sm border border-brand-border/80 bg-brand-bg px-4 py-5">
+            <h3 className="font-heading text-sm font-semibold text-brand-text">Fin de semana (agenda)</h3>
+            <p className="mt-2 text-xs leading-relaxed text-brand-muted">
+              Por defecto los horarios incluyen sábado y domingo. Desmarca a quien solo atiende entre semana.
+            </p>
+            <ul className="mt-4 space-y-3">
+              {team.map((m) => {
+                const skipped = advisorNoWeekendIds.includes(m.id);
+                return (
+                  <li key={m.id}>
+                    <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 size-4 shrink-0 rounded border-brand-border text-brand-accent focus:ring-brand-accent"
+                        checked={!skipped}
+                        onChange={(e) => {
+                          const offersWeekend = e.target.checked;
+                          setAdvisorNoWeekendIds((prev) => {
+                            const set = new Set(prev);
+                            if (offersWeekend) set.delete(m.id);
+                            else set.add(m.id);
+                            return [...set].sort();
+                          });
+                        }}
+                      />
+                      <span>
+                        <span className="font-medium">{m.name.trim() || m.id}</span>
+                        <span className="mt-0.5 block text-[11px] text-brand-muted">
+                          {skipped ? "Solo lun–vie" : "Incluye sábados y domingos"}
+                        </span>
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       ) : null}
 

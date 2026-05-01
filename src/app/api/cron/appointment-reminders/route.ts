@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { sendAdvisorReminderEmail } from "@/lib/appointments/email";
-import { listAppointmentsInRange, markReminderSent } from "@/lib/appointments/store";
+import { effectiveStatus, listAppointmentsInRange, markReminderSent } from "@/lib/appointments/store";
 import { mergeTeamFromFile } from "@/lib/site-content/merge-public";
 import { getCachedSiteContent } from "@/lib/site-settings/load";
 
@@ -29,6 +29,7 @@ export async function GET(req: Request) {
 
   let remindersSent = 0;
   for (const appt of upcoming) {
+    if (effectiveStatus(appt) !== "confirmed") continue;
     if (appt.reminderSentAt) continue;
 
     const start = Date.parse(appt.startIso);

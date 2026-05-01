@@ -24,8 +24,10 @@ export default async function AdminCalendarioPage() {
         <div>
           <h1 className="font-heading text-2xl font-semibold text-brand-text">Calendario de citas</h1>
           <p className="mt-2 max-w-2xl text-sm text-brand-muted">
-            Visitas agendadas desde las fichas de propiedades. Cada cita queda ligada al asesor asignado en{" "}
-            <strong className="text-brand-text">Listas → Asesores</strong>. Correos con{" "}
+            Solicitudes y citas desde las fichas. El asesor debe <strong className="text-brand-text">confirmar manualmente</strong> cada solicitud; la documentación declarada se guarda{" "}
+            <strong className="text-brand-text">cifrada</strong> en Redis con caducidad ~30 días. Configura{" "}
+            <code className="rounded bg-brand-surface px-1 text-xs">BOOKING_DOCS_ENCRYPTION_KEY</code> (32 bytes:{" "}
+            <code className="rounded bg-brand-surface px-1 text-xs">openssl rand -base64 32</code>) además de Redis y{" "}
             <code className="rounded bg-brand-surface px-1 text-xs">RESEND_API_KEY</code>.
           </p>
         </div>

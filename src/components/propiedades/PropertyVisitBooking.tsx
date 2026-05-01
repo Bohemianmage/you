@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { localeQuery } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import { PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
 
@@ -29,12 +31,18 @@ export function PropertyVisitBooking({
   segment: string;
   copy: DetailCopy;
 }) {
+  const q = localeQuery(locale);
   const [slotsRes, setSlotsRes] = useState<SlotsOk | SlotsErr | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(true);
   const [pick, setPick] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [docIne, setDocIne] = useState(false);
+  const [docAddress, setDocAddress] = useState(false);
+  const [docIncome, setDocIncome] = useState(false);
+  const [docNotes, setDocNotes] = useState("");
+  const [acceptLegal, setAcceptLegal] = useState(false);
   const [hp, setHp] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -47,12 +55,12 @@ export function PropertyVisitBooking({
     setDone(false);
     setFormErr(null);
     try {
-      const q = new URLSearchParams({
+      const qParams = new URLSearchParams({
         catalogId,
         segment,
         locale,
       });
-      const res = await fetch(`/api/appointments/slots?${q}`, { cache: "no-store" });
+      const res = await fetch(`/api/appointments/slots?${qParams}`, { cache: "no-store" });
       const data = (await res.json()) as SlotsOk | SlotsErr;
       if (!data || typeof data !== "object" || !("ok" in data)) {
         setSlotsRes({ ok: false, code: "bad_response" });
@@ -77,6 +85,8 @@ export function PropertyVisitBooking({
         return copy.bookingUnavailableNoAdvisor;
       case "redis_off":
         return copy.bookingUnavailableNoRedis;
+      case "docs_encryption_off":
+        return copy.bookingUnavailableNoEncryption;
       case "no_email":
         return copy.bookingUnavailableAdvisorEmail;
       case "unknown_property":
@@ -94,6 +104,14 @@ export function PropertyVisitBooking({
       setFormErr(copy.bookingErrValidation);
       return;
     }
+    if (!docIne && !docAddress && !docIncome) {
+      setFormErr(copy.bookingErrDocsPickOne);
+      return;
+    }
+    if (!acceptLegal) {
+      setFormErr(copy.bookingErrLegalAccept);
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/appointments/book", {
@@ -107,6 +125,11 @@ export function PropertyVisitBooking({
           guestEmail: email.trim(),
           guestPhone: phone.trim(),
           locale,
+          docIne,
+          docProofAddress: docAddress,
+          docProofIncome: docIncome,
+          docNotes: docNotes.trim(),
+          acceptTerms: true as const,
         }),
       });
       const data = (await res.json()) as { ok?: boolean; code?: string };
@@ -114,6 +137,10 @@ export function PropertyVisitBooking({
         if (data.code === "slot_taken" || data.code === "slot_unavailable") {
           setFormErr(copy.bookingErrConflict);
           await fetchSlots();
+        } else if (data.code === "docs_required") {
+          setFormErr(copy.bookingErrDocsPickOne);
+        } else if (data.code === "validation") {
+          setFormErr(copy.bookingErrLegalAccept);
         } else {
           setFormErr(copy.bookingErrServer);
         }
@@ -124,6 +151,11 @@ export function PropertyVisitBooking({
       setName("");
       setEmail("");
       setPhone("");
+      setDocIne(false);
+      setDocAddress(false);
+      setDocIncome(false);
+      setDocNotes("");
+      setAcceptLegal(false);
       await fetchSlots();
     } catch {
       setFormErr(copy.bookingErrServer);
@@ -159,6 +191,9 @@ export function PropertyVisitBooking({
     );
   }
 
+  const checkboxClass =
+    "mt-1 size-4 shrink-0 rounded border-brand-border text-brand-accent focus:ring-brand-accent";
+
   return (
     <section className="rounded-sm border border-brand-border bg-brand-surface/40 p-6 shadow-sm" aria-labelledby="booking-visita-heading">
       <h2 id="booking-visita-heading" className="font-heading text-lg font-semibold text-brand-text">
@@ -172,7 +207,7 @@ export function PropertyVisitBooking({
 
       {done ? (
         <p className="mt-4 rounded-sm border border-brand-accent/30 bg-brand-accent/10 px-4 py-3 text-sm font-medium text-brand-accent-strong">
-          {copy.bookingConfirmed}
+          {copy.bookingPendingNotice}
         </p>
       ) : null}
 
@@ -209,6 +244,41 @@ export function PropertyVisitBooking({
           </div>
         </div>
 
+        <div className="rounded-sm border border-brand-border/70 bg-brand-bg/60 px-4 py-4">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingDocHeading}</p>
+          <p className="mt-2 text-xs leading-relaxed text-brand-muted">{copy.bookingDocLead}</p>
+          <ul className="mt-4 space-y-3">
+            <li>
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
+                <input type="checkbox" checked={docIne} onChange={(e) => setDocIne(e.target.checked)} className={checkboxClass} />
+                <span>{copy.bookingDocIne}</span>
+              </label>
+            </li>
+            <li>
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
+                <input type="checkbox" checked={docAddress} onChange={(e) => setDocAddress(e.target.checked)} className={checkboxClass} />
+                <span>{copy.bookingDocAddressProof}</span>
+              </label>
+            </li>
+            <li>
+              <label className="flex cursor-pointer items-start gap-3 text-sm text-brand-text">
+                <input type="checkbox" checked={docIncome} onChange={(e) => setDocIncome(e.target.checked)} className={checkboxClass} />
+                <span>{copy.bookingDocIncomeProof}</span>
+              </label>
+            </li>
+          </ul>
+          <label className="mt-4 block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">
+            {copy.bookingDocNotesLabel}
+            <textarea
+              value={docNotes}
+              onChange={(e) => setDocNotes(e.target.value)}
+              rows={3}
+              placeholder={copy.bookingDocNotesPlaceholder}
+              className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text outline-none ring-brand-accent focus:border-brand-accent focus:ring-1"
+            />
+          </label>
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">
             {copy.bookingNameLabel}
@@ -243,6 +313,21 @@ export function PropertyVisitBooking({
             />
           </label>
         </div>
+
+        <label className="flex cursor-pointer items-start gap-3 text-sm leading-snug text-brand-text">
+          <input type="checkbox" checked={acceptLegal} onChange={(e) => setAcceptLegal(e.target.checked)} className={checkboxClass} />
+          <span>
+            {copy.bookingLegalIntro}{" "}
+            <Link href={`/terminos${q}`} className="font-semibold text-brand-accent underline-offset-2 hover:underline">
+              {copy.bookingLegalTermsLink}
+            </Link>{" "}
+            {copy.bookingLegalMid}{" "}
+            <Link href={`/privacidad${q}`} className="font-semibold text-brand-accent underline-offset-2 hover:underline">
+              {copy.bookingLegalPrivacyLink}
+            </Link>
+            .
+          </span>
+        </label>
 
         {formErr ? <p className="text-sm font-medium text-brand-accent-strong">{formErr}</p> : null}
 

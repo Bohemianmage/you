@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { findCatalogPropertyBySegment } from "@/lib/property-routes";
+import { bookingDocsEncryptionConfigured } from "@/lib/appointments/doc-vault";
 import { appointmentsRedisConfigured } from "@/lib/appointments/store";
 import { getAvailableSlotStartsForAdvisor } from "@/lib/appointments/availability";
 import { resolveAdvisorForCatalogProperty } from "@/lib/appointments/resolve-advisor";
@@ -23,6 +24,10 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false as const, code: "redis_off" });
   }
 
+  if (!bookingDocsEncryptionConfigured()) {
+    return NextResponse.json({ ok: false as const, code: "docs_encryption_off" });
+  }
+
   const file = await getCachedSiteContent();
   const resolved = resolveAdvisorForCatalogProperty(file, catalogId);
   if (!resolved.ok) {
@@ -35,7 +40,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false as const, code: "unknown_property" }, { status: 404 });
   }
 
-  const slots = await getAvailableSlotStartsForAdvisor(resolved.advisor.id);
+  const slots = await getAvailableSlotStartsForAdvisor(resolved.advisor.id, file);
 
   return NextResponse.json({
     ok: true as const,

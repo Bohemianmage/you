@@ -84,6 +84,8 @@ export interface HomeCopy {
     phoneLabel: string;
     copyright: string;
     proposalLinkLabel: string;
+    termsLinkLabel: string;
+    privacyLinkLabel: string;
   };
 }
 
@@ -198,6 +200,8 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       phoneLabel: "Tel.",
       copyright: "Todos los derechos reservados.",
       proposalLinkLabel: "Nuestra propuesta",
+      termsLinkLabel: "Términos y condiciones",
+      privacyLinkLabel: "Aviso de privacidad",
     },
   },
   en: {
@@ -284,6 +288,8 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       phoneLabel: "Phone",
       copyright: "All rights reserved.",
       proposalLinkLabel: "Our proposal",
+      termsLinkLabel: "Terms & conditions",
+      privacyLinkLabel: "Privacy notice",
     },
   },
 };

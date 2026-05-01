@@ -40,4 +40,8 @@ export type SiteContentFile = SiteSettingsPayload & {
    * Solo propiedades con entrada aquí ofrecen agenda en ficha.
    */
   propertyAdvisorByCatalogId?: Record<string, string>;
+  /**
+   * IDs de miembros del equipo que no ofrecen citas en sábado ni domingo (solo entre semana).
+   */
+  advisorNoWeekendAvailability?: string[];
 };

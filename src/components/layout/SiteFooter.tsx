@@ -64,6 +64,18 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
             >
               {footerCopy.proposalLinkLabel}
             </Link>
+            <Link
+              href={`/terminos${localeQuery(locale)}`}
+              className="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-muted no-underline transition hover:text-brand-accent"
+            >
+              {footerCopy.termsLinkLabel}
+            </Link>
+            <Link
+              href={`/privacidad${localeQuery(locale)}`}
+              className="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-muted no-underline transition hover:text-brand-accent"
+            >
+              {footerCopy.privacyLinkLabel}
+            </Link>
             {navItems.map((item) => (
               <Link
                 key={item.href}

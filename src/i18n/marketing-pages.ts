@@ -222,6 +222,21 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingUnavailableAdvisorEmail: string;
     bookingUnavailableNoSlots: string;
     bookingTimezoneNote: string;
+    bookingUnavailableNoEncryption: string;
+    bookingDocHeading: string;
+    bookingDocLead: string;
+    bookingDocIne: string;
+    bookingDocAddressProof: string;
+    bookingDocIncomeProof: string;
+    bookingDocNotesLabel: string;
+    bookingDocNotesPlaceholder: string;
+    bookingLegalIntro: string;
+    bookingLegalTermsLink: string;
+    bookingLegalMid: string;
+    bookingLegalPrivacyLink: string;
+    bookingErrDocsPickOne: string;
+    bookingErrLegalAccept: string;
+    bookingPendingNotice: string;
   }
 > = {
   es: {
@@ -271,15 +286,15 @@ export const PROPERTY_DETAIL_COPY: Record<
     contactFormCta: "Formulario de contacto",
     bookingSectionTitle: "Agendar visita",
     bookingSectionHint:
-      "Elige un horario disponible (hora Ciudad de México). Tu asesor asignado recibirá la solicitud y un recordatorio por correo.",
+      "Elige horario (hora Ciudad de México). El asesor confirmará la visita manualmente; hasta entonces solo tienes solicitud recibida. Si confirma, recibirás correo con detalles.",
     bookingPickSlot: "Horarios disponibles",
     bookingNameLabel: "Nombre completo",
     bookingEmailLabel: "Correo electrónico",
     bookingPhoneLabel: "Teléfono (opcional)",
-    bookingSubmit: "Confirmar cita",
-    bookingWorking: "Agendando…",
+    bookingSubmit: "Enviar solicitud de visita",
+    bookingWorking: "Enviando…",
     bookingConfirmed: "Listo — revisa tu correo para la confirmación.",
-    bookingErrValidation: "Revisa nombre y correo.",
+    bookingErrValidation: "Revisa nombre, correo y la documentación indicada.",
     bookingErrConflict: "Ese horario ya no está disponible. Elige otro.",
     bookingErrServer: "No se pudo agendar. Intenta más tarde o escríbenos por WhatsApp.",
     bookingUnavailableNoAdvisor:
@@ -288,7 +303,24 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingUnavailableAdvisorEmail:
       "Falta correo del asesor en admin (Equipo). Mientras tanto, contáctanos por WhatsApp.",
     bookingUnavailableNoSlots: "No hay horarios libres en las próximas semanas. Escríbenos para coordinar.",
-    bookingTimezoneNote: "Horarios en hora de Ciudad de México.",
+    bookingTimezoneNote: "Hora Ciudad de México; suele haber huecos también sábado y domingo (salvo que el asesor solo atienda entre semana).",
+    bookingUnavailableNoEncryption:
+      "La solicitud de visitas no está configurada en el servidor (falta cifrado de documentación). Contacta al equipo técnico o usa WhatsApp.",
+    bookingDocHeading: "Documentación para la visita",
+    bookingDocLead: "Indica qué podrás presentar el día de la cita. Los datos se guardan cifrados y se eliminan automáticamente a los 30 días.",
+    bookingDocIne: "Identificación oficial vigente (INE / pasaporte)",
+    bookingDocAddressProof: "Comprobante de domicilio reciente",
+    bookingDocIncomeProof: "Comprobante de ingresos o solvencia (según aplique)",
+    bookingDocNotesLabel: "Notas adicionales (opcional)",
+    bookingDocNotesPlaceholder: "Ej. vigencias, formato electrónico, personas que asisten…",
+    bookingLegalIntro: "He leído y acepto los",
+    bookingLegalTermsLink: "términos y condiciones",
+    bookingLegalMid: "y el",
+    bookingLegalPrivacyLink: "aviso de privacidad",
+    bookingErrDocsPickOne: "Selecciona al menos un tipo de documentación que podrás presentar.",
+    bookingErrLegalAccept: "Debes aceptar términos y aviso de privacidad para continuar.",
+    bookingPendingNotice:
+      "Solicitud enviada. Tu asesor debe confirmarla manualmente; cuando lo haga recibirás un correo de confirmación con los detalles.",
   },
   en: {
     interestCta: "I’m interested",
@@ -337,15 +369,15 @@ export const PROPERTY_DETAIL_COPY: Record<
     contactFormCta: "Contact form",
     bookingSectionTitle: "Schedule a visit",
     bookingSectionHint:
-      "Pick an available time (Mexico City time). Your assigned advisor will be notified by email with a reminder before the visit.",
+      "Pick a time (Mexico City). Your advisor confirms visits manually — until then you only have a request receipt. If confirmed, you’ll get details by email.",
     bookingPickSlot: "Available times",
     bookingNameLabel: "Full name",
     bookingEmailLabel: "Email",
     bookingPhoneLabel: "Phone (optional)",
-    bookingSubmit: "Confirm appointment",
-    bookingWorking: "Booking…",
+    bookingSubmit: "Submit visit request",
+    bookingWorking: "Sending…",
     bookingConfirmed: "You’re set — check your inbox for confirmation.",
-    bookingErrValidation: "Please check your name and email.",
+    bookingErrValidation: "Please check your name, email, and documentation selections.",
     bookingErrConflict: "That time was just taken. Please pick another slot.",
     bookingErrServer: "We couldn’t complete booking. Try again later or message us on WhatsApp.",
     bookingUnavailableNoAdvisor:
@@ -354,7 +386,24 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingUnavailableAdvisorEmail:
       "The advisor email isn’t configured yet in admin (Team). Please use WhatsApp for now.",
     bookingUnavailableNoSlots: "No open slots in the coming weeks. Contact us to coordinate.",
-    bookingTimezoneNote: "Times are shown in Mexico City time.",
+    bookingTimezoneNote: "Mexico City time; weekend slots are usually available unless the advisor is weekdays-only.",
+    bookingUnavailableNoEncryption:
+      "Visit requests aren’t configured on the server (document encryption missing). Contact us or use WhatsApp.",
+    bookingDocHeading: "Documentation for your visit",
+    bookingDocLead: "Tell us what you can bring on the day of the visit. Data is stored encrypted and deleted automatically after 30 days.",
+    bookingDocIne: "Government-issued photo ID (INE / passport)",
+    bookingDocAddressProof: "Recent proof of address",
+    bookingDocIncomeProof: "Proof of income or funds (if applicable)",
+    bookingDocNotesLabel: "Additional notes (optional)",
+    bookingDocNotesPlaceholder: "e.g. validity, electronic copies, who attends…",
+    bookingLegalIntro: "I have read and accept the",
+    bookingLegalTermsLink: "terms & conditions",
+    bookingLegalMid: "and the",
+    bookingLegalPrivacyLink: "privacy notice",
+    bookingErrDocsPickOne: "Select at least one document type you can provide.",
+    bookingErrLegalAccept: "Please accept the terms and privacy notice to continue.",
+    bookingPendingNotice:
+      "Request sent. Your advisor must confirm manually — once confirmed you’ll receive an email with the details.",
   },
 };
 

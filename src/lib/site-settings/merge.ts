@@ -112,6 +112,7 @@ export async function getAdminEditorSeed(): Promise<AdminEditorSeed> {
     team: mergeTeamFromFile(file),
     featuredCatalogIds: deriveFeaturedCatalogIdsForAdmin(file, catalog),
     propertyAdvisorByCatalogId: file.propertyAdvisorByCatalogId ? { ...file.propertyAdvisorByCatalogId } : {},
+    advisorNoWeekendAvailability: file.advisorNoWeekendAvailability?.length ? [...file.advisorNoWeekendAvailability] : [],
     catalog,
     downloadablesEs: mergeDownloadablesFromFile("es", file),
     downloadablesEn: mergeDownloadablesFromFile("en", file),

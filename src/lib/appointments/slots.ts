@@ -18,10 +18,10 @@ export function wallCdmxToUtcDate(y: number, mo: number, d: number, hh: number, 
   return new Date(Date.UTC(y, mo - 1, d, hh + 6, mm, 0, 0));
 }
 
-function weekdayMon0ToFri4(d: Date, tz: string): number | null {
+/** Sábado o domingo en la zona de agenda (p. ej. CDMX). */
+export function isWeekendInBookingTz(d: Date, tz: string = BOOKING_TIMEZONE): boolean {
   const w = new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "short" }).format(d);
-  const map: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4 };
-  return map[w] ?? null;
+  return w === "Sat" || w === "Sun";
 }
 
 export type BusyInterval = { startMs: number; endMs: number };
@@ -45,11 +45,10 @@ export function generateCandidateSlots(now: Date, overrides?: Partial<{ daysAhea
 
   for (let i = 0; i < daysAhead; i++) {
     const { y, m, d } = addCalendarDays(y0, m0, d0, i);
-    const noon = wallCdmxToUtcDate(y, m, d, 12, 0);
-    if (weekdayMon0ToFri4(noon, tz) === null) continue;
+    const dayStart = wallCdmxToUtcDate(y, m, d, dayStartHour, 0);
 
     const closeInstant = wallCdmxToUtcDate(y, m, d, dayEndHour, 0).getTime();
-    let cur = wallCdmxToUtcDate(y, m, d, dayStartHour, 0);
+    let cur = dayStart;
     while (true) {
       const slotEnd = cur.getTime() + durationMs;
       if (slotEnd > closeInstant) break;

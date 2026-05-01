@@ -139,6 +139,7 @@ export const siteContentFileSchema = z
       .optional(),
     homeCopyByLocale: z.any().optional(),
     propertyAdvisorByCatalogId: z.record(z.string(), z.string()).optional(),
+    advisorNoWeekendAvailability: z.array(z.string().min(1)).optional(),
   })
   .strict();
 
@@ -275,6 +276,11 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
       ([k, v]) => k.trim().length > 0 && typeof v === "string" && v.trim().length > 0,
     );
     if (entries.length) out.propertyAdvisorByCatalogId = Object.fromEntries(entries);
+  }
+
+  if (input.advisorNoWeekendAvailability !== undefined) {
+    const ids = [...new Set(input.advisorNoWeekendAvailability.map((x) => x.trim()).filter(Boolean))];
+    if (ids.length) out.advisorNoWeekendAvailability = ids;
   }
 
   return out;

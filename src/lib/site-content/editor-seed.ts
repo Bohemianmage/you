@@ -9,6 +9,8 @@ export type AdminEditorSeed = {
   featuredCatalogIds: string[];
   /** ID catálogo EB → ID persona equipo (citas). */
   propertyAdvisorByCatalogId: Record<string, string>;
+  /** Asesores sin huecos sáb/dom (solo lun–vie). */
+  advisorNoWeekendAvailability: string[];
   catalog: CatalogProperty[];
   downloadablesEs: DownloadableItem[];
   downloadablesEn: DownloadableItem[];
