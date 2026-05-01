@@ -25,7 +25,7 @@ const HEADER_SOCIAL = [
   },
 ] as const;
 
-const HOME_SECTION_IDS = ["about", "downloadables"] as const;
+const HOME_SECTION_IDS = ["about"] as const;
 
 interface SiteHeaderProps {
   locale: Locale;
@@ -58,7 +58,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
       return;
     }
 
-    const headerOffset = 112;
+    const headerOffset = 100;
 
     const pickSectionFromScroll = () => {
       let current: string | null = null;
@@ -73,7 +73,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
 
     const syncHash = () => {
       const raw = window.location.hash.replace(/^#/, "");
-      if (raw === "about" || raw === "downloadables") {
+      if (raw === "about") {
         setActiveSectionId(raw);
         return;
       }
@@ -142,7 +142,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   }
 
   const desktopPillBase =
-    "block rounded-full px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] no-underline transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none";
+    "block rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] no-underline transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none";
   const desktopPillActive =
     "scale-[1.02] bg-brand-accent text-brand-white shadow-[0_2px_10px_rgba(97,110,137,0.35)] ring-1 ring-brand-accent/45";
   const desktopPillIdle =
@@ -154,8 +154,8 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const mobileLinkIdle = "hover:bg-brand-surface hover:text-brand-accent-strong";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_8px_30px_-12px_rgba(47,46,46,0.12)] backdrop-blur-md">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:gap-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_6px_24px_-10px_rgba(47,46,46,0.1)] backdrop-blur-md">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-1.5 sm:px-6 lg:gap-5 lg:px-8">
         <Link
           href={homePath(locale)}
           className="group flex shrink-0 items-center font-semibold tracking-tight text-brand-text"
@@ -172,7 +172,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
         </Link>
 
         <nav className="hidden lg:flex lg:flex-1 lg:justify-center" aria-label="Principal">
-          <ul className="flex items-center gap-0.5 rounded-full bg-brand-surface/95 px-1 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-brand-border/55">
+          <ul className="flex items-center gap-0.5 rounded-full bg-brand-surface/95 px-0.5 py-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-brand-border/55">
             {navItems.map((item) => {
               const active = isNavItemActive(item);
               return (
@@ -191,8 +191,8 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="hidden items-center gap-1.5 md:flex">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="hidden items-center gap-1 md:flex">
             {HEADER_SOCIAL.map(({ label, href, Icon }) => (
               <a
                 key={label}
@@ -200,7 +200,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={label}
-                className="group flex h-9 w-9 items-center justify-center rounded-full bg-brand-surface/90 text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white hover:ring-brand-accent"
+                className="group flex h-8 w-8 items-center justify-center rounded-full bg-brand-surface/90 text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white hover:ring-brand-accent"
               >
                 <span className="sr-only">{label}</span>
                 <Icon className={iconClasses()} />
@@ -214,7 +214,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
 
           <button
             type="button"
-            className="flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1 rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text transition-colors duration-200 lg:hidden"
+            className="flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-0.5 rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text transition-colors duration-200 lg:hidden"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav-panel"
             aria-label={

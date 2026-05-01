@@ -106,6 +106,11 @@ export function marketingNav(locale: Locale): NavItem[] {
   ];
 }
 
+/** Navegación del header — sin Descargables (acceso desde hero / footer). */
+export function marketingNavHeader(locale: Locale): NavItem[] {
+  return marketingNav(locale).filter((item) => !item.href.includes("#downloadables"));
+}
+
 export const HOME_COPY: Record<Locale, HomeCopy> = {
   es: {
     hero: {

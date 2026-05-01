@@ -107,7 +107,7 @@ export function AboutSection({ locale, copy, footerCopy, contact, contactHref, t
   return (
     <section
       id="about"
-      className="scroll-mt-[6.5rem] border-b border-brand-border bg-brand-bg py-16 sm:py-24 sm:scroll-mt-28"
+      className="scroll-mt-[6.25rem] border-b border-brand-border bg-brand-bg py-16 sm:py-24 sm:scroll-mt-[6.25rem]"
       aria-labelledby="about-heading"
     >
       <div className="mx-auto max-w-6xl space-y-16 px-4 sm:px-6 lg:px-8">

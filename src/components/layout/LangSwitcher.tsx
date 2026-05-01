@@ -25,7 +25,7 @@ const pillShell =
   "flex items-center rounded-full bg-brand-surface/95 p-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] ring-1 ring-brand-border/55";
 
 const pillSegment =
-  "min-w-[2.25rem] rounded-full px-2.5 py-1.5 text-center text-[11px] font-bold uppercase tracking-[0.14em] no-underline transition";
+  "min-w-[2rem] rounded-full px-2 py-1 text-center text-[10px] font-bold uppercase tracking-[0.14em] no-underline transition";
 
 /** Preserves path + query when switching ES ↔ EN (requires Suspense boundary parent). */
 export function LangSwitcher({ locale }: LangSwitcherProps) {

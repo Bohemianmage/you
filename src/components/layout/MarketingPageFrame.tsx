@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import type { SiteContact } from "@/constants/site-contact";
 import type { HomeCopy } from "@/i18n/home";
-import { HOME_COPY, marketingNav } from "@/i18n/home";
+import { HOME_COPY, marketingNav, marketingNavHeader } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import { mergeHomeCopy, mergeSiteContact } from "@/lib/site-content/merge-public";
 
@@ -46,7 +46,7 @@ export function MarketingPageFrame({
 
   return (
     <LiveSiteContext.Provider value={live}>
-      <SiteHeader locale={locale} navItems={marketingNav(locale)} />
+      <SiteHeader locale={locale} navItems={marketingNavHeader(locale)} />
       <main className="flex-1">{children}</main>
       <SiteFooter navItems={marketingNav(locale)} footerCopy={live.homeCopy.footer} contact={live.contact} />
     </LiveSiteContext.Provider>
