@@ -15,6 +15,10 @@ interface SiteFooterProps {
   contact: SiteContact;
 }
 
+/** Enlaces columna derecha — misma base y hover que el resto de marketing. */
+const FOOTER_ASIDE_LINK =
+  "text-[12px] font-bold uppercase tracking-[0.14em] text-brand-muted no-underline transition-colors hover:text-brand-accent-strong";
+
 /**
  * Pie — tipografía clara, redes y navegación en ritmo de marca.
  */
@@ -26,7 +30,7 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_auto] lg:items-start lg:gap-16">
           <div className="space-y-8">
             <p className="font-heading text-xl font-semibold leading-snug tracking-tight text-brand-text sm:text-2xl">
-              {footerCopy.tagline}
+              {withYouWordmark(footerCopy.tagline)}
             </p>
             <address className="max-w-md not-italic text-sm font-medium leading-relaxed text-brand-muted">{contact.addressLine}</address>
             <p className="text-sm text-brand-muted">
@@ -58,30 +62,17 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
           </div>
 
           <nav className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-10 sm:gap-y-3 lg:flex-col lg:items-end lg:gap-4" aria-label="Pie">
-            <Link
-              href={`/nuestra-propuesta${localeQuery(locale)}`}
-              className="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-text no-underline transition hover:text-brand-accent"
-            >
+            <Link href={`/nuestra-propuesta${localeQuery(locale)}`} className={FOOTER_ASIDE_LINK}>
               {footerCopy.proposalLinkLabel}
             </Link>
-            <Link
-              href={`/terminos${localeQuery(locale)}`}
-              className="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-muted no-underline transition hover:text-brand-accent"
-            >
+            <Link href={`/terminos${localeQuery(locale)}`} className={FOOTER_ASIDE_LINK}>
               {footerCopy.termsLinkLabel}
             </Link>
-            <Link
-              href={`/privacidad${localeQuery(locale)}`}
-              className="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-muted no-underline transition hover:text-brand-accent"
-            >
+            <Link href={`/privacidad${localeQuery(locale)}`} className={FOOTER_ASIDE_LINK}>
               {footerCopy.privacyLinkLabel}
             </Link>
             {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-[12px] font-bold uppercase tracking-[0.14em] text-brand-text no-underline transition hover:text-brand-accent"
-              >
+              <Link key={item.href} href={item.href} className={FOOTER_ASIDE_LINK}>
                 {item.label}
               </Link>
             ))}

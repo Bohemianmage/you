@@ -3,19 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { withYouWordmark } from "@/components/brand/you-wordmark";
-import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import { PropertyImageGallery } from "@/components/propiedades/PropertyImageGallery";
 import { PropertyVisitBooking } from "@/components/propiedades/PropertyVisitBooking";
-import {
-  CATALOG_PAGE_COPY,
-  PROPERTY_DETAIL_COPY,
-  ebOperationPeriodNote,
-  ebOperationTypeLabel,
-} from "@/i18n/marketing-pages";
+import { PROPERTY_DETAIL_COPY, ebOperationPeriodNote, ebOperationTypeLabel } from "@/i18n/marketing-pages";
 import { localeQuery } from "@/i18n/home";
 import { resolveMarketingLocale } from "@/lib/marketing-locale";
-import { inferListingDisplayType } from "@/lib/catalog-filters";
 import { appendContactParams } from "@/lib/contact-url";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import { propertyGalleryImages } from "@/lib/property-media";
@@ -155,19 +148,6 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
 
           <header className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <ListingTypeBadge
-                kind={inferListingDisplayType({
-                  listingType: property.listingType,
-                  status: property.status,
-                  title: property.title,
-                  specs: property.specs,
-                  ebOperations: property.ebOperations,
-                })}
-                labels={{
-                  rent: CATALOG_PAGE_COPY[locale].listingBadgeRent,
-                  sale: CATALOG_PAGE_COPY[locale].listingBadgeSale,
-                }}
-              />
               {property.foreclosure ? <span className={badgeClass}>{copy.badgeForeclosure}</span> : null}
             </div>
             <h1 className="font-heading text-3xl font-semibold tracking-tight text-brand-text sm:text-4xl">{property.title}</h1>

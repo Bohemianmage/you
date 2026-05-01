@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 
 import { iconClasses } from "@/components/icons/SocialIcons";
@@ -37,6 +38,7 @@ function scrollToSectionHash(hash: string) {
 export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileNavMounted, setMobileNavMounted] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
 
   const isHome = pathname === "/";
@@ -98,6 +100,10 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     };
   }, [mobileOpen]);
 
+  useEffect(() => {
+    setMobileNavMounted(true);
+  }, []);
+
   function handleInPageNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
     if (typeof window === "undefined") return;
     const dest = parseNavHref(href);
@@ -143,8 +149,75 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const mobileLinkActive = "bg-brand-accent/12 text-brand-accent-strong ring-1 ring-brand-accent/25";
   const mobileLinkIdle = "hover:bg-brand-surface hover:text-brand-accent-strong";
 
+  const mobileNavPanel = (
+      <div className="fixed inset-0 z-[200] lg:hidden" id="mobile-nav-panel">
+        <button
+          type="button"
+          className="absolute inset-0 bg-brand-text/45 backdrop-blur-[2px]"
+          aria-label={locale === "en" ? "Close menu" : "Cerrar menú"}
+          onClick={() => setMobileOpen(false)}
+        />
+        <div className="absolute inset-x-0 bottom-0 top-0 flex justify-end">
+          <div
+            className="flex h-full w-[min(100%,380px)] flex-col border-l border-brand-border/70 bg-brand-bg shadow-[0_0_48px_rgba(26,30,97,0.12)]"
+            role="dialog"
+            aria-modal="true"
+            aria-label={locale === "en" ? "Main menu" : "Menú principal"}
+          >
+            <div className="flex items-center justify-between border-b border-brand-border/60 px-4 py-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-muted">
+                {locale === "en" ? "Menu" : "Menú"}
+              </span>
+              <button
+                type="button"
+                className="rounded-md border border-brand-border/80 bg-brand-surface px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-text"
+                onClick={() => setMobileOpen(false)}
+              >
+                {locale === "en" ? "Close" : "Cerrar"}
+              </button>
+            </div>
+            <nav className="flex-1 overflow-y-auto px-4 py-4 sm:px-5" aria-label="Principal móvil">
+              <ul className="space-y-1">
+                {navItems.map((item) => {
+                  const active = isNavItemActive(item);
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        scroll={false}
+                        onClick={(e) => handleInPageNavClick(e, item.href)}
+                        aria-current={active ? "page" : undefined}
+                        className={`${mobileLinkBase} ${active ? mobileLinkActive : mobileLinkIdle}`}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-6 flex items-center justify-center gap-3 border-t border-brand-border/60 pt-6">
+                {MARKETING_SOCIAL_LINKS.map(({ label, href, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-surface text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white"
+                    aria-label={label}
+                  >
+                    <Icon className={iconClasses()} />
+                  </a>
+                ))}
+              </div>
+            </nav>
+          </div>
+        </div>
+      </div>
+  );
+
   return (
-    <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] backdrop-blur-md">
+    <>
+      <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] backdrop-blur-md">
       <div className="relative mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-1 sm:px-5 lg:gap-5 lg:px-6 xl:max-w-5xl">
         <Link
           href={homePath(locale)}
@@ -229,71 +302,8 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
         </div>
       </div>
 
-      {mobileOpen ? (
-        <div className="fixed inset-0 z-[100] lg:hidden" id="mobile-nav-panel">
-          <button
-            type="button"
-            className="absolute inset-0 bg-brand-text/45 backdrop-blur-[2px]"
-            aria-label={locale === "en" ? "Close menu" : "Cerrar menú"}
-            onClick={() => setMobileOpen(false)}
-          />
-          <div className="absolute inset-x-0 bottom-0 top-0 flex justify-end">
-            <div
-              className="flex h-full w-[min(100%,380px)] flex-col border-l border-brand-border/70 bg-brand-bg shadow-[0_0_48px_rgba(26,30,97,0.12)]"
-              role="dialog"
-              aria-modal="true"
-              aria-label={locale === "en" ? "Main menu" : "Menú principal"}
-            >
-              <div className="flex items-center justify-between border-b border-brand-border/60 px-4 py-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-muted">
-                  {locale === "en" ? "Menu" : "Menú"}
-                </span>
-                <button
-                  type="button"
-                  className="rounded-md border border-brand-border/80 bg-brand-surface px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-text"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {locale === "en" ? "Close" : "Cerrar"}
-                </button>
-              </div>
-              <nav className="flex-1 overflow-y-auto px-4 py-4 sm:px-5" aria-label="Principal móvil">
-                <ul className="space-y-1">
-                  {navItems.map((item) => {
-                    const active = isNavItemActive(item);
-                    return (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          scroll={false}
-                          onClick={(e) => handleInPageNavClick(e, item.href)}
-                          aria-current={active ? "page" : undefined}
-                          className={`${mobileLinkBase} ${active ? mobileLinkActive : mobileLinkIdle}`}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <div className="mt-6 flex items-center justify-center gap-3 border-t border-brand-border/60 pt-6">
-                  {MARKETING_SOCIAL_LINKS.map(({ label, href, Icon }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-surface text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white"
-                      aria-label={label}
-                    >
-                      <Icon className={iconClasses()} />
-                    </a>
-                  ))}
-                </div>
-              </nav>
-            </div>
-          </div>
-        </div>
-      ) : null}
-    </header>
+      </header>
+      {mobileNavMounted && mobileOpen ? createPortal(mobileNavPanel, document.body) : null}
+    </>
   );
 }

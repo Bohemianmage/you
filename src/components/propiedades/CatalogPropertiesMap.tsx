@@ -13,6 +13,7 @@ type CatalogMapCopy = {
   mapEmpty: string;
   mapError: string;
   mapHint: string;
+  mapLoading: string;
 };
 
 type GeoPoint = { lat: number; lng: number; title: string; segment: string };
@@ -192,7 +193,7 @@ export function CatalogPropertiesMap({
         radius: 8,
         color: "#1a1e61",
         weight: 2,
-        fillColor: "#4f46e5",
+        fillColor: "#55607a",
         fillOpacity: 0.92,
       });
       marker.bindPopup(`<a href="${escapeHtml(href)}" style="font-weight:600">${escapeHtml(pt.title)}</a>`);
@@ -221,8 +222,15 @@ export function CatalogPropertiesMap({
       <div className="relative h-[min(420px,55vh)] min-h-[280px] w-full">
         <div ref={containerRef} className="absolute inset-0 z-0" aria-hidden />
         {status === "loading" ? (
-          <div className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center bg-brand-bg/40 text-sm text-brand-muted">
-            …
+          <div
+            className="pointer-events-none absolute inset-0 z-[1] flex flex-col items-center justify-center gap-4 bg-brand-bg/75 px-6 backdrop-blur-[2px]"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="h-1.5 w-40 rounded-full bg-brand-border">
+              <div className="h-full w-full rounded-full bg-brand-accent-strong/70 motion-safe:animate-pulse" />
+            </div>
+            <p className="text-center text-sm font-medium text-brand-muted">{copy.mapLoading}</p>
           </div>
         ) : null}
         {status === "ready" && points.length === 0 ? (

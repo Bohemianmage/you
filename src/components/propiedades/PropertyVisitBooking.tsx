@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import { localeQuery } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import { PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
@@ -168,7 +169,12 @@ export function PropertyVisitBooking({
     return (
       <section className="rounded-sm border border-brand-border bg-brand-surface/40 p-6 shadow-sm" aria-busy="true">
         <h2 className="font-heading text-lg font-semibold text-brand-text">{copy.bookingSectionTitle}</h2>
-        <p className="mt-3 text-sm text-brand-muted">…</p>
+        <div className="mt-5 flex flex-col items-start gap-3" role="status" aria-live="polite">
+          <div className="h-1.5 w-44 rounded-full bg-brand-border">
+            <div className="h-full w-full rounded-full bg-brand-accent-strong/65 motion-safe:animate-pulse" />
+          </div>
+          <p className="text-sm font-medium text-brand-muted">{copy.bookingLoading}</p>
+        </div>
       </section>
     );
   }
@@ -177,7 +183,9 @@ export function PropertyVisitBooking({
     return (
       <section className="rounded-sm border border-brand-border bg-brand-surface/40 p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold text-brand-text">{copy.bookingSectionTitle}</h2>
-        <p className="mt-3 text-sm leading-relaxed text-brand-muted">{unavailableMessage}</p>
+        <p className="mt-3 text-sm leading-relaxed text-brand-muted">
+          {unavailableMessage ? withYouWordmark(unavailableMessage) : null}
+        </p>
       </section>
     );
   }
@@ -186,7 +194,7 @@ export function PropertyVisitBooking({
     return (
       <section className="rounded-sm border border-brand-border bg-brand-surface/40 p-6 shadow-sm">
         <h2 className="font-heading text-lg font-semibold text-brand-text">{copy.bookingSectionTitle}</h2>
-        <p className="mt-3 text-sm leading-relaxed text-brand-muted">{copy.bookingUnavailableNoSlots}</p>
+        <p className="mt-3 text-sm leading-relaxed text-brand-muted">{withYouWordmark(copy.bookingUnavailableNoSlots)}</p>
       </section>
     );
   }
@@ -200,14 +208,14 @@ export function PropertyVisitBooking({
         {copy.bookingSectionTitle}
       </h2>
       <p className="mt-2 text-xs text-brand-muted">{copy.bookingTimezoneNote}</p>
-      <p className="mt-3 text-sm leading-relaxed text-brand-muted">{copy.bookingSectionHint}</p>
+      <p className="mt-3 text-sm leading-relaxed text-brand-muted">{withYouWordmark(copy.bookingSectionHint)}</p>
       <p className="mt-2 text-xs font-semibold text-brand-text">
         {slotsRes.advisorName ? `${slotsRes.advisorName}` : null}
       </p>
 
       {done ? (
         <p className="mt-4 rounded-sm border border-brand-accent/30 bg-brand-accent/10 px-4 py-3 text-sm font-medium text-brand-accent-strong">
-          {copy.bookingPendingNotice}
+          {withYouWordmark(copy.bookingPendingNotice)}
         </p>
       ) : null}
 

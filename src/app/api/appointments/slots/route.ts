@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import { findCatalogPropertyBySegment } from "@/lib/property-routes";
-import { bookingDocsEncryptionConfigured } from "@/lib/appointments/doc-vault";
 import { appointmentsRedisConfigured } from "@/lib/appointments/store";
 import { getAvailableSlotStartsForAdvisor } from "@/lib/appointments/availability";
 import { resolveAdvisorForCatalogProperty } from "@/lib/appointments/resolve-advisor";
@@ -22,10 +21,6 @@ export async function GET(req: Request) {
 
   if (!appointmentsRedisConfigured()) {
     return NextResponse.json({ ok: false as const, code: "redis_off" });
-  }
-
-  if (!bookingDocsEncryptionConfigured()) {
-    return NextResponse.json({ ok: false as const, code: "docs_encryption_off" });
   }
 
   const file = await getCachedSiteContent();

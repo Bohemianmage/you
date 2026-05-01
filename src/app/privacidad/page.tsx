@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import { LEGAL_PAGES_COPY } from "@/i18n/legal-pages";
 import { homePath, localeQuery, marketingNav } from "@/i18n/home";
@@ -39,7 +40,7 @@ export default async function PrivacidadPage({ searchParams }: PageProps) {
             </Link>
           </nav>
           <h1 className="mt-6 font-heading text-3xl font-semibold tracking-tight text-brand-text">{c.privacyTitle}</h1>
-          <p className="mt-4 text-sm leading-relaxed text-brand-muted">{c.privacyLead}</p>
+          <p className="mt-4 text-sm leading-relaxed text-brand-muted">{withYouWordmark(c.privacyLead)}</p>
 
           <div className="mt-10 space-y-10">
             {c.privacySections.map((s) => (
@@ -47,7 +48,7 @@ export default async function PrivacidadPage({ searchParams }: PageProps) {
                 <h2 className="font-heading text-lg font-semibold text-brand-text">{s.heading}</h2>
                 <div className="mt-3 space-y-3 text-sm leading-relaxed text-brand-text">
                   {s.body.map((p, i) => (
-                    <p key={i}>{p}</p>
+                    <p key={i}>{withYouWordmark(p)}</p>
                   ))}
                 </div>
               </section>
@@ -63,7 +64,7 @@ export default async function PrivacidadPage({ searchParams }: PageProps) {
           <ul className="mt-8 flex flex-wrap gap-4 text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
             {nav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="text-brand-accent hover:underline">
+                <Link href={item.href} className={`${TEXT_LINK_INLINE} text-xs`}>
                   {item.label}
                 </Link>
               </li>

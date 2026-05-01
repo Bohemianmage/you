@@ -90,13 +90,7 @@ export function HomePageContent({
               .
             </p>
           ) : null}
-          <FeaturedPropertiesSection
-            locale={locale}
-            copy={copy.featured}
-            properties={featured}
-            catalogHref={catalogHref}
-            contactHref={contactHref}
-          />
+          <FeaturedPropertiesSection locale={locale} copy={copy.featured} properties={featured} />
         </>
       </EditableSection>
 

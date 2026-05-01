@@ -171,8 +171,12 @@ export function AdminCalendarView({
                   <tr key={a.id} className="align-top">
                     <td className="whitespace-nowrap px-4 py-3">
                       <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] ${
-                          pending ? "bg-amber-500/15 text-amber-900" : st === "confirmed" ? "bg-emerald-500/15 text-emerald-900" : "bg-brand-border/40 text-brand-muted"
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] ring-1 ${
+                          pending
+                            ? "bg-brand-you/10 text-brand-you ring-brand-you/20"
+                            : st === "confirmed"
+                              ? "bg-brand-accent/12 text-brand-accent-strong ring-brand-accent/25"
+                              : "bg-brand-border/50 text-brand-muted ring-brand-border/60"
                         }`}
                       >
                         {statusLabel(st)}

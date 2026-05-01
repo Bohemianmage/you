@@ -6,8 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import type { CatalogProperty } from "@/data/catalog-properties";
-import { filterCatalogProperties, inferListingDisplayType, normalizeCatalogFeatureKey } from "@/lib/catalog-filters";
-import { ListingTypeBadge } from "@/components/propiedades/ListingTypeBadge";
+import { filterCatalogProperties, normalizeCatalogFeatureKey } from "@/lib/catalog-filters";
 import { CatalogPropertiesMap } from "@/components/propiedades/CatalogPropertiesMap";
 import { distinctCatalogZoneFilterKeys } from "@/lib/catalog-zone-filter";
 import { catalogPageHref, type CatalogQueryFilters, type ListingTypeFilter } from "@/lib/catalog-query";
@@ -528,7 +527,12 @@ export function PropiedadesCatalog({
           <CatalogPropertiesMap
             locale={locale}
             listings={filtered}
-            copy={{ mapEmpty: copy.mapEmpty, mapError: copy.mapError, mapHint: copy.mapHint }}
+            copy={{
+              mapEmpty: copy.mapEmpty,
+              mapError: copy.mapError,
+              mapHint: copy.mapHint,
+              mapLoading: copy.mapLoading,
+            }}
           />
         </div>
       ) : null}
@@ -565,21 +569,9 @@ export function PropiedadesCatalog({
                       <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.06),transparent)]" />
                     </div>
                     <div className="p-6">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <ListingTypeBadge
-                          kind={inferListingDisplayType({
-                            listingType: p.listingType,
-                            status: p.status,
-                            title: p.title,
-                            specs: p.specs,
-                            ebOperations: p.ebOperations,
-                          })}
-                          labels={{ rent: copy.listingBadgeRent, sale: copy.listingBadgeSale }}
-                        />
-                        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent">
-                          {copy.cardLocationLabel}: {p.zone}
-                        </p>
-                      </div>
+                      {p.zone?.trim() ? (
+                        <p className="text-sm font-medium leading-snug text-brand-muted line-clamp-2">{p.zone.trim()}</p>
+                      ) : null}
                       <h2 className="mt-2 font-heading text-xl font-semibold text-brand-text group-hover:text-brand-accent-strong">
                         {p.title}
                       </h2>

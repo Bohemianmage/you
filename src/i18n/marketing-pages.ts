@@ -11,6 +11,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterFeaturesHint: string;
     mapHeading: string;
     mapHint: string;
+    mapLoading: string;
     mapEmpty: string;
     mapError: string;
     /** Línea de ubicación en tarjetas del listado. */
@@ -66,6 +67,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterFeaturesHint: "La propiedad debe incluir todas las características marcadas.",
     mapHeading: "Mapa",
     mapHint: "Marcadores del listado filtrado. Mantén Ctrl y usa la rueda del ratón para acercar o alejar dentro del mapa.",
+    mapLoading: "Cargando ubicaciones…",
     mapEmpty: "Ninguna propiedad del listado tiene coordenadas para mostrar.",
     mapError: "No se pudo cargar el mapa. Intenta de nuevo más tarde.",
     cardLocationLabel: "Ubicación",
@@ -115,6 +117,7 @@ export const CATALOG_PAGE_COPY: Record<
     filterFeaturesHint: "The listing must include every feature you select.",
     mapHeading: "Map",
     mapHint: "Markers for the filtered list. Hold Ctrl and scroll to zoom inside the map.",
+    mapLoading: "Loading locations…",
     mapEmpty: "No listings in this view have coordinates to display.",
     mapError: "Could not load the map. Please try again later.",
     cardLocationLabel: "Location",
@@ -206,6 +209,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     officeHeading: string;
     contactFormCta: string;
     bookingSectionTitle: string;
+    bookingLoading: string;
     bookingSectionHint: string;
     bookingPickSlot: string;
     bookingNameLabel: string;
@@ -285,6 +289,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     officeHeading: "Oficina YOU",
     contactFormCta: "Formulario de contacto",
     bookingSectionTitle: "Agendar visita",
+    bookingLoading: "Cargando horarios disponibles…",
     bookingSectionHint:
       "Elige horario (hora Ciudad de México). El asesor confirmará la visita manualmente; hasta entonces solo tienes solicitud recibida. Si confirma, recibirás correo con detalles.",
     bookingPickSlot: "Horarios disponibles",
@@ -368,6 +373,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     officeHeading: "YOU office",
     contactFormCta: "Contact form",
     bookingSectionTitle: "Schedule a visit",
+    bookingLoading: "Loading available times…",
     bookingSectionHint:
       "Pick a time (Mexico City). Your advisor confirms visits manually — until then you only have a request receipt. If confirmed, you’ll get details by email.",
     bookingPickSlot: "Available times",

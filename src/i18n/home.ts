@@ -158,7 +158,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     },
     featured: {
       title: "Propiedades destacadas",
-      subtitle: "Selección actual del portafolio YOU.",
+      subtitle: "",
       visitCta: "Agenda una visita",
       catalogCta: "Catálogo completo",
       detailCta: "Ver propiedad",
@@ -247,7 +247,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
     },
     featured: {
       title: "Featured properties",
-      subtitle: "Current selection from the YOU portfolio.",
+      subtitle: "",
       visitCta: "Schedule a visit",
       catalogCta: "Full catalog",
       detailCta: "View listing",
