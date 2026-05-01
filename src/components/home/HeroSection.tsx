@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HeroDevelopmentModal } from "@/components/home/HeroDevelopmentModal";
+import { HomeHashLink } from "@/components/layout/HomeHashLink";
 import type { HomeCopy } from "@/i18n/home";
 
 interface HeroSectionProps {
@@ -22,12 +23,12 @@ export function HeroSection({ copy, modalCopy, catalogHref, contactHref, announc
       <HeroDevelopmentModal copy={modalCopy} />
       <div className="border-b border-brand-border bg-brand-surface px-4 py-3.5 text-center sm:px-6">
         <p className="mx-auto max-w-4xl text-[13px] font-semibold leading-snug text-brand-text sm:text-sm">
-          <Link
+          <HomeHashLink
             href={announcementHref}
             className="inline-flex flex-wrap items-center justify-center gap-x-2 rounded-full border border-brand-accent/20 bg-brand-accent/[0.06] px-4 py-2 text-brand-accent-strong transition hover:border-brand-accent/35 hover:bg-brand-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent"
           >
             {copy.announcement}
-          </Link>
+          </HomeHashLink>
         </p>
       </div>
 

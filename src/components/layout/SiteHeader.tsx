@@ -11,6 +11,7 @@ import { MARKETING_SOCIAL_LINKS } from "@/constants/marketing-social";
 import { homePath } from "@/i18n/home";
 import type { NavItem } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
+import { canonicalHrefFromNavString, firstHashFragment } from "@/lib/browser-url";
 
 const HOME_SECTION_IDS = ["about"] as const;
 
@@ -21,20 +22,6 @@ interface SiteHeaderProps {
 
 function parseNavHref(href: string): URL {
   return new URL(href, "https://yousoluciones.com");
-}
-
-/** Fragmento único si la URL acumuló varios `#` por error. */
-function firstHashFragment(hashWithMaybeMultiple: string): string {
-  const raw = hashWithMaybeMultiple.startsWith("#")
-    ? hashWithMaybeMultiple.slice(1)
-    : hashWithMaybeMultiple;
-  return raw.split("#")[0] ?? "";
-}
-
-function canonicalHomeHref(href: string): string {
-  const dest = parseNavHref(href);
-  const id = firstHashFragment(dest.hash);
-  return `${dest.pathname}${dest.search}${id ? `#${id}` : ""}`;
 }
 
 function scrollToSectionHash(hash: string) {
@@ -53,15 +40,6 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
 
   const isHome = pathname === "/";
-
-  /** Corrige URLs con fragmentos encadenados (`#a#b`) por navegación defectuosa. */
-  useEffect(() => {
-    const path = `${window.location.pathname}${window.location.search}`;
-    const h = window.location.hash;
-    if (!h || !h.slice(1).includes("#")) return;
-    const frag = firstHashFragment(h);
-    window.history.replaceState(null, "", `${path}${frag ? `#${frag}` : ""}`);
-  }, []);
 
   useEffect(() => {
     if (!isHome) {
@@ -133,7 +111,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     }
     e.preventDefault();
     scrollToSectionHash(`#${fragment}`);
-    window.history.pushState(null, "", canonicalHomeHref(href));
+    window.history.pushState(window.history.state, "", canonicalHrefFromNavString(href));
     setMobileOpen(false);
     setActiveSectionId(fragment);
   }
@@ -154,7 +132,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   }
 
   const desktopPillBase =
-    "block rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] no-underline transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none";
+    "block rounded-full px-5 py-2.5 text-[13px] font-bold uppercase tracking-[0.1em] no-underline transition-all duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none";
   const desktopPillActive =
     "scale-[1.02] bg-brand-accent text-brand-white shadow-[0_2px_10px_rgba(97,110,137,0.35)] ring-1 ring-brand-accent/45";
   const desktopPillIdle =
@@ -167,7 +145,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] backdrop-blur-md">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-1 sm:px-6 lg:gap-4 lg:px-8">
+      <div className="relative mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-1 sm:px-5 lg:gap-5 lg:px-6 xl:max-w-5xl">
         <Link
           href={homePath(locale)}
           className="group flex shrink-0 items-center font-semibold tracking-tight text-brand-text"
@@ -184,13 +162,14 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
         </Link>
 
         <nav className="hidden lg:flex lg:flex-1 lg:justify-center" aria-label="Principal">
-          <ul className="flex items-center gap-0.5 rounded-full bg-brand-surface/95 px-0.5 py-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-brand-border/55">
+          <ul className="flex items-center gap-1 rounded-full bg-brand-surface/95 px-1 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-brand-border/55">
             {navItems.map((item) => {
               const active = isNavItemActive(item);
               return (
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    scroll={false}
                     onClick={(e) => handleInPageNavClick(e, item.href)}
                     aria-current={active ? "page" : undefined}
                     className={`${desktopPillBase} ${active ? desktopPillActive : desktopPillIdle}`}
@@ -264,6 +243,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      scroll={false}
                       onClick={(e) => handleInPageNavClick(e, item.href)}
                       aria-current={active ? "page" : undefined}
                       className={`${mobileLinkBase} ${active ? mobileLinkActive : mobileLinkIdle}`}

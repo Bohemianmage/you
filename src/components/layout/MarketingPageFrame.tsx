@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, type ReactNode } from "react";
 
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
+import { HashUrlSanitizer } from "@/components/layout/HashUrlSanitizer";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import type { SiteContact } from "@/constants/site-contact";
@@ -46,6 +47,7 @@ export function MarketingPageFrame({
 
   return (
     <LiveSiteContext.Provider value={live}>
+      <HashUrlSanitizer />
       <SiteHeader locale={locale} navItems={marketingNav(locale)} />
       <main className="flex-1">{children}</main>
       <SiteFooter navItems={marketingNav(locale)} footerCopy={live.homeCopy.footer} contact={live.contact} />
