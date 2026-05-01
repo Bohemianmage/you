@@ -3,7 +3,6 @@
 import Link from "next/link";
 
 import { AboutSection } from "@/components/home/AboutSection";
-import { ContactSection } from "@/components/home/ContactSection";
 import { DownloadablesSection } from "@/components/home/DownloadablesSection";
 import { FeaturedPropertiesSection } from "@/components/home/FeaturedPropertiesSection";
 import { HeroSection } from "@/components/home/HeroSection";
@@ -19,14 +18,12 @@ import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import { ZONES_BY_LOCALE } from "@/data/zones";
 import type { ClientLogo } from "@/lib/site-content/types";
-import { CONTACT_FORM_COPY } from "@/i18n/marketing-pages";
 import {
   mergeClientLogosFromFile,
   mergeDownloadablesFromFile,
   mergeFeaturedFromFile,
   mergeTeamFromFile,
 } from "@/lib/site-content/merge-public";
-import { homePath } from "@/i18n/home";
 
 export function HomePageContent({
   catalogHref,
@@ -53,7 +50,7 @@ export function HomePageContent({
   const featured = edit ? mergeFeaturedFromFile(locale, edit.working) : serverFeatured;
   const downloadables = edit ? mergeDownloadablesFromFile(locale, edit.working) : serverDownloadables;
   const clientLogos = edit ? mergeClientLogosFromFile(edit.working) : serverClientLogos;
-  const announcementHref = `${homePath(locale)}#downloadables`;
+  const announcementHref = catalogHref;
 
   return (
     <>
@@ -126,10 +123,6 @@ export function HomePageContent({
           ) : null}
           <DownloadablesSection copy={copy.downloadables} items={downloadables} />
         </>
-      </EditableSection>
-
-      <EditableSection sectionId="contact" label="Editar contacto">
-        <ContactSection copy={CONTACT_FORM_COPY[locale]} />
       </EditableSection>
     </>
   );

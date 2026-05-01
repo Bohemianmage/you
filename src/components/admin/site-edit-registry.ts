@@ -96,10 +96,10 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
     ],
   },
   footer: {
-    title: "Pie de página (textos)",
+    title: "Pie de página",
     fields: [
       { section: "footer", key: "tagline", label: "Tagline" },
-      { section: "footer", key: "phoneLabel", label: "Etiqueta teléfono" },
+      { section: "footer", key: "phoneLabel", label: "Etiqueta teléfono (solo texto de etiqueta)" },
       { section: "footer", key: "copyright", label: "Copyright" },
     ],
   },

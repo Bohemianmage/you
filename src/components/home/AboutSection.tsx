@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import { TeamMemberFlipCard } from "@/components/home/TeamMemberFlipCard";
 import type { ClientLogo } from "@/lib/site-content/types";
 import type { TeamMember } from "@/data/team";
@@ -33,7 +34,7 @@ export function AboutSection({ locale, copy, teamMembers, clientLogos, adminEdit
           <p className="font-heading text-xl font-semibold text-brand-accent sm:text-2xl">{copy.tagline}</p>
           <div className="space-y-4 text-base leading-[1.75] text-brand-muted">
             {copy.intro.map((p) => (
-              <p key={p}>{p}</p>
+              <p key={p}>{withYouWordmark(p)}</p>
             ))}
           </div>
         </header>
@@ -42,7 +43,7 @@ export function AboutSection({ locale, copy, teamMembers, clientLogos, adminEdit
           <h3 className="font-heading text-xl font-semibold text-brand-text sm:text-2xl">{copy.historyTitle}</h3>
           <div className="space-y-4 text-base leading-[1.75] text-brand-muted">
             {copy.history.map((p) => (
-              <p key={p}>{p}</p>
+              <p key={p}>{withYouWordmark(p)}</p>
             ))}
           </div>
         </div>

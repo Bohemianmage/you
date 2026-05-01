@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /**
- * Tokens de marca YOU: superficie clara, texto carbón, acento pizarra rgb(97, 110, 137).
+ * Tokens de marca YOU: superficie clara, texto carbón, acento pizarra, wordmark azul #1a1e61.
  */
 :root {
   --background: #ffffff;
@@ -23,6 +23,8 @@
   --color-brand-accent: #616e89;
   --color-brand-accent-hover: #8e99b1;
   --color-brand-accent-strong: #283b62;
+  /** Palabra marca "YOU" en copy (negritas en componentes). */
+  --color-brand-you: #1a1e61;
   --color-brand-white: #ffffff;
 }
 

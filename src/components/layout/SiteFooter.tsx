@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import { iconClasses } from "@/components/icons/SocialIcons";
 import { MARKETING_SOCIAL_LINKS } from "@/constants/marketing-social";
 import type { SiteContact } from "@/constants/site-contact";
@@ -66,7 +67,7 @@ export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooter
 
         <div className="flex flex-col gap-4 border-t border-brand-border/80 pt-10 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[11px] uppercase tracking-[0.16em] text-brand-subtle">
-            © {new Date().getFullYear()} YOU Soluciones Inmobiliarias. {footerCopy.copyright}
+            {withYouWordmark(`© ${new Date().getFullYear()} YOU Soluciones Inmobiliarias. ${footerCopy.copyright}`)}
           </p>
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-brand-muted">CDMX · México</p>
         </div>

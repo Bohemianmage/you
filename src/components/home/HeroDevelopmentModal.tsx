@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import type { HomeCopy } from "@/i18n/home";
 
 const DISMISS_STORAGE_KEY = "you-soft-launch-modal-dismissed";
@@ -28,7 +30,7 @@ function persistDismissed(): void {
 
 /**
  * Soft-launch notice — informs visitors that the site is still being refined.
- * Dismissal is remembered for the browser tab/session so in-page navigation (e.g. #downloadables) does not reopen it.
+ * Dismissal is remembered for the browser tab/session so in-page navigation does not reopen it.
  */
 export function HeroDevelopmentModal({ copy }: HeroDevelopmentModalProps) {
   const [open, setOpen] = useState(false);
@@ -54,10 +56,10 @@ export function HeroDevelopmentModal({ copy }: HeroDevelopmentModalProps) {
     setOpen(false);
   };
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="presentation">
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6" role="presentation">
       <button
         type="button"
         className="absolute inset-0 bg-brand-text/45 backdrop-blur-[3px]"
@@ -68,12 +70,12 @@ export function HeroDevelopmentModal({ copy }: HeroDevelopmentModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-[101] w-full max-w-md rounded-sm border border-brand-border bg-brand-bg p-6 shadow-[0_8px_32px_rgba(0,0,0,0.18)] sm:max-w-lg sm:p-8"
+        className="relative z-[201] mx-auto w-full max-w-md rounded-sm border border-brand-border bg-brand-bg p-6 shadow-[0_8px_32px_rgba(0,0,0,0.18)] sm:max-w-lg sm:p-8"
       >
         <h2 id={titleId} className="font-heading text-xl font-semibold text-brand-text sm:text-2xl">
-          {copy.title}
+          {withYouWordmark(copy.title)}
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-brand-muted">{copy.message}</p>
+        <p className="mt-3 text-sm leading-relaxed text-brand-muted">{withYouWordmark(copy.message)}</p>
         <button
           type="button"
           onClick={dismiss}
@@ -82,6 +84,7 @@ export function HeroDevelopmentModal({ copy }: HeroDevelopmentModalProps) {
           {copy.close}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -58,7 +58,7 @@ export function MarketingPageFrame({
       <HashUrlSanitizer />
       <SiteHeader locale={locale} navItems={marketingNav(locale)} />
       <main className="flex-1">{children}</main>
-      <EditableSection sectionId="footer" label="Editar pie">
+      <EditableSection sectionId="footer" label="Editar pie y contacto">
         <SiteFooter locale={locale} navItems={marketingNav(locale)} footerCopy={live.homeCopy.footer} contact={live.contact} />
       </EditableSection>
     </LiveSiteContext.Provider>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import type { DownloadableItem } from "@/data/downloadables";
 import type { HomeCopy } from "@/i18n/home";
 
@@ -42,8 +43,8 @@ export function DownloadablesSection({ copy, items }: DownloadablesSectionProps)
                   </div>
                 ) : null}
                 <div className="flex flex-1 flex-col p-6">
-                  <h3 className="font-heading text-lg font-semibold text-brand-text">{item.title}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-brand-muted">{item.description}</p>
+                  <h3 className="font-heading text-lg font-semibold text-brand-text">{withYouWordmark(item.title)}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-brand-muted">{withYouWordmark(item.description)}</p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {item.fileUrl ? (
                       <a

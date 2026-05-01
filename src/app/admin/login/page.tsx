@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { loginAdmin } from "@/app/admin/actions";
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 
 interface LoginPageProps {
   searchParams?: Promise<{ error?: string }>;
@@ -20,7 +21,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm rounded-sm border border-brand-border bg-brand-bg p-8 shadow-[0_8px_30px_-12px_rgba(47,46,46,0.15)]">
-        <h1 className="font-heading text-xl font-semibold text-brand-text">Panel YOU</h1>
+        <h1 className="font-heading text-xl font-semibold text-brand-text">{withYouWordmark("Panel YOU")}</h1>
         <p className="mt-2 text-sm text-brand-muted">Introduce la contraseña de administrador.</p>
         {errorMessage ? (
           <p className="mt-4 rounded-sm border border-brand-accent/40 bg-brand-accent/10 px-3 py-2 text-sm text-brand-accent-strong">

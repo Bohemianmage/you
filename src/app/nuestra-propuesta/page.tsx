@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import { localeQuery } from "@/i18n/home";
 import { resolveMarketingLocale } from "@/lib/marketing-locale";
@@ -52,7 +53,7 @@ export default async function NuestraPropuestaPage({ searchParams }: PropuestaPa
               href={contactHref}
               className="inline-flex items-center justify-center rounded-sm bg-brand-accent px-8 py-3.5 text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong"
             >
-              {copy.contactCta}
+              {withYouWordmark(copy.contactCta)}
             </Link>
             <Link
               href={catalogHref}

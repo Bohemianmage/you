@@ -29,5 +29,7 @@ export async function loginAdmin(formData: FormData) {
 
 export async function logoutAdmin() {
   (await cookies()).delete(ADMIN_SESSION_COOKIE);
-  redirect("/admin/login");
+  const jar = await cookies();
+  const pref = jar.get(MARKETING_LOCALE_COOKIE)?.value?.trim();
+  redirect(pref === "en" ? "/?lang=en" : "/");
 }

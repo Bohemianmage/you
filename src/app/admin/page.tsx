@@ -1,11 +1,12 @@
 import Link from "next/link";
 
 import { logoutAdmin } from "@/app/admin/actions";
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 
 export default async function AdminDashboardPage() {
   return (
     <div id="admin-main" className="mx-auto max-w-lg px-4 py-16 sm:px-6">
-      <h1 className="font-heading text-2xl font-semibold text-brand-text">Panel YOU</h1>
+      <h1 className="font-heading text-2xl font-semibold text-brand-text">{withYouWordmark("Panel YOU")}</h1>
       <p className="mt-3 text-sm leading-relaxed text-brand-muted">
         Entrá al sitio: vas a ver una barra inferior para guardar cambios y el botón <strong className="font-medium text-brand-text">Editar</strong>{" "}
         en cada bloque del inicio.

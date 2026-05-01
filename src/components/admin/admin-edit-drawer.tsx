@@ -54,6 +54,21 @@ export function AdminEditDrawer() {
       return;
     }
 
+    if (active === "footer" && meta) {
+      const m = mergeSiteContact(working);
+      const next: Record<string, string> = {
+        addressLine: m.addressLine,
+        phoneDisplay: m.phoneDisplay,
+        phoneHref: m.phoneHref,
+      };
+      for (const f of meta.fields) {
+        const compound = `${String(f.section)}.${f.key}`;
+        next[compound] = readField(locale, f.section, f.key, working);
+      }
+      setDraft(next);
+      return;
+    }
+
     if (!meta) {
       setDraft({});
       return;
@@ -68,7 +83,8 @@ export function AdminEditDrawer() {
   }, [ctx, active, locale, working, meta]);
 
   const title = useMemo(() => {
-    if (active === "contact") return "Contacto (pie y bloque)";
+    if (active === "contact") return "Datos de contacto globales";
+    if (active === "footer") return "Pie de página — textos y contacto";
     return meta?.title ?? "Editar";
   }, [active, meta]);
 
@@ -150,6 +166,9 @@ export function AdminEditDrawer() {
         <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
           {active === "contact" ? (
             <>
+              <p className="text-sm leading-relaxed text-brand-muted">
+                Dirección y teléfono del pie en todas las páginas. El bloque de contacto del inicio usa los mismos datos.
+              </p>
               <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
                 Dirección
                 <textarea
@@ -180,36 +199,78 @@ export function AdminEditDrawer() {
               </label>
             </>
           ) : meta ? (
-            meta.fields.map((f) => {
-              const compound = `${String(f.section)}.${f.key}`;
-              return (
-                <label key={compound} className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
-                  <span className="text-brand-subtle">{String(f.section)}</span> · {f.label}
-                  {f.multiline || f.lines ? (
+            <>
+              {active === "footer" ? (
+                <p className="text-sm leading-relaxed text-brand-muted">
+                  Editá el texto del pie y la dirección o teléfono; se actualizan en el footer de todo el sitio y en la sección contacto del inicio.
+                </p>
+              ) : null}
+              {meta.fields.map((f) => {
+                const compound = `${String(f.section)}.${f.key}`;
+                return (
+                  <label key={compound} className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
+                    <span className="text-brand-subtle">{String(f.section)}</span> · {f.label}
+                    {f.multiline || f.lines ? (
+                      <textarea
+                        rows={f.lines ? 6 : 3}
+                        value={draft[compound] ?? ""}
+                        onChange={(e) => setDraft((d) => ({ ...d, [compound]: e.target.value }))}
+                        className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value={draft[compound] ?? ""}
+                        onChange={(e) => setDraft((d) => ({ ...d, [compound]: e.target.value }))}
+                        className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
+                      />
+                    )}
+                    {f.assetUpload ? (
+                      <SiteAssetUploadButton
+                        kind={f.assetUpload.kind}
+                        subfolder={f.assetUpload.subfolder}
+                        onUploaded={(url) => setDraft((d) => ({ ...d, [compound]: url }))}
+                      />
+                    ) : null}
+                  </label>
+                );
+              })}
+              {active === "footer" ? (
+                <>
+                  <div className="border-t border-brand-border pt-2">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted">Datos globales (contact)</p>
+                  </div>
+                  <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
+                    Dirección
                     <textarea
-                      rows={f.lines ? 6 : 3}
-                      value={draft[compound] ?? ""}
-                      onChange={(e) => setDraft((d) => ({ ...d, [compound]: e.target.value }))}
+                      rows={3}
+                      value={draft.addressLine ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, addressLine: e.target.value }))}
                       className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
                     />
-                  ) : (
+                  </label>
+                  <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
+                    Teléfono (visible)
                     <input
                       type="text"
-                      value={draft[compound] ?? ""}
-                      onChange={(e) => setDraft((d) => ({ ...d, [compound]: e.target.value }))}
+                      value={draft.phoneDisplay ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, phoneDisplay: e.target.value }))}
                       className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
                     />
-                  )}
-                  {f.assetUpload ? (
-                    <SiteAssetUploadButton
-                      kind={f.assetUpload.kind}
-                      subfolder={f.assetUpload.subfolder}
-                      onUploaded={(url) => setDraft((d) => ({ ...d, [compound]: url }))}
+                  </label>
+                  <label className="block text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">
+                    Enlace (tel:…)
+                    <input
+                      type="text"
+                      value={draft.phoneHref ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, phoneHref: e.target.value }))}
+                      placeholder={SITE_CONTACT.phoneHref}
+                      className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
                     />
-                  ) : null}
-                </label>
-              );
-            })
+                  </label>
+                </>
+              ) : null}
+            </>
           ) : (
             <p className="text-sm text-brand-muted">Sección no editable desde aquí.</p>
           )}

@@ -25,8 +25,7 @@ function HeroHeadingTitle({ title, locale }: { title: string; locale: Locale }) 
   return (
     <>
       {title.slice(0, i)}
-      {/* YOU del logo usa carbón #2f2e2e (brand-text), no el acento pizarra. */}
-      <span className="font-semibold text-brand-text"> YOU</span>
+      <span className="font-bold text-brand-you"> YOU</span>
     </>
   );
 }

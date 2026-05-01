@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import type { FeaturedProperty } from "@/data/properties";
 import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
@@ -34,7 +35,7 @@ export function FeaturedPropertiesSection({
             <h2 id="featured-heading" className="font-heading text-xl font-semibold uppercase tracking-wide text-brand-text sm:text-2xl">
               {copy.title}
             </h2>
-            <p className="max-w-xl text-sm text-brand-muted">{copy.subtitle}</p>
+            <p className="max-w-xl text-sm text-brand-muted">{withYouWordmark(copy.subtitle)}</p>
           </div>
           <div className="flex flex-wrap gap-4 text-sm font-semibold">
             <Link href={catalogHref} className={TEXT_LINK_INLINE}>

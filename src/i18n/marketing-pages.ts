@@ -33,6 +33,13 @@ export const CATALOG_PAGE_COPY: Record<
     filterApply: string;
     filterReset: string;
     filterPriceNote: string;
+    filtersDetailSubtitle: string;
+    filterActiveLabel: string;
+    filterGroupZone: string;
+    filterGroupSize: string;
+    filterGroupLayout: string;
+    filterGroupPrice: string;
+    filterListingTypeHint: string;
   }
 > = {
   es: {
@@ -65,6 +72,13 @@ export const CATALOG_PAGE_COPY: Record<
     filterApply: "Aplicar filtros",
     filterReset: "Limpiar todo",
     filterPriceNote: "El filtro por precio usa la moneda indicada y los datos numéricos de cada propiedad.",
+    filtersDetailSubtitle: "Combiná criterios y tocá aplicar para actualizar el listado.",
+    filterActiveLabel: "criterios activos",
+    filterGroupZone: "Ubicación",
+    filterGroupSize: "Superficie",
+    filterGroupLayout: "Recámaras y baños",
+    filterGroupPrice: "Precio",
+    filterListingTypeHint: "Todas las operaciones, solo renta o solo venta.",
   },
   en: {
     title: "Properties",
@@ -96,6 +110,13 @@ export const CATALOG_PAGE_COPY: Record<
     filterApply: "Apply filters",
     filterReset: "Clear all",
     filterPriceNote: "Price filtering uses the selected currency and each listing’s numeric amount.",
+    filtersDetailSubtitle: "Combine criteria, then apply to refresh the list.",
+    filterActiveLabel: "active filters",
+    filterGroupZone: "Location",
+    filterGroupSize: "Floor area",
+    filterGroupLayout: "Beds & baths",
+    filterGroupPrice: "Price",
+    filterListingTypeHint: "All listings, rentals only, or sales only.",
   },
 };
 

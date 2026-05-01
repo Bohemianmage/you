@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { withYouWordmark } from "@/components/brand/you-wordmark";
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import { PropertyImageGallery } from "@/components/propiedades/PropertyImageGallery";
 import { PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
@@ -150,7 +151,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
           <div className="space-y-4 text-sm leading-relaxed text-brand-muted">
             {(property.description ?? copy.descriptionFallback).split(/\n\n+/).map((para, i) => (
               <p key={i} className="text-brand-text">
-                {para}
+                {withYouWordmark(para)}
               </p>
             ))}
           </div>
@@ -186,19 +187,11 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
             ) : null}
             <Link
               href={contactInterestHref}
-              className="inline-flex items-center justify-center rounded-sm px-2 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-brand-muted underline-offset-4 hover:text-brand-accent hover:underline"
+              className="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-brand-border bg-brand-bg px-6 text-sm font-semibold text-brand-text shadow-sm transition hover:border-brand-accent/40 hover:bg-brand-surface"
             >
               {copy.contactFormCta}
             </Link>
           </div>
-
-          <footer className="border-t border-brand-border pt-8 text-sm text-brand-muted">
-            <p className="font-heading text-xs font-bold uppercase tracking-[0.14em] text-brand-text">{copy.officeHeading}</p>
-            <p className="mt-2 leading-relaxed">{contact.addressLine}</p>
-            <a href={contact.phoneHref} className={`${TEXT_LINK_INLINE} mt-1 inline-block font-semibold`}>
-              {contact.phoneDisplay}
-            </a>
-          </footer>
         </div>
       </div>
     </MarketingLayout>
