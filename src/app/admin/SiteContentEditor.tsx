@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 
 import { saveSiteContent } from "@/app/actions/site-content";
 import type { FeaturedProperty } from "@/data/properties";
@@ -62,6 +62,21 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
   const [featuredEn, setFeaturedEn] = useState<FeaturedProperty[]>(() => seed.featuredEn.map((p) => ({ ...p })));
 
   const [pending, startTransition] = useTransition();
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!saveModalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSaveModalOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [saveModalOpen]);
 
   const payloadJson = useMemo(() => {
     const body = {
@@ -375,14 +390,55 @@ export function SiteContentEditor({ seed }: { seed: AdminEditorSeed }) {
           type="button"
           disabled={pending}
           className="rounded-sm bg-brand-accent px-8 py-3 text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong disabled:cursor-not-allowed disabled:opacity-45"
-          onClick={() => {
-            if (!window.confirm("¿Guardar los cambios?")) return;
-            startTransition(() => void saveSiteContent(payloadJson));
-          }}
+          onClick={() => setSaveModalOpen(true)}
         >
           {pending ? "Guardando…" : "Guardar cambios"}
         </button>
       </div>
+
+      {saveModalOpen ? (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45 backdrop-blur-[1px]"
+            aria-label="Cerrar diálogo"
+            onClick={() => setSaveModalOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="save-confirm-title"
+            className="relative z-10 w-full max-w-md rounded-sm border border-brand-border bg-brand-bg p-6 shadow-xl ring-1 ring-brand-border/60"
+          >
+            <h2 id="save-confirm-title" className="font-heading text-lg font-semibold text-brand-text">
+              ¿Guardar los cambios?
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-brand-muted">
+              Se aplicarán los datos actuales del formulario (contacto, hero, equipo y destacadas).
+            </p>
+            <div className="mt-6 flex flex-wrap justify-end gap-3">
+              <button
+                type="button"
+                className="rounded-sm border border-brand-border bg-brand-bg px-4 py-2 text-sm font-semibold text-brand-text transition hover:border-brand-accent hover:text-brand-accent-strong"
+                onClick={() => setSaveModalOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                className="rounded-sm bg-brand-accent px-4 py-2 text-sm font-semibold text-brand-white shadow-sm transition hover:bg-brand-accent-strong disabled:cursor-not-allowed disabled:opacity-45"
+                onClick={() => {
+                  setSaveModalOpen(false);
+                  startTransition(() => void saveSiteContent(payloadJson));
+                }}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
