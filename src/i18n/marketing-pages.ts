@@ -299,8 +299,8 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingSectionTitle: "Agendar visita",
     bookingLoading: "Cargando horarios disponibles…",
     bookingSectionHint:
-      "Elegí día y hora. La visita queda como solicitud: el equipo la confirma por correo cuando esté aceptada (no es automática).",
-    bookingPickDay: "Día disponible",
+      "Elige día y hora. Tu visita queda como solicitud: el equipo te confirma por correo cuando esté aceptada (no es al instante).",
+    bookingPickDay: "Días disponibles",
     bookingPickTime: "Hora",
     bookingChangeDay: "Cambiar día",
     bookingPickSlot: "Horarios disponibles",
@@ -338,7 +338,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingErrDocsPickOne: "Selecciona al menos un tipo de documentación que podrás presentar.",
     bookingErrLegalAccept: "Debes aceptar términos y aviso de privacidad para continuar.",
     bookingPendingNotice:
-      "Solicitud enviada. Tu asesor debe confirmarla manualmente; cuando lo haga recibirás un correo de confirmación con los detalles.",
+      "Listo, recibimos tu solicitud. Te mandamos un correo cuando confirmemos la visita con fecha y detalles.",
   },
   en: {
     interestCta: "I’m interested",

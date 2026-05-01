@@ -272,9 +272,6 @@ export function PropertyVisitBooking({
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-brand-muted">{withYouWordmark(copy.bookingSectionHint)}</p>
       <p className="mt-1.5 text-xs text-brand-muted">{copy.bookingTimezoneNote}</p>
-      {slotsRes.assignAdvisorAtConfirm ? (
-        <p className="mt-2 text-xs leading-relaxed text-brand-muted">{copy.bookingAssignAdvisorNote}</p>
-      ) : null}
       {slotsRes.advisorName ? (
         <p className="mt-2 text-xs font-semibold text-brand-text">{slotsRes.advisorName}</p>
       ) : null}

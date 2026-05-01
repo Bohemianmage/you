@@ -150,74 +150,61 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const mobileLinkIdle = "hover:bg-brand-surface hover:text-brand-accent-strong";
 
   const mobileNavPanel = (
-      <div className="fixed inset-0 z-[200] lg:hidden" id="mobile-nav-panel">
-        <button
-          type="button"
-          className="absolute inset-0 bg-brand-text/45 backdrop-blur-[2px]"
-          aria-label={locale === "en" ? "Close menu" : "Cerrar menú"}
-          onClick={() => setMobileOpen(false)}
-        />
-        <div className="absolute inset-x-0 bottom-0 top-0 flex justify-end">
-          <div
-            className="flex h-full w-[min(100%,380px)] flex-col border-l border-brand-border/70 bg-brand-bg shadow-[0_0_48px_rgba(26,30,97,0.12)]"
-            role="dialog"
-            aria-modal="true"
-            aria-label={locale === "en" ? "Main menu" : "Menú principal"}
-          >
-            <div className="flex items-center justify-between border-b border-brand-border/60 px-4 py-3">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-muted">
-                {locale === "en" ? "Menu" : "Menú"}
-              </span>
-              <button
-                type="button"
-                className="rounded-md border border-brand-border/80 bg-brand-surface px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-text"
-                onClick={() => setMobileOpen(false)}
-              >
-                {locale === "en" ? "Close" : "Cerrar"}
-              </button>
-            </div>
-            <nav className="flex-1 overflow-y-auto px-4 py-4 sm:px-5" aria-label="Principal móvil">
-              <ul className="space-y-1">
-                {navItems.map((item) => {
-                  const active = isNavItemActive(item);
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        scroll={false}
-                        onClick={(e) => handleInPageNavClick(e, item.href)}
-                        aria-current={active ? "page" : undefined}
-                        className={`${mobileLinkBase} ${active ? mobileLinkActive : mobileLinkIdle}`}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-              <div className="mt-6 flex items-center justify-center gap-3 border-t border-brand-border/60 pt-6">
-                {MARKETING_SOCIAL_LINKS.map(({ label, href, Icon }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-surface text-brand-muted ring-1 ring-brand-border/55 transition hover:bg-brand-accent hover:text-brand-white"
-                    aria-label={label}
-                  >
-                    <Icon className={iconClasses()} />
-                  </a>
-                ))}
-              </div>
-            </nav>
-          </div>
+    <div
+      id="mobile-nav-panel"
+      className={`fixed inset-0 z-[200] lg:hidden ${mobileOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+      aria-hidden={!mobileOpen}
+    >
+      <button
+        type="button"
+        className={`absolute inset-0 transition-opacity duration-300 ease-out motion-reduce:transition-none ${
+          mobileOpen ? "bg-brand-text/35 opacity-100 backdrop-blur-[3px]" : "opacity-0"
+        }`}
+        tabIndex={mobileOpen ? 0 : -1}
+        aria-label={locale === "en" ? "Close menu" : "Cerrar menú"}
+        onClick={() => setMobileOpen(false)}
+      />
+      <div className="absolute inset-0 flex justify-end">
+        <div
+          className={`relative flex h-full w-[min(100%,22rem)] flex-col border-l border-white/15 bg-brand-bg/88 shadow-[0_0_40px_rgba(26,30,97,0.18)] backdrop-blur-xl transition-transform duration-300 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+            mobileOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+          role="dialog"
+          aria-modal="true"
+          aria-label={locale === "en" ? "Main menu" : "Menú principal"}
+        >
+          <nav className="flex-1 overflow-y-auto px-4 py-8 sm:px-5" aria-label="Principal móvil">
+            <ul className="space-y-1">
+              {navItems.map((item) => {
+                const active = isNavItemActive(item);
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      scroll={false}
+                      onClick={(e) => handleInPageNavClick(e, item.href)}
+                      aria-current={active ? "page" : undefined}
+                      className={`${mobileLinkBase} ${active ? mobileLinkActive : mobileLinkIdle}`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         </div>
       </div>
+    </div>
   );
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] backdrop-blur-md">
+      <header
+        className={`sticky top-0 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] backdrop-blur-md ${
+          mobileOpen ? "z-[201]" : "z-50"
+        }`}
+      >
       <div className="relative mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-1 sm:px-5 lg:gap-5 lg:px-6 xl:max-w-5xl">
         <Link
           href={homePath(locale)}
@@ -278,7 +265,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
 
           <button
             type="button"
-            className="flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-0.5 rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text transition-colors duration-200 lg:hidden"
+            className="flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-0.5 rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text transition-colors duration-300 lg:hidden"
             aria-expanded={mobileOpen}
             aria-label={
               mobileOpen
@@ -292,18 +279,20 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
             onClick={() => setMobileOpen((o) => !o)}
           >
             <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition duration-200 ease-out ${mobileOpen ? "translate-y-1.5 rotate-45" : ""}`}
+              className={`block h-0.5 w-5 rounded-full bg-current transition duration-300 ease-out motion-reduce:transition-none ${mobileOpen ? "translate-y-1.5 rotate-45" : ""}`}
             />
-            <span className={`block h-0.5 w-5 rounded-full bg-current transition duration-200 ease-out ${mobileOpen ? "opacity-0" : ""}`} />
             <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition duration-200 ease-out ${mobileOpen ? "-translate-y-1.5 -rotate-45" : ""}`}
+              className={`block h-0.5 w-5 rounded-full bg-current transition duration-300 ease-out motion-reduce:transition-none ${mobileOpen ? "opacity-0" : ""}`}
+            />
+            <span
+              className={`block h-0.5 w-5 rounded-full bg-current transition duration-300 ease-out motion-reduce:transition-none ${mobileOpen ? "-translate-y-1.5 -rotate-45" : ""}`}
             />
           </button>
         </div>
       </div>
 
       </header>
-      {mobileNavMounted && mobileOpen ? createPortal(mobileNavPanel, document.body) : null}
+      {mobileNavMounted ? createPortal(mobileNavPanel, document.body) : null}
     </>
   );
 }

@@ -107,13 +107,18 @@ export function FeaturedPropertiesCarousel({
   const settlingRef = useRef(false);
   const scrollSettleTimerRef = useRef<number | null>(null);
 
+  /** Solo mueve el carril horizontal; no usar `scrollIntoView` (sube el scroll de la página al cargar). */
   const scrollToExt = useCallback(
     (extIdx: number, smooth: boolean) => {
+      const sc = scrollRef.current;
       const el = itemRefs.current[extIdx];
-      if (!el) return;
-      el.scrollIntoView({
-        inline: "center",
-        block: "nearest",
+      if (!sc || !el) return;
+      const slideCenter = el.offsetLeft + el.offsetWidth / 2;
+      const targetLeft = slideCenter - sc.clientWidth / 2;
+      const maxLeft = Math.max(0, sc.scrollWidth - sc.clientWidth);
+      const left = Math.max(0, Math.min(maxLeft, targetLeft));
+      sc.scrollTo({
+        left,
         behavior: reducedMotion || !smooth ? "auto" : "smooth",
       });
     },
