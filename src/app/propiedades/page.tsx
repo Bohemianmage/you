@@ -9,7 +9,7 @@ import { getMergedCatalog } from "@/lib/site-settings/merge";
 import type { Metadata } from "next";
 
 interface PropiedadesPageProps {
-  searchParams?: Promise<{ lang?: string }>;
+  searchParams?: Promise<{ lang?: string; zone?: string; tipo?: string }>;
 }
 
 export async function generateMetadata({ searchParams }: PropiedadesPageProps): Promise<Metadata> {
@@ -33,6 +33,8 @@ export default async function PropiedadesPage({ searchParams }: PropiedadesPageP
   const contactHref = `/contacto${q}`;
   const homeHref = locale === "en" ? "/?lang=en" : "/";
   const catalog = await getMergedCatalog();
+  const filterZone = typeof params?.zone === "string" ? params.zone : undefined;
+  const filterTipo = params?.tipo === "rent" || params?.tipo === "sale" ? params.tipo : undefined;
 
   return (
     <MarketingLayout locale={locale}>
@@ -55,7 +57,14 @@ export default async function PropiedadesPage({ searchParams }: PropiedadesPageP
               </Link>
             </div>
           </div>
-          <PropiedadesCatalog locale={locale} serverCatalog={catalog} copy={copy} contactHref={contactHref} />
+          <PropiedadesCatalog
+            locale={locale}
+            serverCatalog={catalog}
+            copy={copy}
+            contactHref={contactHref}
+            filterZone={filterZone}
+            filterTipo={filterTipo}
+          />
         </div>
       </div>
     </MarketingLayout>

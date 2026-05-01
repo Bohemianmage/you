@@ -46,6 +46,8 @@ export interface HomeCopy {
     catalogCta: string;
     /** Primary button on featured cards → internal `/propiedades/[slug]`. */
     detailCta: string;
+    /** CTA tour externo cuando hay `tourUrl`. */
+    virtualTourCta: string;
   };
   virtualTours: {
     title: string;
@@ -95,20 +97,14 @@ export function marketingNav(locale: Locale): NavItem[] {
   const home = homePath(locale);
   const labels =
     locale === "es"
-      ? (["Nosotros", "Propiedades", "Descargables", "Contacto"] as const)
-      : (["About", "Properties", "Downloads", "Contact"] as const);
+      ? (["Nosotros", "Propiedades", "Contacto"] as const)
+      : (["About", "Properties", "Contact"] as const);
 
   return [
     { href: `${home}#about`, label: labels[0] },
     { href: `/propiedades${q}`, label: labels[1] },
-    { href: `${home}#downloadables`, label: labels[2] },
-    { href: `/contacto${q}`, label: labels[3] },
+    { href: `/contacto${q}`, label: labels[2] },
   ];
-}
-
-/** Navegación del header — sin Descargables (acceso desde hero / footer). */
-export function marketingNavHeader(locale: Locale): NavItem[] {
-  return marketingNav(locale).filter((item) => !item.href.includes("#downloadables"));
 }
 
 export const HOME_COPY: Record<Locale, HomeCopy> = {
@@ -159,6 +155,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       visitCta: "Agenda una visita",
       catalogCta: "Catálogo completo",
       detailCta: "Ver propiedad",
+      virtualTourCta: "Tour virtual",
     },
     virtualTours: {
       title: "Descubre nuestras experiencias 3D",
@@ -238,6 +235,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       visitCta: "Schedule a visit",
       catalogCta: "Full catalog",
       detailCta: "View listing",
+      virtualTourCta: "Virtual tour",
     },
     virtualTours: {
       title: "Discover our 3D experiences",

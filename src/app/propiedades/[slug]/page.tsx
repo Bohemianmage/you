@@ -98,16 +98,9 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-sm border border-brand-accent px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-brand-accent transition hover:bg-brand-accent hover:text-brand-white"
               >
-                {property.ctaLabel}
+                {copy.virtualTourCta}
               </a>
-            ) : (
-              <Link
-                href={`${homePath(locale)}#virtual-tours`}
-                className="inline-flex items-center justify-center rounded-sm border border-brand-accent px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-brand-accent transition hover:bg-brand-accent hover:text-brand-white"
-              >
-                {property.ctaLabel}
-              </Link>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

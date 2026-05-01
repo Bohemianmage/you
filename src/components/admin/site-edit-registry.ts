@@ -36,8 +36,6 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
       { section: "about", key: "teamTitle", label: "Título equipo" },
       { section: "about", key: "clientsTitle", label: "Título clientes" },
       { section: "about", key: "clientsSubtitle", label: "Subtítulo clientes", multiline: true },
-      { section: "about", key: "contactTitle", label: "Título bloque contacto" },
-      { section: "about", key: "contactFormCta", label: "CTA formulario contacto" },
     ],
   },
   zones: {
@@ -52,6 +50,7 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
       { section: "featured", key: "visitCta", label: "CTA visita" },
       { section: "featured", key: "catalogCta", label: "CTA catálogo" },
       { section: "featured", key: "detailCta", label: "CTA ficha (tarjetas)" },
+      { section: "featured", key: "virtualTourCta", label: "CTA tour virtual (si hay URL)" },
     ],
   },
   virtualTours: {

@@ -5,25 +5,12 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { IconFacebook, IconInstagram, IconYoutube, iconClasses } from "@/components/icons/SocialIcons";
+import { iconClasses } from "@/components/icons/SocialIcons";
 import { LangSwitcher, LangSwitcherFallback } from "@/components/layout/LangSwitcher";
+import { MARKETING_SOCIAL_LINKS } from "@/constants/marketing-social";
 import { homePath } from "@/i18n/home";
 import type { NavItem } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
-
-const HEADER_SOCIAL = [
-  { label: "Facebook", href: "https://www.facebook.com/yousimx", Icon: IconFacebook },
-  {
-    label: "YouTube",
-    href: "https://www.youtube.com/channel/UCpehP2_hvHX0WPcLQK-ki3Q",
-    Icon: IconYoutube,
-  },
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/yousolucionesinmobiliarias/",
-    Icon: IconInstagram,
-  },
-] as const;
 
 const HOME_SECTION_IDS = ["about"] as const;
 
@@ -36,8 +23,23 @@ function parseNavHref(href: string): URL {
   return new URL(href, "https://yousoluciones.com");
 }
 
+/** Fragmento único si la URL acumuló varios `#` por error. */
+function firstHashFragment(hashWithMaybeMultiple: string): string {
+  const raw = hashWithMaybeMultiple.startsWith("#")
+    ? hashWithMaybeMultiple.slice(1)
+    : hashWithMaybeMultiple;
+  return raw.split("#")[0] ?? "";
+}
+
+function canonicalHomeHref(href: string): string {
+  const dest = parseNavHref(href);
+  const id = firstHashFragment(dest.hash);
+  return `${dest.pathname}${dest.search}${id ? `#${id}` : ""}`;
+}
+
 function scrollToSectionHash(hash: string) {
-  const id = hash.startsWith("#") ? hash.slice(1) : hash;
+  const id = firstHashFragment(hash);
+  if (!id) return;
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -51,6 +53,15 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
 
   const isHome = pathname === "/";
+
+  /** Corrige URLs con fragmentos encadenados (`#a#b`) por navegación defectuosa. */
+  useEffect(() => {
+    const path = `${window.location.pathname}${window.location.search}`;
+    const h = window.location.hash;
+    if (!h || !h.slice(1).includes("#")) return;
+    const frag = firstHashFragment(h);
+    window.history.replaceState(null, "", `${path}${frag ? `#${frag}` : ""}`);
+  }, []);
 
   useEffect(() => {
     if (!isHome) {
@@ -72,7 +83,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     };
 
     const syncHash = () => {
-      const raw = window.location.hash.replace(/^#/, "");
+      const raw = firstHashFragment(window.location.hash);
       if (raw === "about") {
         setActiveSectionId(raw);
         return;
@@ -115,15 +126,16 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     const here = `${window.location.pathname}${window.location.search}`;
     const destLoc = `${dest.pathname}${dest.search}`;
     if (destLoc !== here) return;
-    if (!dest.hash) {
+    const fragment = firstHashFragment(dest.hash);
+    if (!fragment) {
       setMobileOpen(false);
       return;
     }
     e.preventDefault();
-    scrollToSectionHash(dest.hash);
-    window.history.pushState(null, "", href);
+    scrollToSectionHash(`#${fragment}`);
+    window.history.pushState(null, "", canonicalHomeHref(href));
     setMobileOpen(false);
-    setActiveSectionId(dest.hash.slice(1));
+    setActiveSectionId(fragment);
   }
 
   function isNavItemActive(item: NavItem): boolean {
@@ -135,7 +147,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
       return pathname.startsWith("/propiedades");
     }
     if (u.pathname === "/" && u.hash) {
-      const id = u.hash.slice(1);
+      const id = firstHashFragment(u.hash);
       return isHome && activeSectionId === id;
     }
     return false;
@@ -154,8 +166,8 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const mobileLinkIdle = "hover:bg-brand-surface hover:text-brand-accent-strong";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_6px_24px_-10px_rgba(47,46,46,0.1)] backdrop-blur-md">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-1.5 sm:px-6 lg:gap-5 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] backdrop-blur-md">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-1 sm:px-6 lg:gap-4 lg:px-8">
         <Link
           href={homePath(locale)}
           className="group flex shrink-0 items-center font-semibold tracking-tight text-brand-text"
@@ -193,7 +205,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <div className="hidden items-center gap-1 md:flex">
-            {HEADER_SOCIAL.map(({ label, href, Icon }) => (
+            {MARKETING_SOCIAL_LINKS.map(({ label, href, Icon }) => (
               <a
                 key={label}
                 href={href}
@@ -263,7 +275,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
               })}
             </ul>
             <div className="mt-4 flex items-center justify-center gap-3 border-t border-brand-border/60 pt-4">
-              {HEADER_SOCIAL.map(({ label, href, Icon }) => (
+              {MARKETING_SOCIAL_LINKS.map(({ label, href, Icon }) => (
                 <a
                   key={label}
                   href={href}

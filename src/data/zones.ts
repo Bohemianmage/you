@@ -1,21 +1,27 @@
 import type { Locale } from "@/i18n/types";
 
-/** Premium zones exposed on home, localized for UI copy. */
-export const ZONES_BY_LOCALE: Record<Locale, readonly string[]> = {
+/** Tarjeta de zona en home — `filterZone` alinea con `CatalogProperty.zone` cuando el nombre visible difiere. */
+export interface HomeZone {
+  label: string;
+  filterZone?: string;
+}
+
+/** Zonas premium en portada (localizadas en etiqueta; filtro de catálogo vía `filterZone`). */
+export const ZONES_BY_LOCALE: Record<Locale, readonly HomeZone[]> = {
   es: [
-    "Nuevo Polanco",
-    "Polanco",
-    "Santa Fe",
-    "Condesa",
-    "Roma Norte / Cibeles",
-    "Bosques",
+    { label: "Nuevo Polanco", filterZone: "Polanco" },
+    { label: "Polanco" },
+    { label: "Santa Fe" },
+    { label: "Condesa" },
+    { label: "Roma Norte / Cibeles" },
+    { label: "Bosques", filterZone: "Santa Fe" },
   ],
   en: [
-    "Nuevo Polanco",
-    "Polanco",
-    "Santa Fe",
-    "Condesa",
-    "Roma Norte / Cibeles",
-    "Bosques",
+    { label: "Nuevo Polanco", filterZone: "Polanco" },
+    { label: "Polanco" },
+    { label: "Santa Fe" },
+    { label: "Condesa" },
+    { label: "Roma Norte / Cibeles" },
+    { label: "Bosques", filterZone: "Santa Fe" },
   ],
 };

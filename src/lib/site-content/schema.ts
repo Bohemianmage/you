@@ -33,6 +33,12 @@ const catalogPropertySchema = z.object({
   imageSrc: z.string().optional(),
   tourUrl: z.string().optional(),
   ctaLabel: z.string().optional(),
+  listingType: z.enum(["rent", "sale"]).optional(),
+});
+
+const clientLogoSchema = z.object({
+  src: z.string().min(1),
+  alt: z.string().min(1),
 });
 
 const downloadableItemSchema = z.object({
@@ -87,6 +93,7 @@ export const siteContentFileSchema = z
       })
       .optional(),
     catalogProperties: z.array(catalogPropertySchema).optional(),
+    clientLogos: z.array(clientLogoSchema).optional(),
     downloadablesByLocale: z
       .object({
         es: z.array(downloadableItemSchema).optional(),
@@ -164,6 +171,14 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
       imageSrc: p.imageSrc?.trim() || undefined,
       tourUrl: p.tourUrl?.trim() || undefined,
       ctaLabel: p.ctaLabel?.trim() || undefined,
+      listingType: p.listingType,
+    }));
+  }
+
+  if (input.clientLogos !== undefined) {
+    out.clientLogos = input.clientLogos.map((l) => ({
+      src: l.src.trim(),
+      alt: l.alt.trim(),
     }));
   }
 

@@ -2,6 +2,7 @@ import { HomePageContent } from "@/components/home/HomePageContent";
 import { MarketingPageFrame } from "@/components/layout/MarketingPageFrame";
 import { localeQuery, resolveLocale } from "@/i18n/home";
 import {
+  getMergedClientLogos,
   getMergedDownloadablesForLocale,
   getMergedFeaturedForLocale,
   getMergedSiteContext,
@@ -18,11 +19,12 @@ interface HomePageProps {
 export default async function Home({ searchParams }: HomePageProps) {
   const params = searchParams ? await searchParams : undefined;
   const locale = resolveLocale(params?.lang);
-  const [{ homeCopy: copy, contact }, teamMembers, featuredProperties, downloadables] = await Promise.all([
+  const [{ homeCopy: copy, contact }, teamMembers, featuredProperties, downloadables, clientLogos] = await Promise.all([
     getMergedSiteContext(locale),
     getMergedTeamMembers(),
     getMergedFeaturedForLocale(locale),
     getMergedDownloadablesForLocale(locale),
+    getMergedClientLogos(),
   ]);
   const q = localeQuery(locale);
   const catalogHref = `/propiedades${q}`;
@@ -40,6 +42,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         serverTeam={teamMembers}
         serverFeatured={featuredProperties}
         serverDownloadables={downloadables}
+        serverClientLogos={clientLogos}
       />
     </MarketingPageFrame>
   );

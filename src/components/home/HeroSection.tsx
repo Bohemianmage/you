@@ -9,19 +9,21 @@ interface HeroSectionProps {
   modalCopy: HomeCopy["modal"];
   catalogHref: string;
   contactHref: string;
+  /** Chip superior — URL canónica con un solo fragmento (p. ej. sección descargables). */
+  announcementHref: string;
 }
 
 /**
  * Hero — lienzo claro, titular Montserrat, acento pizarra `#616E89`.
  */
-export function HeroSection({ copy, modalCopy, catalogHref, contactHref }: HeroSectionProps) {
+export function HeroSection({ copy, modalCopy, catalogHref, contactHref, announcementHref }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden border-b border-brand-border bg-brand-bg" aria-labelledby="hero-heading">
       <HeroDevelopmentModal copy={modalCopy} />
       <div className="border-b border-brand-border bg-brand-surface px-4 py-3.5 text-center sm:px-6">
         <p className="mx-auto max-w-4xl text-[13px] font-semibold leading-snug text-brand-text sm:text-sm">
           <Link
-            href={catalogHref}
+            href={announcementHref}
             className="inline-flex flex-wrap items-center justify-center gap-x-2 rounded-full border border-brand-accent/20 bg-brand-accent/[0.06] px-4 py-2 text-brand-accent-strong transition hover:border-brand-accent/35 hover:bg-brand-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-accent"
           >
             {copy.announcement}

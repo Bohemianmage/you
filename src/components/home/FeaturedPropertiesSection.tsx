@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { FeaturedProperty } from "@/data/properties";
-import { homePath, type HomeCopy } from "@/i18n/home";
+import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import { featuredPropertyDetailHref } from "@/lib/property-routes";
@@ -50,7 +50,6 @@ export function FeaturedPropertiesSection({
         <ul className="grid gap-10 md:grid-cols-2">
           {properties.map((property) => {
             const detailHref = featuredPropertyDetailHref(locale, property);
-            const toursHref = `${homePath(locale)}#virtual-tours`;
             return (
               <li key={property.id}>
                 <article className="flex h-full flex-col overflow-hidden rounded-sm border border-brand-border bg-brand-bg shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
@@ -88,16 +87,9 @@ export function FeaturedPropertiesSection({
                         rel="noopener noreferrer"
                         className="inline-flex flex-1 items-center justify-center rounded-sm border border-brand-accent bg-transparent px-5 py-2.5 text-center text-xs font-bold uppercase tracking-[0.14em] text-brand-accent transition hover:bg-brand-accent hover:text-brand-white sm:flex-none"
                       >
-                        {property.ctaLabel}
+                        {copy.virtualTourCta}
                       </a>
-                    ) : (
-                      <Link
-                        href={toursHref}
-                        className="inline-flex flex-1 items-center justify-center rounded-sm border border-brand-accent bg-transparent px-5 py-2.5 text-center text-xs font-bold uppercase tracking-[0.14em] text-brand-accent transition hover:bg-brand-accent hover:text-brand-white sm:flex-none"
-                      >
-                        {property.ctaLabel}
-                      </Link>
-                    )}
+                    ) : null}
                   </div>
                 </article>
               </li>

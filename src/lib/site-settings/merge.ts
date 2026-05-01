@@ -18,8 +18,9 @@ import {
   mergePublicCatalogFromFile,
   mergeSiteContact as mergeSiteContactFromFile,
   mergeTeamFromFile,
+  mergeClientLogosFromFile,
 } from "@/lib/site-content/merge-public";
-import type { SiteContentFile } from "@/lib/site-content/types";
+import type { ClientLogo, SiteContentFile } from "@/lib/site-content/types";
 
 import { findCatalogPropertyBySegment, findFeaturedPropertyBySegment } from "@/lib/property-routes";
 
@@ -45,6 +46,11 @@ export async function getMergedSiteContext(locale: Locale): Promise<{ homeCopy: 
 export async function getMergedTeamMembers(): Promise<TeamMember[]> {
   const file = await getCachedSiteContent();
   return mergeTeamFromFile(file);
+}
+
+export async function getMergedClientLogos(): Promise<ClientLogo[]> {
+  const file = await getCachedSiteContent();
+  return mergeClientLogosFromFile(file);
 }
 
 export async function getMergedFeaturedForLocale(locale: Locale): Promise<FeaturedProperty[]> {

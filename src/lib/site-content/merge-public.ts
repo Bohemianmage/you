@@ -11,7 +11,7 @@ import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 
 import { deepMerge } from "./deep-merge";
-import type { SiteContentFile } from "./types";
+import type { ClientLogo, SiteContentFile } from "./types";
 
 export function mergeSiteContact(file: SiteContentFile): SiteContact {
   return {
@@ -44,6 +44,11 @@ export function mergeHomeCopy(locale: Locale, base: HomeCopy, file: SiteContentF
     out = { ...out, hero: { ...out.hero, announcement: announcementOverride } };
   }
   return out;
+}
+
+export function mergeClientLogosFromFile(file: SiteContentFile): ClientLogo[] {
+  if (file.clientLogos !== undefined) return [...file.clientLogos];
+  return [];
 }
 
 export function mergeTeamFromFile(file: SiteContentFile): TeamMember[] {

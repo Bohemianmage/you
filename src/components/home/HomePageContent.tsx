@@ -18,8 +18,15 @@ import type { DownloadableItem } from "@/data/downloadables";
 import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import { ZONES_BY_LOCALE } from "@/data/zones";
+import type { ClientLogo } from "@/lib/site-content/types";
 import { CONTACT_FORM_COPY } from "@/i18n/marketing-pages";
-import { mergeDownloadablesFromFile, mergeFeaturedFromFile, mergeTeamFromFile } from "@/lib/site-content/merge-public";
+import {
+  mergeClientLogosFromFile,
+  mergeDownloadablesFromFile,
+  mergeFeaturedFromFile,
+  mergeTeamFromFile,
+} from "@/lib/site-content/merge-public";
+import { homePath } from "@/i18n/home";
 
 export function HomePageContent({
   catalogHref,
@@ -29,6 +36,7 @@ export function HomePageContent({
   serverTeam,
   serverFeatured,
   serverDownloadables,
+  serverClientLogos,
 }: {
   catalogHref: string;
   contactHref: string;
@@ -37,32 +45,40 @@ export function HomePageContent({
   serverTeam: TeamMember[];
   serverFeatured: FeaturedProperty[];
   serverDownloadables: DownloadableItem[];
+  serverClientLogos: ClientLogo[];
 }) {
-  const { homeCopy: copy, contact, locale } = useLiveSite();
+  const { homeCopy: copy, locale } = useLiveSite();
   const edit = useSiteContentEditOptional();
   const team = edit ? mergeTeamFromFile(edit.working) : serverTeam;
   const featured = edit ? mergeFeaturedFromFile(locale, edit.working) : serverFeatured;
   const downloadables = edit ? mergeDownloadablesFromFile(locale, edit.working) : serverDownloadables;
+  const clientLogos = edit ? mergeClientLogosFromFile(edit.working) : serverClientLogos;
+  const announcementHref = `${homePath(locale)}#downloadables`;
 
   return (
     <>
       <EditableSection sectionId="hero-modal" label="Editar">
-        <HeroSection copy={copy.hero} modalCopy={copy.modal} catalogHref={catalogHref} contactHref={contactHref} />
+        <HeroSection
+          copy={copy.hero}
+          modalCopy={copy.modal}
+          catalogHref={catalogHref}
+          contactHref={contactHref}
+          announcementHref={announcementHref}
+        />
       </EditableSection>
 
       <EditableSection sectionId="about" label="Editar">
         <AboutSection
           locale={locale}
           copy={copy.about}
-          footerCopy={copy.footer}
-          contact={contact}
-          contactHref={contactHref}
           teamMembers={team}
+          clientLogos={clientLogos}
+          adminEditing={!!edit}
         />
       </EditableSection>
 
       <EditableSection sectionId="zones" label="Editar">
-        <ZonesSection title={copy.zones.title} zones={ZONES_BY_LOCALE[locale]} />
+        <ZonesSection title={copy.zones.title} zones={ZONES_BY_LOCALE[locale]} locale={locale} />
       </EditableSection>
 
       <EditableSection sectionId="featured" label="Editar">

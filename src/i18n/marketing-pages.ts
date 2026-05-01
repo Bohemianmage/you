@@ -11,6 +11,12 @@ export const CATALOG_PAGE_COPY: Record<
     backHome: string;
     contactCta: string;
     viewListingCta: string;
+    virtualTourCta: string;
+    filterHeading: string;
+    filterAll: string;
+    filterRent: string;
+    filterSale: string;
+    noResults: string;
   }
 > = {
   es: {
@@ -21,6 +27,12 @@ export const CATALOG_PAGE_COPY: Record<
     backHome: "Volver al inicio",
     contactCta: "Platicar con un asesor",
     viewListingCta: "Ver ficha",
+    virtualTourCta: "Tour virtual",
+    filterHeading: "Tipo de operación",
+    filterAll: "Todas",
+    filterRent: "En renta",
+    filterSale: "En venta",
+    noResults: "No hay propiedades que coincidan con estos filtros.",
   },
   en: {
     title: "Properties",
@@ -30,6 +42,12 @@ export const CATALOG_PAGE_COPY: Record<
     backHome: "Back to home",
     contactCta: "Talk to an advisor",
     viewListingCta: "View listing",
+    virtualTourCta: "Virtual tour",
+    filterHeading: "Listing type",
+    filterAll: "All",
+    filterRent: "For rent",
+    filterSale: "For sale",
+    noResults: "No listings match these filters.",
   },
 };
 
@@ -41,6 +59,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     backFeatured: string;
     backCatalog: string;
     descriptionFallback: string;
+    virtualTourCta: string;
   }
 > = {
   es: {
@@ -49,6 +68,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     backCatalog: "Ver catálogo",
     descriptionFallback:
       "Para más detalle y disponibilidad actual, escribinos o agenda una visita con un asesor YOU.",
+    virtualTourCta: "Tour virtual",
   },
   en: {
     interestCta: "I’m interested",
@@ -56,6 +76,7 @@ export const PROPERTY_DETAIL_COPY: Record<
     backCatalog: "Browse listings",
     descriptionFallback:
       "For availability and full detail, contact us or schedule a visit with a YOU advisor.",
+    virtualTourCta: "Virtual tour",
   },
 };
 
