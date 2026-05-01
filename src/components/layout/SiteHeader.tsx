@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 
@@ -40,8 +40,25 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileNavMounted, setMobileNavMounted] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  /** Altura real del navbar (px) para anclar el panel móvil justo debajo, sin solaparlo. */
+  const [headerHeightPx, setHeaderHeightPx] = useState(80);
 
   const isHome = pathname === "/";
+
+  useLayoutEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const measure = () => setHeaderHeightPx(el.offsetHeight);
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!isHome) {
@@ -166,14 +183,18 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
       />
       <div className="pointer-events-none absolute inset-0 z-[1]">
         <div
-          className={`pointer-events-auto absolute left-0 right-0 top-2 flex max-h-[calc(100dvh-1rem)] flex-col overflow-y-auto rounded-b-xl border border-brand-border/35 border-t-0 bg-brand-bg/80 shadow-[0_12px_40px_rgba(26,30,97,0.12)] backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none motion-reduce:transform-none sm:top-3 ${
-            mobileOpen ? "translate-x-0" : "translate-x-full"
-          }`}
           role="dialog"
           aria-modal="true"
           aria-label={locale === "en" ? "Main menu" : "Menú principal"}
+          style={{
+            top: headerHeightPx,
+            maxHeight: `calc(100dvh - ${headerHeightPx}px)`,
+          }}
+          className={`absolute left-0 right-0 flex flex-col overflow-y-auto rounded-none border-0 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_10px_28px_-12px_rgba(47,46,46,0.18)] backdrop-blur-md transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none motion-reduce:transform-none ${
+            mobileOpen ? "pointer-events-auto translate-y-0" : "pointer-events-none -translate-y-full"
+          }`}
         >
-          <nav className="px-4 pb-2 pt-6 sm:px-5 sm:pt-7" aria-label="Principal móvil">
+          <nav className="px-4 pb-2 pt-4 sm:px-5 sm:pt-5" aria-label="Principal móvil">
             <ul className="space-y-1">
               {navItems.map((item) => {
                 const active = isNavItemActive(item);
@@ -221,6 +242,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
   return (
     <>
       <header
+        ref={headerRef}
         className={`sticky top-0 border-b border-brand-border/70 bg-brand-bg/85 shadow-[0_4px_20px_-10px_rgba(47,46,46,0.09)] backdrop-blur-md ${
           mobileOpen ? "z-[201]" : "z-50"
         }`}
@@ -299,18 +321,18 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
             onClick={() => setMobileOpen((o) => !o)}
           >
             <span
-              className={`block h-[2px] w-[1.15rem] origin-[18%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.15,0.64,1)] motion-reduce:transition-none ${
-                mobileOpen ? "translate-x-px translate-y-[7px] rotate-[41deg]" : ""
+              className={`block h-[2px] w-[1.1rem] origin-[14%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
+                mobileOpen ? "translate-x-[2px] translate-y-[7px] rotate-[44deg]" : ""
               }`}
             />
             <span
-              className={`block h-[2px] w-5 origin-center rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.15,0.64,1)] motion-reduce:transition-none ${
-                mobileOpen ? "translate-x-1 scale-x-[0.08] opacity-0" : ""
+              className={`block h-[2px] w-5 origin-[55%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
+                mobileOpen ? "translate-x-2 scale-x-[0.06] opacity-0" : ""
               }`}
             />
             <span
-              className={`block h-[2px] w-[1.05rem] origin-[82%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.15,0.64,1)] motion-reduce:transition-none ${
-                mobileOpen ? "-translate-x-0.5 -translate-y-[7px] -rotate-[36deg]" : ""
+              className={`block h-[2px] w-[1rem] origin-[88%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.2,0.55,1)] motion-reduce:transition-none ${
+                mobileOpen ? "-translate-x-[3px] -translate-y-[7px] -rotate-[34deg]" : ""
               }`}
             />
           </button>
