@@ -8,6 +8,29 @@ import { localeQuery } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import { PROPERTY_DETAIL_COPY } from "@/i18n/marketing-pages";
 
+const BOOKING_TZ = "America/Mexico_City";
+
+function dayKeyInMexicoCity(iso: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: BOOKING_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+}
+
+function groupSlotsByDay(slotsIso: string[]): { orderedKeys: string[]; byDay: Map<string, string[]> } {
+  const byDay = new Map<string, string[]>();
+  for (const iso of slotsIso) {
+    const k = dayKeyInMexicoCity(iso);
+    if (!byDay.has(k)) byDay.set(k, []);
+    byDay.get(k)!.push(iso);
+  }
+  for (const arr of byDay.values()) arr.sort((a, b) => a.localeCompare(b));
+  const orderedKeys = [...byDay.keys()].sort();
+  return { orderedKeys, byDay };
+}
+
 type DetailCopy = (typeof PROPERTY_DETAIL_COPY)["es"];
 
 type SlotsOk = {
@@ -37,6 +60,7 @@ export function PropertyVisitBooking({
   const [slotsRes, setSlotsRes] = useState<SlotsOk | SlotsErr | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(true);
   const [pick, setPick] = useState<string | null>(null);
+  const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -76,9 +100,22 @@ export function PropertyVisitBooking({
     }
   }, [catalogId, locale, segment]);
 
+  const slotsByDay = useMemo(() => {
+    if (!slotsRes || !slotsRes.ok || slotsRes.slotsIso.length === 0) {
+      return { orderedKeys: [] as string[], byDay: new Map<string, string[]>() };
+    }
+    return groupSlotsByDay(slotsRes.slotsIso);
+  }, [slotsRes]);
+
   useEffect(() => {
     void fetchSlots();
   }, [fetchSlots]);
+
+  useEffect(() => {
+    const keys = slotsByDay.orderedKeys;
+    if (!slotsRes?.ok || keys.length === 0) return;
+    setSelectedDayKey((prev) => (prev && keys.includes(prev) ? prev : keys[0]));
+  }, [slotsRes, slotsByDay]);
 
   const unavailableMessage = useMemo(() => {
     if (!slotsRes || slotsRes.ok) return null;
@@ -97,6 +134,31 @@ export function PropertyVisitBooking({
         return copy.bookingErrServer;
     }
   }, [copy, slotsRes]);
+
+  const dateFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-MX", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        timeZone: BOOKING_TZ,
+      }),
+    [locale],
+  );
+  const timeFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-MX", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: BOOKING_TZ,
+      }),
+    [locale],
+  );
+
+  const timesForDay = useMemo(() => {
+    if (!selectedDayKey) return [] as string[];
+    return slotsByDay.byDay.get(selectedDayKey) ?? [];
+  }, [selectedDayKey, slotsByDay]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -208,11 +270,11 @@ export function PropertyVisitBooking({
       <h2 id="booking-visita-heading" className="font-heading text-lg font-semibold text-brand-text">
         {copy.bookingSectionTitle}
       </h2>
-      <p className="mt-2 text-xs text-brand-muted">{copy.bookingTimezoneNote}</p>
+      <p className="mt-2 text-sm leading-relaxed text-brand-muted">{withYouWordmark(copy.bookingSectionHint)}</p>
+      <p className="mt-1.5 text-xs text-brand-muted">{copy.bookingTimezoneNote}</p>
       {slotsRes.assignAdvisorAtConfirm ? (
         <p className="mt-2 text-xs leading-relaxed text-brand-muted">{copy.bookingAssignAdvisorNote}</p>
       ) : null}
-      <p className="mt-3 text-sm leading-relaxed text-brand-muted">{withYouWordmark(copy.bookingSectionHint)}</p>
       {slotsRes.advisorName ? (
         <p className="mt-2 text-xs font-semibold text-brand-text">{slotsRes.advisorName}</p>
       ) : null}
@@ -226,34 +288,74 @@ export function PropertyVisitBooking({
       <form onSubmit={(e) => void onSubmit(e)} className="mt-6 space-y-6">
         <input type="text" name="website" value={hp} onChange={(e) => setHp(e.target.value)} className="hidden" tabIndex={-1} autoComplete="off" aria-hidden />
 
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickSlot}</p>
-          <div className="mt-3 grid max-h-52 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
-            {slotsRes.slotsIso.map((iso) => {
-              const d = new Date(iso);
-              const label = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-MX", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                timeZone: "America/Mexico_City",
-              }).format(d);
-              const active = pick === iso;
-              return (
-                <button
-                  key={iso}
-                  type="button"
-                  onClick={() => setPick(iso)}
-                  className={`rounded-sm border px-3 py-2 text-left text-xs font-semibold transition ${
-                    active ? "border-brand-accent bg-brand-accent text-brand-white" : "border-brand-border bg-brand-bg text-brand-text hover:border-brand-accent/50"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
+        <div className="space-y-5">
+          <div id="booking-days">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickDay}</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {slotsByDay.orderedKeys.map((key) => {
+                const firstIso = slotsByDay.byDay.get(key)?.[0];
+                const label = firstIso ? dateFmt.format(new Date(firstIso)) : key;
+                const active = selectedDayKey === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      setSelectedDayKey(key);
+                      setPick(null);
+                    }}
+                    className={`rounded-sm border px-3 py-2 text-left text-xs font-semibold transition ${
+                      active
+                        ? "border-brand-accent bg-brand-accent text-brand-white"
+                        : "border-brand-border bg-brand-bg text-brand-text hover:border-brand-accent/50"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
+          {selectedDayKey && timesForDay.length > 0 ? (
+            <div>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickTime}</p>
+                {slotsByDay.orderedKeys.length > 1 ? (
+                  <button
+                    type="button"
+                    className="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-accent hover:underline"
+                    onClick={() => {
+                      setPick(null);
+                      document.getElementById("booking-days")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    }}
+                  >
+                    {copy.bookingChangeDay}
+                  </button>
+                ) : null}
+              </div>
+              <div className="mt-2 grid max-h-48 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4 md:grid-cols-5">
+                {timesForDay.map((iso) => {
+                  const active = pick === iso;
+                  const label = timeFmt.format(new Date(iso));
+                  return (
+                    <button
+                      key={iso}
+                      type="button"
+                      onClick={() => setPick(iso)}
+                      className={`rounded-sm border px-2 py-2 text-center text-xs font-semibold transition ${
+                        active
+                          ? "border-brand-accent bg-brand-accent text-brand-white"
+                          : "border-brand-border bg-brand-bg text-brand-text hover:border-brand-accent/50"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <div className="rounded-sm border border-brand-border/70 bg-brand-bg/60 px-4 py-4">

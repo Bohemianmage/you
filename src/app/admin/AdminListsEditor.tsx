@@ -9,6 +9,7 @@ import { TeamPhotoFramingEditor } from "@/components/admin/TeamPhotoFramingEdito
 import type { CatalogProperty } from "@/data/catalog-properties";
 import type { DownloadableItem } from "@/data/downloadables";
 import type { TeamMember } from "@/data/team";
+import { computeAgendaReadiness } from "@/lib/admin/agenda-readiness";
 import type { AdminEditorSeed } from "@/lib/site-content/editor-seed";
 import type { SiteContentFile } from "@/lib/site-content/types";
 
@@ -208,11 +209,52 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
       .sort((a, b) => a.title.localeCompare(b.title, "es"));
   }, [catalog, advisorSearch]);
 
+  const agendaReadiness = useMemo(
+    () =>
+      computeAgendaReadiness({
+        team,
+        propertyAdvisorByCatalogId: normalizeAdvisorMap(advisorMap, catalog),
+        featuredCatalogIds,
+        catalog,
+      }),
+    [team, advisorMap, featuredCatalogIds, catalog],
+  );
+
   return (
     <div className="mt-10 space-y-8">
       {edit?.saveError ? (
         <p className="rounded-sm border border-brand-accent/40 bg-brand-accent/10 px-4 py-3 text-sm text-brand-accent-strong">{edit.saveError}</p>
       ) : null}
+
+      <section
+        className="rounded-sm border border-brand-border bg-brand-bg px-4 py-4 shadow-sm"
+        aria-label="Validación agenda en sitio"
+      >
+        <h2 className="font-heading text-sm font-semibold text-brand-text">Agenda en el sitio (contenido)</h2>
+        <p className="mt-1 text-xs leading-relaxed text-brand-muted">
+          Comprobación sobre Equipo, destacadas y mapa de asesores. Redis, correo transaccional y cifrado de documentos se configuran en el servidor / Vercel (ver también{" "}
+          <a href="/admin/calendario" className="font-semibold text-brand-accent underline-offset-2 hover:underline">
+            Calendario
+          </a>
+          ).
+        </p>
+        {agendaReadiness.errors.length > 0 ? (
+          <ul className="mt-3 list-inside list-disc space-y-1.5 text-sm text-brand-accent-strong">
+            {agendaReadiness.errors.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm font-medium text-brand-accent-strong">Listo a nivel contenido: correos de equipo y mapa coherentes.</p>
+        )}
+        {agendaReadiness.warnings.length > 0 ? (
+          <ul className="mt-3 list-inside list-disc space-y-1.5 text-xs text-brand-muted">
+            {agendaReadiness.warnings.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
 
       <div className="flex flex-wrap gap-2 rounded-sm border border-brand-border/80 bg-brand-surface/30 p-1">
         <button type="button" className={`${tabBtn} ${tab === "team" ? tabActive : tabIdle}`} onClick={() => setTab("team")}>

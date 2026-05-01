@@ -37,7 +37,7 @@ export type SiteContentFile = SiteSettingsPayload & {
   homeCopyByLocale?: Partial<Record<Locale, DeepPartial<HomeCopy>>>;
   /**
    * ID de catálogo EasyBroker → ID de miembro del equipo (asesor) para citas y recordatorios.
-   * Solo propiedades con entrada aquí ofrecen agenda en ficha.
+   * Si falta entrada, la ficha puede seguir ofreciendo agenda con horarios del equipo (unión) hasta confirmar en admin.
    */
   propertyAdvisorByCatalogId?: Record<string, string>;
   /**

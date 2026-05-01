@@ -211,6 +211,12 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingSectionTitle: string;
     bookingLoading: string;
     bookingSectionHint: string;
+    /** Encabezado del paso 1 (días con huecos). */
+    bookingPickDay: string;
+    /** Encabezado del paso 2 (horas del día elegido). */
+    bookingPickTime: string;
+    /** Volver a la lista de días (accesible / móvil). */
+    bookingChangeDay: string;
     bookingPickSlot: string;
     bookingNameLabel: string;
     bookingEmailLabel: string;
@@ -293,7 +299,10 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingSectionTitle: "Agendar visita",
     bookingLoading: "Cargando horarios disponibles…",
     bookingSectionHint:
-      "Elige horario (hora Ciudad de México). El asesor confirmará la visita manualmente; hasta entonces solo tienes solicitud recibida. Si confirma, recibirás correo con detalles.",
+      "Elegí día y hora. La visita queda como solicitud: el equipo la confirma por correo cuando esté aceptada (no es automática).",
+    bookingPickDay: "Día disponible",
+    bookingPickTime: "Hora",
+    bookingChangeDay: "Cambiar día",
     bookingPickSlot: "Horarios disponibles",
     bookingNameLabel: "Nombre completo",
     bookingEmailLabel: "Correo electrónico",
@@ -310,9 +319,9 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingUnavailableAdvisorEmail:
       "Falta correo del asesor en admin (Equipo). Mientras tanto, contáctanos por WhatsApp.",
     bookingUnavailableNoSlots: "No hay horarios libres en las próximas semanas. Escríbenos para coordinar.",
-    bookingTimezoneNote: "Hora Ciudad de México; suele haber huecos también sábado y domingo (salvo que el asesor solo atienda entre semana).",
+    bookingTimezoneNote: "Todo en hora de Ciudad de México.",
     bookingAssignAdvisorNote:
-      "Esta propiedad aún no tiene asesor asignado en catálogo; elegimos quién te atiende al confirmar tu solicitud. Los horarios muestran cuando hay disponibilidad en el equipo.",
+      "Esta propiedad aún no tiene asesor fijo en catálogo: al confirmar la visita asignamos a alguien del equipo. Los horarios son cuando hay alguien disponible.",
     bookingUnavailableNoEncryption:
       "La solicitud de visitas no está configurada en el servidor (falta cifrado de documentación). Contacta al equipo técnico o usa WhatsApp.",
     bookingDocHeading: "Documentación para la visita",
@@ -379,7 +388,10 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingSectionTitle: "Schedule a visit",
     bookingLoading: "Loading available times…",
     bookingSectionHint:
-      "Pick a time (Mexico City). Your advisor confirms visits manually — until then you only have a request receipt. If confirmed, you’ll get details by email.",
+      "Pick a day and time. Your visit stays a request until we confirm it by email (confirmation isn’t automatic).",
+    bookingPickDay: "Available day",
+    bookingPickTime: "Time",
+    bookingChangeDay: "Change day",
     bookingPickSlot: "Available times",
     bookingNameLabel: "Full name",
     bookingEmailLabel: "Email",
@@ -396,9 +408,9 @@ export const PROPERTY_DETAIL_COPY: Record<
     bookingUnavailableAdvisorEmail:
       "The advisor email isn’t configured yet in admin (Team). Please use WhatsApp for now.",
     bookingUnavailableNoSlots: "No open slots in the coming weeks. Contact us to coordinate.",
-    bookingTimezoneNote: "Mexico City time; weekend slots are usually available unless the advisor is weekdays-only.",
+    bookingTimezoneNote: "All times are Mexico City time.",
     bookingAssignAdvisorNote:
-      "This listing isn’t mapped to a specific advisor yet—we’ll assign someone when your request is confirmed. Times shown reflect availability across the team.",
+      "This listing doesn’t have a fixed advisor in the catalog yet—we’ll assign a team member when your visit is confirmed. Times reflect when someone on the team is free.",
     bookingUnavailableNoEncryption:
       "Visit requests aren’t configured on the server (document encryption missing). Contact us or use WhatsApp.",
     bookingDocHeading: "Documentation for your visit",

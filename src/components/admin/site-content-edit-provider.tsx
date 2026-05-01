@@ -94,7 +94,6 @@ function SiteAdminToolbar({
         <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-between sm:gap-x-6 sm:gap-y-3">
           <div className="flex min-w-0 flex-col gap-0.5 sm:max-w-[11rem]">
             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-accent-strong">Admin</p>
-            <p className="text-[11px] leading-snug text-brand-muted">Vista previa pública con cambios locales hasta guardar.</p>
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-3 border-t border-brand-border/70 pt-3 sm:flex-row sm:items-start sm:justify-end sm:gap-0 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
