@@ -157,16 +157,16 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
     >
       <button
         type="button"
-        className={`absolute inset-0 transition-opacity duration-300 ease-out motion-reduce:transition-none ${
+        className={`absolute inset-0 z-0 transition-opacity duration-300 ease-out motion-reduce:transition-none ${
           mobileOpen ? "bg-brand-text/35 opacity-100 backdrop-blur-[3px]" : "opacity-0"
         }`}
         tabIndex={mobileOpen ? 0 : -1}
         aria-label={locale === "en" ? "Close menu" : "Cerrar menú"}
         onClick={() => setMobileOpen(false)}
       />
-      <div className="absolute inset-0 flex items-start justify-end p-2 sm:p-3">
+      <div className="pointer-events-none absolute inset-0 z-[1]">
         <div
-          className={`relative flex h-auto max-h-[calc(100dvh-1rem)] w-[min(100%,20rem)] flex-col overflow-y-auto rounded-lg border border-brand-border/35 bg-brand-bg/78 shadow-[0_8px_32px_rgba(26,30,97,0.14)] backdrop-blur-xl transition-transform duration-300 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+          className={`pointer-events-auto absolute left-0 right-0 top-2 flex max-h-[calc(100dvh-1rem)] flex-col overflow-y-auto rounded-b-xl border border-brand-border/35 border-t-0 bg-brand-bg/80 shadow-[0_12px_40px_rgba(26,30,97,0.12)] backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none motion-reduce:transform-none sm:top-3 ${
             mobileOpen ? "translate-x-0" : "translate-x-full"
           }`}
           role="dialog"
@@ -285,7 +285,7 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
 
           <button
             type="button"
-            className="flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-0.5 rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text transition-colors duration-300 lg:hidden"
+            className="relative flex h-9 w-9 shrink-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md border border-brand-border/80 bg-brand-surface/90 text-brand-text lg:hidden"
             aria-expanded={mobileOpen}
             aria-label={
               mobileOpen
@@ -299,13 +299,19 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
             onClick={() => setMobileOpen((o) => !o)}
           >
             <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition duration-300 ease-out motion-reduce:transition-none ${mobileOpen ? "translate-y-1.5 rotate-45" : ""}`}
+              className={`block h-[2px] w-[1.15rem] origin-[18%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.15,0.64,1)] motion-reduce:transition-none ${
+                mobileOpen ? "translate-x-px translate-y-[7px] rotate-[41deg]" : ""
+              }`}
             />
             <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition duration-300 ease-out motion-reduce:transition-none ${mobileOpen ? "opacity-0" : ""}`}
+              className={`block h-[2px] w-5 origin-center rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.15,0.64,1)] motion-reduce:transition-none ${
+                mobileOpen ? "translate-x-1 scale-x-[0.08] opacity-0" : ""
+              }`}
             />
             <span
-              className={`block h-0.5 w-5 rounded-full bg-current transition duration-300 ease-out motion-reduce:transition-none ${mobileOpen ? "-translate-y-1.5 -rotate-45" : ""}`}
+              className={`block h-[2px] w-[1.05rem] origin-[82%_50%] rounded-full bg-current transition-all duration-300 ease-[cubic-bezier(0.34,1.15,0.64,1)] motion-reduce:transition-none ${
+                mobileOpen ? "-translate-x-0.5 -translate-y-[7px] -rotate-[36deg]" : ""
+              }`}
             />
           </button>
         </div>
