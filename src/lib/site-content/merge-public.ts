@@ -51,9 +51,26 @@ export function mergeClientLogosFromFile(file: SiteContentFile): ClientLogo[] {
   return [];
 }
 
+/** Une JSON persistido con `TEAM_MEMBERS` por `id` para no perder fotos/contacto cuando el archivo no los incluye. */
 export function mergeTeamFromFile(file: SiteContentFile): TeamMember[] {
-  if (file.team !== undefined) return [...file.team];
-  return [...TEAM_MEMBERS];
+  if (file.team === undefined) return [...TEAM_MEMBERS];
+  const defaultsById = new Map(TEAM_MEMBERS.map((m) => [m.id, m]));
+  return file.team.map((m) => {
+    const base = defaultsById.get(m.id);
+    if (!base) return { ...m };
+    const role = { ...base.role, ...m.role };
+    const trimmedImg = m.imageSrc?.trim();
+    return {
+      ...base,
+      ...m,
+      role,
+      imageSrc: trimmedImg ? trimmedImg : base.imageSrc,
+      email: m.email?.trim() ? m.email.trim() : base.email,
+      phoneDisplay: m.phoneDisplay?.trim() ? m.phoneDisplay.trim() : base.phoneDisplay,
+      phoneHref: m.phoneHref?.trim() ? m.phoneHref.trim() : base.phoneHref,
+      social: m.social !== undefined ? m.social : base.social,
+    };
+  });
 }
 
 export function mergeFeaturedFromFile(locale: Locale, file: SiteContentFile): FeaturedProperty[] {

@@ -44,3 +44,6 @@ next-env.d.ts
 # Uploads reflejados en disco local (el origen es el commit en GitHub)
 /public/site-uploads/*
 !/public/site-uploads/.gitkeep
+
+# Backup local del hero antes de comprimir (archivo pesado)
+/public/videos/*.original.mp4

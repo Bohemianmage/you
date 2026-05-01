@@ -20,7 +20,8 @@
       "role": {
         "es": "Co-Founder / COO",
         "en": "Co-Founder / COO"
-      }
+      },
+      "imageSrc": "/team/eugenia-alonso.jpg"
     },
     {
       "id": "emiliano-berumen",
@@ -28,7 +29,8 @@
       "role": {
         "es": "Co-Founder",
         "en": "Co-Founder"
-      }
+      },
+      "imageSrc": "/team/emiliano-berumen.png"
     },
     {
       "id": "blanca-cepeda",
@@ -36,7 +38,8 @@
       "role": {
         "es": "Broker especializado",
         "en": "Specialized broker"
-      }
+      },
+      "imageSrc": "/team/blanca-cepeda.png"
     },
     {
       "id": "jean-claude-martell",
@@ -44,7 +47,8 @@
       "role": {
         "es": "Broker especializado",
         "en": "Specialized broker"
-      }
+      },
+      "imageSrc": "/team/jean-claude-martell.png"
     }
   ],
   "featuredCatalogIds": [
