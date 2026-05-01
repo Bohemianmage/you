@@ -5,6 +5,7 @@ import type { FeaturedProperty } from "@/data/properties";
 import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
+import { propertyCoverImage } from "@/lib/property-media";
 import { featuredPropertyDetailHref } from "@/lib/property-routes";
 
 interface FeaturedPropertiesSectionProps {
@@ -50,16 +51,18 @@ export function FeaturedPropertiesSection({
         <ul className="grid gap-10 md:grid-cols-2">
           {properties.map((property) => {
             const detailHref = featuredPropertyDetailHref(locale, property);
+            const cover = propertyCoverImage(property);
             return (
               <li key={property.id}>
                 <article className="flex h-full flex-col overflow-hidden rounded-sm border border-brand-border bg-brand-bg shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
                   <Link href={detailHref} className="group block text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2">
                     <div className="relative aspect-[16/10] bg-gradient-to-br from-brand-surface to-brand-border/60">
-                      {property.imageSrc ? (
+                      {cover ? (
                         <Image
-                          src={property.imageSrc}
+                          src={cover}
                           alt={property.title}
                           fill
+                          unoptimized={cover.startsWith("http")}
                           className="object-cover transition duration-300 group-hover:scale-[1.02]"
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />

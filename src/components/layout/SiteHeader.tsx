@@ -151,9 +151,10 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
           className="group flex shrink-0 items-center font-semibold tracking-tight text-brand-text"
         >
           <Image
-            src="/logo-you-mark.png"
-            width={256}
-            height={256}
+            src="/logo-you.svg"
+            width={120}
+            height={120}
+            unoptimized
             sizes="(max-width: 640px) 96px, 112px"
             alt="YOU Soluciones Inmobiliarias"
             className="h-[72px] w-auto max-w-[5.5rem] object-contain object-left transition-opacity duration-200 group-hover:opacity-[0.92] sm:h-[88px] sm:max-w-[6.5rem]"

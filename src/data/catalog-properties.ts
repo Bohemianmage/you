@@ -13,10 +13,27 @@ export interface CatalogProperty {
   status?: string;
   /** Filtro catálogo renta vs venta (si falta, se infiere de `status` / texto). */
   listingType?: "rent" | "sale";
+  /** Superficie en m² (si falta, se intenta leer de `specs`). */
+  areaM2?: number;
+  bedrooms?: number;
+  /** Permite medios baños (ej. 5.5). */
+  bathrooms?: number;
+  /** Monto numérico para filtros; si falta se parsea de `price`. */
+  priceAmount?: number;
+  priceCurrency?: "MXN" | "USD";
   description?: string;
   imageSrc?: string;
+  /** Varias imágenes; la primera sustituye cover si existe. */
+  imageGallery?: string[];
   tourUrl?: string;
   ctaLabel?: string;
+  neighborhood?: string;
+  propertyType?: string;
+  lotAreaM2?: number;
+  gardenM2?: number;
+  parkingSpots?: number;
+  yearBuilt?: number;
+  brochureUrl?: string;
 }
 
 export const CATALOG_PROPERTIES: readonly CatalogProperty[] = [
@@ -28,6 +45,11 @@ export const CATALOG_PROPERTIES: readonly CatalogProperty[] = [
     zone: "Polanco",
     status: "En venta",
     listingType: "sale",
+    areaM2: 240,
+    bedrooms: 3,
+    bathrooms: 3,
+    priceAmount: 1350000,
+    priceCurrency: "USD",
   },
   {
     id: "tres-picos-polanco",
@@ -37,6 +59,11 @@ export const CATALOG_PROPERTIES: readonly CatalogProperty[] = [
     zone: "Polanco",
     status: "En venta",
     listingType: "sale",
+    areaM2: 500,
+    bedrooms: 3,
+    bathrooms: 5,
+    priceAmount: 20000000,
+    priceCurrency: "MXN",
   },
   {
     id: "tecamachalco-naucalpan",
@@ -46,6 +73,11 @@ export const CATALOG_PROPERTIES: readonly CatalogProperty[] = [
     zone: "Estado de México",
     status: "En renta",
     listingType: "rent",
+    areaM2: 250,
+    bedrooms: 3,
+    bathrooms: 3,
+    priceAmount: 90000,
+    priceCurrency: "MXN",
   },
   {
     id: "zona-hotelera-polanco",
@@ -55,6 +87,11 @@ export const CATALOG_PROPERTIES: readonly CatalogProperty[] = [
     zone: "Polanco",
     status: "En venta",
     listingType: "sale",
+    areaM2: 660,
+    bedrooms: 3,
+    bathrooms: 4,
+    priceAmount: 2500000,
+    priceCurrency: "USD",
   },
   {
     id: "club-golf-bosques-santa-fe",
@@ -64,5 +101,10 @@ export const CATALOG_PROPERTIES: readonly CatalogProperty[] = [
     zone: "Santa Fe",
     status: "En venta",
     listingType: "sale",
+    areaM2: 240,
+    bedrooms: 3,
+    bathrooms: 3,
+    priceAmount: 1350000,
+    priceCurrency: "USD",
   },
 ] as const;

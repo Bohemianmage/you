@@ -2,19 +2,34 @@ import Link from "next/link";
 
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
 import { PropiedadesCatalog } from "@/components/propiedades/PropiedadesCatalog";
-import { localeQuery, resolveLocale } from "@/i18n/home";
+import { localeQuery } from "@/i18n/home";
+import { resolveMarketingLocale } from "@/lib/marketing-locale";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
+import { parseCatalogFiltersFromSearchParams } from "@/lib/catalog-query";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import { getMergedCatalog } from "@/lib/site-settings/merge";
 import type { Metadata } from "next";
 
 interface PropiedadesPageProps {
-  searchParams?: Promise<{ lang?: string; zone?: string; tipo?: string }>;
+  searchParams?: Promise<{
+    lang?: string;
+    zone?: string;
+    tipo?: string;
+    m2Min?: string;
+    m2Max?: string;
+    recMin?: string;
+    recMax?: string;
+    banMin?: string;
+    banMax?: string;
+    precioMin?: string;
+    precioMax?: string;
+    moneda?: string;
+  }>;
 }
 
 export async function generateMetadata({ searchParams }: PropiedadesPageProps): Promise<Metadata> {
   const params = searchParams ? await searchParams : undefined;
-  const locale = resolveLocale(params?.lang);
+  const locale = await resolveMarketingLocale(params?.lang);
   const title = locale === "en" ? "Properties" : "Propiedades";
   return {
     title,
@@ -27,14 +42,13 @@ export async function generateMetadata({ searchParams }: PropiedadesPageProps): 
 
 export default async function PropiedadesPage({ searchParams }: PropiedadesPageProps) {
   const params = searchParams ? await searchParams : undefined;
-  const locale = resolveLocale(params?.lang);
+  const locale = await resolveMarketingLocale(params?.lang);
   const copy = CATALOG_PAGE_COPY[locale];
   const q = localeQuery(locale);
   const contactHref = `/contacto${q}`;
   const homeHref = locale === "en" ? "/?lang=en" : "/";
   const catalog = await getMergedCatalog();
-  const filterZone = typeof params?.zone === "string" ? params.zone : undefined;
-  const filterTipo = params?.tipo === "rent" || params?.tipo === "sale" ? params.tipo : undefined;
+  const filters = parseCatalogFiltersFromSearchParams(params ?? {});
 
   return (
     <MarketingLayout locale={locale}>
@@ -62,8 +76,7 @@ export default async function PropiedadesPage({ searchParams }: PropiedadesPageP
             serverCatalog={catalog}
             copy={copy}
             contactHref={contactHref}
-            filterZone={filterZone}
-            filterTipo={filterTipo}
+            filters={filters}
           />
         </div>
       </div>

@@ -80,6 +80,11 @@ export async function getMergedPropertyDetailBySlug(locale: Locale, slug: string
   return catalogAsFeaturedDetail(cat, locale);
 }
 
+export async function getMergedSiteContact(): Promise<SiteContact> {
+  const file = await getCachedSiteContent();
+  return mergeSiteContact(file);
+}
+
 function deriveFeaturedCatalogIdsForAdmin(file: SiteContentFile): string[] {
   if (file.featuredCatalogIds !== undefined) return [...file.featuredCatalogIds];
   const catalog = mergeCatalogFromFile(file);

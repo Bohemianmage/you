@@ -44,6 +44,20 @@ function newDownloadableId(): string {
   return `dl-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+function optionalInt(raw: string): number | undefined {
+  const t = raw.trim();
+  if (!t) return undefined;
+  const n = parseInt(t, 10);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function optionalFloat(raw: string): number | undefined {
+  const t = raw.trim();
+  if (!t) return undefined;
+  const n = Number(t);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 function emptyDownloadable(): DownloadableItem {
   return { id: newDownloadableId(), title: "", description: "" };
 }
@@ -178,16 +192,6 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
     );
   }
 
-  function updateSocial(i: number, field: keyof NonNullable<TeamMember["social"]>, value: string) {
-    setTeam((prev) =>
-      prev.map((m, j) => {
-        if (j !== i) return m;
-        const social = { ...m.social, [field]: value };
-        return { ...m, social };
-      }),
-    );
-  }
-
   function updateCatalog(idx: number, patch: Partial<CatalogProperty>) {
     setCatalog((prev) => prev.map((p, j) => (j === idx ? { ...p, ...patch } : p)));
   }
@@ -214,7 +218,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
       ) : null}
 
       <p className="text-sm text-brand-muted">
-        Contacto, textos del pie, aviso del hero y copy de secciones del home se editan en el sitio con la barra inferior (&quot;Modo edición&quot;).
+        Contacto, textos del pie, aviso del hero y copy de secciones del home se editan en el sitio con la barra inferior en modo edición.
       </p>
 
       <div className="flex flex-wrap gap-2">
@@ -322,29 +326,32 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                     <SiteAssetUploadButton kind="image" subfolder="team" onUploaded={(url) => updateTeam(i, { imageSrc: url })} />
                   </label>
                   <label className={labelClass}>
-                    Facebook URL
+                    Correo
                     <input
-                      type="text"
-                      value={member.social?.facebook ?? ""}
-                      onChange={(e) => updateSocial(i, "facebook", e.target.value)}
+                      type="email"
+                      value={member.email ?? ""}
+                      onChange={(e) => updateTeam(i, { email: e.target.value || undefined })}
+                      placeholder="nombre@ejemplo.com"
                       className={inputClass}
                     />
                   </label>
                   <label className={labelClass}>
-                    Twitter/X URL
+                    Teléfono visible
                     <input
                       type="text"
-                      value={member.social?.twitter ?? ""}
-                      onChange={(e) => updateSocial(i, "twitter", e.target.value)}
+                      value={member.phoneDisplay ?? ""}
+                      onChange={(e) => updateTeam(i, { phoneDisplay: e.target.value || undefined })}
+                      placeholder="55-1234-5678"
                       className={inputClass}
                     />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
-                    LinkedIn URL
+                    Teléfono enlace (tel:)
                     <input
                       type="text"
-                      value={member.social?.linkedin ?? ""}
-                      onChange={(e) => updateSocial(i, "linkedin", e.target.value)}
+                      value={member.phoneHref ?? ""}
+                      onChange={(e) => updateTeam(i, { phoneHref: e.target.value || undefined })}
+                      placeholder="tel:+5255..."
                       className={inputClass}
                     />
                   </label>
@@ -615,7 +622,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                     <textarea rows={5} value={prop.description ?? ""} onChange={(e) => updateCatalog(idx, { description: e.target.value || undefined })} className={inputClass} />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
-                    Imagen (/public/… o URL)
+                    Imagen principal (/public/… o URL)
                     <input
                       type="text"
                       value={prop.imageSrc ?? ""}
@@ -623,6 +630,127 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
                       className={inputClass}
                     />
                     <SiteAssetUploadButton kind="image" subfolder="catalog" onUploaded={(url) => updateCatalog(idx, { imageSrc: url })} />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Galería — una URL por línea
+                    <textarea
+                      rows={4}
+                      value={prop.imageGallery?.join("\n") ?? ""}
+                      onChange={(e) => {
+                        const lines = e.target.value
+                          .split("\n")
+                          .map((l) => l.trim())
+                          .filter(Boolean);
+                        updateCatalog(idx, { imageGallery: lines.length ? lines : undefined });
+                      }}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Colonia / barrio (ficha)
+                    <input
+                      type="text"
+                      value={prop.neighborhood ?? ""}
+                      onChange={(e) => updateCatalog(idx, { neighborhood: e.target.value || undefined })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Tipo de propiedad
+                    <input
+                      type="text"
+                      value={prop.propertyType ?? ""}
+                      onChange={(e) => updateCatalog(idx, { propertyType: e.target.value || undefined })}
+                      placeholder="Casa, PH…"
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Recámaras (número)
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={prop.bedrooms ?? ""}
+                      onChange={(e) => updateCatalog(idx, { bedrooms: optionalInt(e.target.value) })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Baños (permite 5.5)
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.5}
+                      value={prop.bathrooms ?? ""}
+                      onChange={(e) => updateCatalog(idx, { bathrooms: optionalFloat(e.target.value) })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    m² construcción
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={prop.areaM2 ?? ""}
+                      onChange={(e) => updateCatalog(idx, { areaM2: optionalFloat(e.target.value) })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    m² terreno
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={prop.lotAreaM2 ?? ""}
+                      onChange={(e) => updateCatalog(idx, { lotAreaM2: optionalFloat(e.target.value) })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    m² jardín
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={prop.gardenM2 ?? ""}
+                      onChange={(e) => updateCatalog(idx, { gardenM2: optionalFloat(e.target.value) })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Cajones estacionamiento
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      value={prop.parkingSpots ?? ""}
+                      onChange={(e) => updateCatalog(idx, { parkingSpots: optionalInt(e.target.value) })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Año construcción
+                    <input
+                      type="number"
+                      min={1800}
+                      max={2100}
+                      step={1}
+                      value={prop.yearBuilt ?? ""}
+                      onChange={(e) => updateCatalog(idx, { yearBuilt: optionalInt(e.target.value) })}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className={`${labelClass} sm:col-span-2`}>
+                    Folleto PDF (URL)
+                    <input
+                      type="text"
+                      value={prop.brochureUrl ?? ""}
+                      onChange={(e) => updateCatalog(idx, { brochureUrl: e.target.value || undefined })}
+                      className={inputClass}
+                    />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
                     Tour URL (opcional)
@@ -658,10 +786,7 @@ export function AdminListsEditor({ seed, persistedBaseline }: { seed: AdminEdito
               English
             </button>
           </div>
-          <p className="text-sm text-brand-muted">
-            Expandí cada ítem para editar PDF/imagen. Arrastrá ⋮⋮ para ordenar. Los títulos de la sección se editan en el sitio. <strong className="text-brand-text">Subida:</strong> Git (
-            <code className="text-xs">GITHUB_TOKEN</code> / <code className="text-xs">GITHUB_REPO</code>); tras subir hace falta deploy para servir bajo <code className="text-xs">/site-uploads/…</code>.
-          </p>
+          <p className="text-sm text-brand-muted">Expandí cada ítem para editar PDF o miniatura. Arrastrá ⋮⋮ para ordenar.</p>
           <ul className="space-y-4">
             {downloadList.map((item, idx) => {
               const rowKey = `dl:${downloadLocale}:${item.id}`;

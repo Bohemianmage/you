@@ -34,7 +34,7 @@ export function useSiteContentEditOptional() {
 function mapSaveError(e: string): string {
   const m: Record<string, string> = {
     invalid_json: "JSON inválido.",
-    validation: "Revisá los datos (validación).",
+    validation: "Revisá los datos.",
     write_failed: "No se pudo escribir el archivo.",
     github_unauthorized: "GitHub: token inválido.",
     github_forbidden: "GitHub: sin permiso.",
@@ -47,15 +47,49 @@ function mapSaveError(e: string): string {
   return m[e] ?? "No se pudo guardar.";
 }
 
-function SiteAdminToolbar() {
+function SiteAdminToolbar({
+  saveNoticeOpen,
+  dismissSaveNotice,
+}: {
+  saveNoticeOpen: boolean;
+  dismissSaveNotice: () => void;
+}) {
   const ctx = useContext(SiteContentEditContext);
   if (!ctx) return null;
   const { dirty, discard, save, saving, saveError } = ctx;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[190] border-t border-brand-border bg-brand-bg/95 px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
+    <>
+      {saveNoticeOpen ? (
+        <div className="fixed inset-0 z-[240] flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45 backdrop-blur-[1px]"
+            aria-label="Cerrar"
+            onClick={dismissSaveNotice}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="site-save-notice-title"
+            className="relative z-10 w-full max-w-sm rounded-sm border border-brand-border bg-brand-bg p-6 shadow-xl ring-1 ring-brand-border/60"
+          >
+            <p id="site-save-notice-title" className="text-center font-heading text-base font-semibold text-brand-text">
+              Cambios guardados
+            </p>
+            <button
+              type="button"
+              className="mt-5 w-full rounded-sm bg-brand-accent py-3 text-xs font-bold uppercase tracking-[0.14em] text-brand-white shadow-sm hover:bg-brand-accent-strong"
+              onClick={dismissSaveNotice}
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <div className="fixed bottom-0 left-0 right-0 z-[190] border-t border-brand-border bg-brand-bg/95 px-4 py-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-muted">Modo edición · navegá el sitio y pulsá Editar en cada bloque</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-muted">Modo edición</p>
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/admin/listas"
@@ -90,7 +124,8 @@ function SiteAdminToolbar() {
         </div>
       </div>
       {saveError ? <p className="mx-auto mt-2 max-w-6xl text-center text-xs text-brand-accent-strong">{saveError}</p> : null}
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -112,6 +147,7 @@ export function SiteContentEditProvider({
   const [marketingLocale, setMarketingLocale] = useState<Locale>("es");
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveNoticeOpen, setSaveNoticeOpen] = useState(false);
 
   useEffect(() => {
     if (!dirty) {
@@ -129,6 +165,7 @@ export function SiteContentEditProvider({
     setWorking(structuredClone(initialPersisted));
     setDirty(false);
     setSaveError(null);
+    setSaveNoticeOpen(false);
   }, [initialPersisted]);
 
   const save = useCallback(async () => {
@@ -141,8 +178,11 @@ export function SiteContentEditProvider({
       return;
     }
     setDirty(false);
+    setSaveNoticeOpen(true);
     router.refresh();
   }, [working, router]);
+
+  const dismissSaveNotice = useCallback(() => setSaveNoticeOpen(false), []);
 
   const openSection = useCallback((id: string) => setActiveSection(id), []);
   const closeDrawer = useCallback(() => setActiveSection(null), []);
@@ -184,7 +224,7 @@ export function SiteContentEditProvider({
   return (
     <SiteContentEditContext.Provider value={ctxValue}>
       <div className="min-h-full pb-28">{children}</div>
-      <SiteAdminToolbar />
+      <SiteAdminToolbar saveNoticeOpen={saveNoticeOpen} dismissSaveNotice={dismissSaveNotice} />
       <AdminEditDrawer />
     </SiteContentEditContext.Provider>
   );

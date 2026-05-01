@@ -59,6 +59,7 @@ export function HomePageContent({
     <>
       <EditableSection sectionId="hero-modal" label="Editar">
         <HeroSection
+          locale={locale}
           copy={copy.hero}
           modalCopy={copy.modal}
           catalogHref={catalogHref}
@@ -87,8 +88,8 @@ export function HomePageContent({
             <p className="mx-auto mb-3 max-w-6xl px-4 text-center text-xs text-brand-muted sm:px-6 lg:px-8">
               <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
                 Catálogo y orden de destacados
-              </Link>{" "}
-              (panel Listas).
+              </Link>
+              .
             </p>
           ) : null}
           <FeaturedPropertiesSection
@@ -119,8 +120,8 @@ export function HomePageContent({
             <p className="mx-auto mb-3 max-w-6xl px-4 text-center text-xs text-brand-muted sm:px-6 lg:px-8">
               <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
                 Archivos PDF e imágenes de tarjetas
-              </Link>{" "}
-              (panel → pestaña Descargables).
+              </Link>
+              .
             </p>
           ) : null}
           <DownloadablesSection copy={copy.downloadables} items={downloadables} />

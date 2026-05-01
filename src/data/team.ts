@@ -12,27 +12,34 @@ export interface TeamMember {
   role: Record<Locale, string>;
   /** Add under `/public/team/…` when assets are available (see migration). */
   imageSrc?: string;
+  email?: string;
+  phoneDisplay?: string;
+  phoneHref?: string;
+  /** Legacy; preferir email y teléfono en tarjetas con volteo. */
   social?: TeamMemberSocial;
 }
 
 /**
- * Equipo inicial; las URLs sociales se pueden completar cuando estén confirmadas.
+ * Equipo inicial; correo y teléfono opcionales por persona en admin / JSON.
  */
 export const TEAM_MEMBERS: readonly TeamMember[] = [
   {
     id: "eugenia-alonso",
     name: "Eugenia Alonso",
     role: { es: "Co-Founder / COO", en: "Co-Founder / COO" },
+    imageSrc: "/team/eugenia-alonso.jpg",
   },
   {
     id: "emiliano-berumen",
     name: "Emiliano Berumen",
     role: { es: "Co-Founder", en: "Co-Founder" },
+    imageSrc: "/team/emiliano-berumen.png",
   },
   {
     id: "blanca-cepeda",
     name: "Blanca Cepeda",
     role: { es: "Broker especializado", en: "Specialized broker" },
+    imageSrc: "/team/blanca-cepeda.png",
   },
   {
     id: "mariana-novales",
@@ -48,6 +55,7 @@ export const TEAM_MEMBERS: readonly TeamMember[] = [
     id: "jean-claude-martell",
     name: "Jean Claude Martell",
     role: { es: "Broker especializado", en: "Specialized broker" },
+    imageSrc: "/team/jean-claude-martell.png",
   },
   {
     id: "alejandra-rodriguez",

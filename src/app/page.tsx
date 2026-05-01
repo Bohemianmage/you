@@ -1,6 +1,7 @@
 import { HomePageContent } from "@/components/home/HomePageContent";
 import { MarketingPageFrame } from "@/components/layout/MarketingPageFrame";
-import { localeQuery, resolveLocale } from "@/i18n/home";
+import { localeQuery } from "@/i18n/home";
+import { resolveMarketingLocale } from "@/lib/marketing-locale";
 import {
   getMergedClientLogos,
   getMergedDownloadablesForLocale,
@@ -18,7 +19,7 @@ interface HomePageProps {
  */
 export default async function Home({ searchParams }: HomePageProps) {
   const params = searchParams ? await searchParams : undefined;
-  const locale = resolveLocale(params?.lang);
+  const locale = await resolveMarketingLocale(params?.lang);
   const [{ homeCopy: copy, contact }, teamMembers, featuredProperties, downloadables, clientLogos] = await Promise.all([
     getMergedSiteContext(locale),
     getMergedTeamMembers(),

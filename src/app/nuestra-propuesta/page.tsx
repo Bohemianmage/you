@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
-import { localeQuery, resolveLocale } from "@/i18n/home";
+import { localeQuery } from "@/i18n/home";
+import { resolveMarketingLocale } from "@/lib/marketing-locale";
 import { PROPOSAL_PAGE_COPY } from "@/i18n/marketing-pages";
 import type { Metadata } from "next";
 
@@ -11,7 +12,7 @@ interface PropuestaPageProps {
 
 export async function generateMetadata({ searchParams }: PropuestaPageProps): Promise<Metadata> {
   const params = searchParams ? await searchParams : undefined;
-  const locale = resolveLocale(params?.lang);
+  const locale = await resolveMarketingLocale(params?.lang);
   const title = PROPOSAL_PAGE_COPY[locale].title;
   return {
     title,
@@ -24,7 +25,7 @@ export async function generateMetadata({ searchParams }: PropuestaPageProps): Pr
 
 export default async function NuestraPropuestaPage({ searchParams }: PropuestaPageProps) {
   const params = searchParams ? await searchParams : undefined;
-  const locale = resolveLocale(params?.lang);
+  const locale = await resolveMarketingLocale(params?.lang);
   const copy = PROPOSAL_PAGE_COPY[locale];
   const q = localeQuery(locale);
   const contactHref = `/contacto${q}`;

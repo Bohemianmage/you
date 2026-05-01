@@ -5,8 +5,10 @@ import { MARKETING_SOCIAL_LINKS } from "@/constants/marketing-social";
 import type { SiteContact } from "@/constants/site-contact";
 import { TEXT_LINK_INLINE } from "@/lib/link-styles";
 import type { HomeCopy, NavItem } from "@/i18n/home";
+import type { Locale } from "@/i18n/types";
 
 interface SiteFooterProps {
+  locale: Locale;
   navItems: readonly NavItem[];
   footerCopy: HomeCopy["footer"];
   contact: SiteContact;
@@ -15,7 +17,7 @@ interface SiteFooterProps {
 /**
  * Pie — tipografía clara, redes y navegación en ritmo de marca.
  */
-export function SiteFooter({ navItems, footerCopy, contact }: SiteFooterProps) {
+export function SiteFooter({ locale, navItems, footerCopy, contact }: SiteFooterProps) {
   return (
     <footer className="relative mt-auto border-t border-brand-border bg-gradient-to-b from-brand-surface/90 via-brand-bg to-brand-bg text-brand-text">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-accent/25 to-transparent" aria-hidden />
@@ -67,6 +69,36 @@ export function SiteFooter({ navItems, footerCopy, contact }: SiteFooterProps) {
             © {new Date().getFullYear()} YOU Soluciones Inmobiliarias. {footerCopy.copyright}
           </p>
           <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-brand-muted">CDMX · México</p>
+        </div>
+
+        <div className="border-t border-brand-border/60 pt-8 text-center">
+          <p className="text-[11px] leading-relaxed text-brand-muted">
+            {locale === "en" ? (
+              <>
+                Site developed by{" "}
+                <a
+                  href="https://www.codiva.dev/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${TEXT_LINK_INLINE} font-semibold`}
+                >
+                  Codiva
+                </a>
+              </>
+            ) : (
+              <>
+                Sitio desarrollado por{" "}
+                <a
+                  href="https://www.codiva.dev/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${TEXT_LINK_INLINE} font-semibold`}
+                >
+                  Codiva
+                </a>
+              </>
+            )}
+          </p>
         </div>
       </div>
     </footer>

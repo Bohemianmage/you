@@ -1,11 +1,6 @@
 import Image from "next/image";
 
-import {
-  IconFacebook,
-  IconLinkedIn,
-  IconTwitter,
-  iconClasses,
-} from "@/components/icons/SocialIcons";
+import { TeamMemberFlipCard } from "@/components/home/TeamMemberFlipCard";
 import type { ClientLogo } from "@/lib/site-content/types";
 import type { TeamMember } from "@/data/team";
 import type { HomeCopy } from "@/i18n/home";
@@ -18,84 +13,6 @@ interface AboutSectionProps {
   clientLogos: readonly ClientLogo[];
   /** En modo admin: mensaje si aún no hay logos en `site-content.json`. */
   adminEditing?: boolean;
-}
-
-function memberInitials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "?";
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return `${parts[0][0] ?? ""}${parts[parts.length - 1][0] ?? ""}`.toUpperCase();
-}
-
-function TeamMemberCard({ member, locale }: { member: TeamMember; locale: Locale }) {
-  const social = member.social;
-  const hasSocial =
-    social && (social.facebook || social.twitter || social.linkedin);
-
-  return (
-    <li className="flex flex-col overflow-hidden rounded-sm border border-brand-border bg-brand-bg shadow-[0_1px_4px_rgba(0,0,0,0.08)]">
-      <div className="relative aspect-[4/5] bg-gradient-to-br from-brand-surface to-brand-border/40">
-        {member.imageSrc ? (
-          <Image
-            src={member.imageSrc}
-            alt={member.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-accent/15 via-brand-surface to-brand-accent/10">
-            <span className="font-heading text-2xl font-semibold tracking-wide text-brand-accent">
-              {memberInitials(member.name)}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        <div>
-          <h4 className="font-heading text-base font-semibold text-brand-text">{member.name}</h4>
-          <p className="mt-1 text-xs font-medium uppercase tracking-[0.08em] text-brand-muted">{member.role[locale]}</p>
-        </div>
-        {hasSocial ? (
-          <div className="mt-auto flex gap-2 border-t border-brand-border/60 pt-3">
-            {social!.facebook ? (
-              <a
-                href={social!.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full p-2 text-brand-muted ring-1 ring-brand-border/60 transition hover:bg-brand-accent hover:text-brand-white hover:ring-brand-accent"
-                aria-label={`${member.name} — Facebook`}
-              >
-                <IconFacebook className={iconClasses("sm")} />
-              </a>
-            ) : null}
-            {social!.twitter ? (
-              <a
-                href={social!.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full p-2 text-brand-muted ring-1 ring-brand-border/60 transition hover:bg-brand-accent hover:text-brand-white hover:ring-brand-accent"
-                aria-label={`${member.name} — X`}
-              >
-                <IconTwitter className={iconClasses("sm")} />
-              </a>
-            ) : null}
-            {social!.linkedin ? (
-              <a
-                href={social!.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full p-2 text-brand-muted ring-1 ring-brand-border/60 transition hover:bg-brand-accent hover:text-brand-white hover:ring-brand-accent"
-                aria-label={`${member.name} — LinkedIn`}
-              >
-                <IconLinkedIn className={iconClasses("sm")} />
-              </a>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
-    </li>
-  );
 }
 
 /**
@@ -136,7 +53,7 @@ export function AboutSection({ locale, copy, teamMembers, clientLogos, adminEdit
           </h3>
           <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {teamMembers.map((member) => (
-              <TeamMemberCard key={member.id} member={member} locale={locale} />
+              <TeamMemberFlipCard key={member.id} member={member} locale={locale} />
             ))}
           </ul>
         </div>
@@ -167,7 +84,7 @@ export function AboutSection({ locale, copy, teamMembers, clientLogos, adminEdit
               Añade logos en{" "}
               <code className="rounded bg-brand-border/25 px-1.5 py-0.5 text-xs text-brand-text">clientLogos</code> dentro de{" "}
               <code className="rounded bg-brand-border/25 px-1.5 py-0.5 text-xs text-brand-text">content/site-content.json</code>{" "}
-              (array de <code className="text-xs">src</code> y <code className="text-xs">alt</code>). La edición visual en panel llegará después.
+              como array de <code className="text-xs">src</code> y <code className="text-xs">alt</code>. La edición visual en panel llegará después.
             </p>
           ) : null}
         </div>

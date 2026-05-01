@@ -96,6 +96,8 @@ export function catalogAsFeaturedDetail(c: CatalogProperty, locale: Locale): Fea
       ? `${c.specs}. ${c.zone}. Contact us for availability and a private visit.`
       : `${c.specs}. ${c.zone}. Consultanos por disponibilidad y visita.`;
 
+  const gallery = c.imageGallery?.map((u) => u.trim()).filter(Boolean);
+
   return {
     id: c.id,
     slug: c.slug,
@@ -106,6 +108,17 @@ export function catalogAsFeaturedDetail(c: CatalogProperty, locale: Locale): Fea
     ctaLabel: c.ctaLabel?.trim() || defaultCta,
     description: c.description?.trim() || fallbackDesc,
     imageSrc: c.imageSrc,
+    imageGallery: gallery?.length ? gallery : undefined,
     tourUrl: c.tourUrl,
+    neighborhood: c.neighborhood?.trim() || undefined,
+    propertyType: c.propertyType?.trim() || undefined,
+    bedrooms: c.bedrooms,
+    bathrooms: c.bathrooms,
+    areaM2: c.areaM2,
+    lotAreaM2: c.lotAreaM2,
+    gardenM2: c.gardenM2,
+    parkingSpots: c.parkingSpots,
+    yearBuilt: c.yearBuilt,
+    brochureUrl: c.brochureUrl?.trim() || undefined,
   };
 }

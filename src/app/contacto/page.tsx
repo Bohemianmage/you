@@ -1,6 +1,6 @@
 import { ContactSection } from "@/components/home/ContactSection";
 import { MarketingLayout } from "@/components/layout/MarketingLayout";
-import { resolveLocale } from "@/i18n/home";
+import { resolveMarketingLocale } from "@/lib/marketing-locale";
 import { CONTACT_FORM_COPY } from "@/i18n/marketing-pages";
 import { normalizeContactTopic } from "@/lib/contact-url";
 import type { Metadata } from "next";
@@ -11,7 +11,7 @@ interface ContactoPageProps {
 
 export async function generateMetadata({ searchParams }: ContactoPageProps): Promise<Metadata> {
   const params = searchParams ? await searchParams : undefined;
-  const locale = resolveLocale(params?.lang);
+  const locale = await resolveMarketingLocale(params?.lang);
   return {
     title: CONTACT_FORM_COPY[locale].sectionTitle,
     description:
@@ -23,7 +23,7 @@ export async function generateMetadata({ searchParams }: ContactoPageProps): Pro
 
 export default async function ContactoPage({ searchParams }: ContactoPageProps) {
   const params = searchParams ? await searchParams : undefined;
-  const locale = resolveLocale(params?.lang);
+  const locale = await resolveMarketingLocale(params?.lang);
   const downloadableId = params?.item;
   const defaultTopic = downloadableId ? "descargables" : normalizeContactTopic(params?.topic);
 

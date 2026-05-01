@@ -1,11 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import { HeroBackdropVideo } from "@/components/home/HeroBackdropVideo";
 import { HeroDevelopmentModal } from "@/components/home/HeroDevelopmentModal";
 import { HomeHashLink } from "@/components/layout/HomeHashLink";
 import type { HomeCopy } from "@/i18n/home";
+import type { Locale } from "@/i18n/types";
 
 interface HeroSectionProps {
+  locale: Locale;
   copy: HomeCopy["hero"];
   modalCopy: HomeCopy["modal"];
   catalogHref: string;
@@ -14,14 +16,27 @@ interface HeroSectionProps {
   announcementHref: string;
 }
 
+function HeroHeadingTitle({ title, locale }: { title: string; locale: Locale }) {
+  if (locale !== "en") return title;
+  const suf = " YOU";
+  const i = title.lastIndexOf(suf);
+  if (i === -1) return title;
+  return (
+    <>
+      {title.slice(0, i)}
+      <span className="text-brand-accent"> YOU</span>
+    </>
+  );
+}
+
 /**
- * Hero — lienzo claro, titular Montserrat, acento pizarra `#616E89`.
+ * Hero — video de ciudad de fondo (bloque principal), aviso superior y CTAs.
  */
-export function HeroSection({ copy, modalCopy, catalogHref, contactHref, announcementHref }: HeroSectionProps) {
+export function HeroSection({ locale, copy, modalCopy, catalogHref, contactHref, announcementHref }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden border-b border-brand-border bg-brand-bg" aria-labelledby="hero-heading">
       <HeroDevelopmentModal copy={modalCopy} />
-      <div className="border-b border-brand-border bg-brand-surface px-4 py-3.5 text-center sm:px-6">
+      <div className="relative z-20 border-b border-brand-border bg-brand-surface px-4 py-3.5 text-center sm:px-6">
         <p className="mx-auto max-w-4xl text-[13px] font-semibold leading-snug text-brand-text sm:text-sm">
           <HomeHashLink
             href={announcementHref}
@@ -32,60 +47,47 @@ export function HeroSection({ copy, modalCopy, catalogHref, contactHref, announc
         </p>
       </div>
 
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-12 px-4 py-14 sm:px-6 sm:py-16 lg:flex-row lg:items-center lg:gap-14 lg:px-8 lg:py-20">
-        <div className="flex-1 space-y-8">
-          <div className="space-y-5">
-            <h1
-              id="hero-heading"
-              className="font-heading text-[2.1rem] font-semibold leading-[1.12] tracking-tight text-brand-text sm:text-5xl lg:text-[3.15rem]"
-            >
-              {copy.title}
-            </h1>
-            <p className="max-w-xl text-[13px] font-bold uppercase leading-relaxed tracking-[0.24em] text-brand-muted sm:text-sm">
-              {copy.subtitle}
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link
-              href={catalogHref}
-              className="inline-flex items-center justify-center rounded-sm bg-brand-accent px-7 py-3.5 text-center text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong"
-            >
-              {copy.primaryCta}
-            </Link>
-            <Link
-              href={contactHref}
-              className="inline-flex items-center justify-center rounded-sm border border-brand-accent bg-transparent px-7 py-3.5 text-center text-sm font-semibold text-brand-accent transition hover:bg-[rgba(97,110,137,0.08)]"
-            >
-              {copy.secondaryCta}
-            </Link>
-          </div>
-        </div>
+      <div className="relative isolate min-h-[28rem] overflow-hidden sm:min-h-[32rem] lg:min-h-[36rem]">
+        <HeroBackdropVideo poster={copy.imageSrc} />
+        <div
+          className="absolute inset-0 z-[1] bg-gradient-to-b from-brand-bg/88 via-brand-bg/72 to-brand-bg/80 lg:bg-gradient-to-r lg:from-brand-bg/90 lg:via-brand-bg/78 lg:to-brand-bg/65"
+          aria-hidden
+        />
 
-        <div className="flex-1">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm border border-brand-border bg-brand-surface shadow-[0_1px_4px_rgba(0,0,0,0.12)]">
-            {copy.imageSrc ? (
-              <>
-                <Image
-                  src={copy.imageSrc}
-                  alt=""
-                  fill
-                  unoptimized={copy.imageSrc.startsWith("http")}
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(47,46,46,0.45),transparent)]" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <p className="font-heading text-lg font-semibold text-brand-white drop-shadow-sm">YOU Soluciones Inmobiliarias</p>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/90">{copy.imageBadge}</p>
-                </div>
-              </>
-            ) : (
-              <div className="flex h-full w-full flex-col justify-end bg-gradient-to-br from-brand-surface via-brand-border/40 to-brand-accent/15 p-6">
-                <p className="font-heading text-lg font-semibold text-brand-text">YOU Soluciones Inmobiliarias</p>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand-accent">{copy.imageBadge}</p>
-              </div>
-            )}
+        <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:flex-row lg:items-center lg:gap-14 lg:px-8 lg:py-20">
+          <div className="flex-1 space-y-8">
+            <div className="space-y-5">
+              <h1
+                id="hero-heading"
+                className="font-heading text-[2.1rem] font-semibold leading-[1.12] tracking-tight text-brand-text sm:text-5xl lg:text-[3.15rem]"
+              >
+                <HeroHeadingTitle title={copy.title} locale={locale} />
+              </h1>
+              <p className="max-w-xl text-[13px] font-bold uppercase leading-relaxed tracking-[0.24em] text-brand-muted sm:text-sm">
+                {copy.subtitle}
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                href={catalogHref}
+                className="inline-flex items-center justify-center rounded-sm bg-brand-accent px-7 py-3.5 text-center text-sm font-semibold text-brand-white shadow-[0_1px_4px_rgba(0,0,0,0.2)] transition hover:bg-brand-accent-strong"
+              >
+                {copy.primaryCta}
+              </Link>
+              <Link
+                href={contactHref}
+                className="inline-flex items-center justify-center rounded-sm border border-brand-accent bg-brand-bg/90 px-7 py-3.5 text-center text-sm font-semibold text-brand-accent shadow-sm backdrop-blur-sm transition hover:bg-[rgba(97,110,137,0.12)]"
+              >
+                {copy.secondaryCta}
+              </Link>
+            </div>
+          </div>
+
+          <div className="flex w-full flex-1 justify-center lg:justify-end">
+            <div className="w-full max-w-md rounded-sm border border-white/25 bg-brand-bg/40 p-8 shadow-[0_8px_32px_rgba(47,46,46,0.12)] backdrop-blur-md backdrop-saturate-150">
+              <p className="font-heading text-lg font-semibold text-brand-text">YOU Soluciones Inmobiliarias</p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-brand-accent">{copy.imageBadge}</p>
+            </div>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { SiteAssetUploadButton } from "@/components/admin/SiteAssetUploadButton";
 import { SECTION_EDIT_META } from "@/components/admin/site-edit-registry";
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import { SITE_CONTACT } from "@/constants/site-contact";
@@ -199,6 +200,13 @@ export function AdminEditDrawer() {
                       className="mt-2 w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm"
                     />
                   )}
+                  {f.assetUpload ? (
+                    <SiteAssetUploadButton
+                      kind={f.assetUpload.kind}
+                      subfolder={f.assetUpload.subfolder}
+                      onUploaded={(url) => setDraft((d) => ({ ...d, [compound]: url }))}
+                    />
+                  ) : null}
                 </label>
               );
             })

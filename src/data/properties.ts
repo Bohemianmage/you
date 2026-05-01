@@ -16,6 +16,19 @@ export interface FeaturedProperty {
   tourUrl?: string;
   /** Optional hero image under `/public`. */
   imageSrc?: string;
+  /** Varias rutas / URLs para carrusel en ficha y cover usa la primera. */
+  imageGallery?: readonly string[];
+  neighborhood?: string;
+  propertyType?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  /** Superficie construida (m²). */
+  areaM2?: number;
+  lotAreaM2?: number;
+  gardenM2?: number;
+  parkingSpots?: number;
+  yearBuilt?: number;
+  brochureUrl?: string;
 }
 
 /**
@@ -70,6 +83,19 @@ export const FEATURED_PROPERTIES_BY_LOCALE: Record<
       address: "Cerrada Fuente de Leones, Lomas de Tecamachalco, Naucalpan de Juárez, Méx., México",
       status: "En renta",
       ctaLabel: "Recorrido virtual",
+      neighborhood: "Lomas de Tecamachalco",
+      propertyType: "Casa",
+      bedrooms: 5,
+      bathrooms: 5.5,
+      areaM2: 850,
+      lotAreaM2: 873,
+      gardenM2: 250,
+      parkingSpots: 9,
+      imageGallery: [
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=80",
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=80",
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1400&q=80",
+      ],
       description:
         "Increíble casa con amplio jardín. Acabados de lujo y amplios espacios.\n\n850 m² de construcción · 873 m² de terreno · 250 m² de jardín.\n\nLa casa cuenta con: 5 recámaras con baño completo, 9 estacionamientos, terraza amplia, gimnasio, 2 cuartos de servicio, lavandería, hidroneumático, 2 family rooms, comedor, antecomedor y sala.",
     },
@@ -118,6 +144,19 @@ export const FEATURED_PROPERTIES_BY_LOCALE: Record<
       address: "Cerrada Fuente de Leones, Lomas de Tecamachalco, Naucalpan de Juárez, State of Mexico, Mexico",
       status: "For rent",
       ctaLabel: "Virtual tour",
+      neighborhood: "Lomas de Tecamachalco",
+      propertyType: "House",
+      bedrooms: 5,
+      bathrooms: 5.5,
+      areaM2: 850,
+      lotAreaM2: 873,
+      gardenM2: 250,
+      parkingSpots: 9,
+      imageGallery: [
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&q=80",
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1400&q=80",
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1400&q=80",
+      ],
       description:
         "Remarkable home with a generous garden, luxury finishes, and expansive spaces.\n\n850 m² built · 873 m² lot · 250 m² garden.\n\nFive bedrooms with full baths, nine parking spaces, large terrace, gym, two service rooms, laundry, hydropneumatic system, two family rooms, dining, ante-dining, and living area.",
     },

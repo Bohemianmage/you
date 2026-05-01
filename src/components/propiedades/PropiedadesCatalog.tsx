@@ -7,9 +7,14 @@ import { useMemo } from "react";
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import type { CatalogProperty } from "@/data/catalog-properties";
 import { filterCatalogProperties } from "@/lib/catalog-filters";
-import { catalogPageHref, type ListingTypeFilter } from "@/lib/catalog-query";
+import {
+  catalogPageHref,
+  type CatalogQueryFilters,
+  type ListingTypeFilter,
+} from "@/lib/catalog-query";
 import { CATALOG_PAGE_COPY } from "@/i18n/marketing-pages";
 import type { Locale } from "@/i18n/types";
+import { propertyCoverImage } from "@/lib/property-media";
 import { catalogDetailHref } from "@/lib/property-routes";
 import { mergePublicCatalogFromFile } from "@/lib/site-content/merge-public";
 import type { SiteContentFile } from "@/lib/site-content/types";
@@ -25,30 +30,41 @@ function filterChipClass(active: boolean): string {
   return `${base} border-brand-border/80 bg-brand-bg text-brand-text hover:border-brand-accent/40 hover:bg-brand-surface`;
 }
 
+const fieldLabel = "mb-1 block text-[10px] font-bold uppercase tracking-[0.14em] text-brand-muted";
+const fieldInput =
+  "w-full rounded-sm border border-brand-border bg-brand-bg px-3 py-2 text-sm text-brand-text shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] ring-0 transition focus:border-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-accent/25";
+
 export function PropiedadesCatalog({
   locale,
   serverCatalog,
   copy,
   contactHref,
-  filterZone,
-  filterTipo,
+  filters,
 }: {
   locale: Locale;
   serverCatalog: CatalogProperty[];
   copy: CatalogCopy;
   contactHref: string;
-  filterZone?: string;
-  filterTipo?: ListingTypeFilter;
+  filters: CatalogQueryFilters;
 }) {
   const edit = useSiteContentEditOptional();
   const catalog = edit ? mergePublicCatalogFromFile(edit.working as SiteContentFile) : serverCatalog;
 
-  const filtered = useMemo(
-    () => filterCatalogProperties(catalog, { zone: filterZone ?? null, tipo: filterTipo ?? null }),
-    [catalog, filterZone, filterTipo],
-  );
+  const filtered = useMemo(() => filterCatalogProperties(catalog, filters), [catalog, filters]);
 
-  const tipo: ListingTypeFilter = filterTipo === "rent" || filterTipo === "sale" ? filterTipo : "";
+  const tipo: ListingTypeFilter =
+    filters.tipo === "rent" || filters.tipo === "sale" ? filters.tipo : "";
+
+  const zones = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of catalog) {
+      if (p.zone?.trim()) set.add(p.zone.trim());
+    }
+    return [...set].sort((a, b) => a.localeCompare(b, locale === "en" ? "en" : "es"));
+  }, [catalog, locale]);
+
+  const hrefTipo = (t: ListingTypeFilter) => catalogPageHref(locale, { ...filters, tipo: t });
+  const filterFormKey = JSON.stringify(filters);
 
   return (
     <div className="space-y-10">
@@ -56,31 +72,205 @@ export function PropiedadesCatalog({
         <p className="text-xs text-brand-muted">
           <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
             Editar catálogo y fichas
-          </Link>{" "}
-          (pestaña Catálogo en el panel).
+          </Link>
+          .
         </p>
       ) : null}
 
       <div className="flex flex-col gap-4 border-b border-brand-border/70 pb-8 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.filterHeading}</p>
         <div className="flex flex-wrap gap-2">
-          <Link href={catalogPageHref(locale, { zone: filterZone, tipo: "" })} className={filterChipClass(tipo === "")}>
+          <Link href={hrefTipo("")} className={filterChipClass(tipo === "")}>
             {copy.filterAll}
           </Link>
-          <Link
-            href={catalogPageHref(locale, { zone: filterZone, tipo: "rent" })}
-            className={filterChipClass(tipo === "rent")}
-          >
+          <Link href={hrefTipo("rent")} className={filterChipClass(tipo === "rent")}>
             {copy.filterRent}
           </Link>
-          <Link
-            href={catalogPageHref(locale, { zone: filterZone, tipo: "sale" })}
-            className={filterChipClass(tipo === "sale")}
-          >
+          <Link href={hrefTipo("sale")} className={filterChipClass(tipo === "sale")}>
             {copy.filterSale}
           </Link>
         </div>
       </div>
+
+      <section className="rounded-sm border border-brand-border/80 bg-brand-surface/60 p-5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] sm:p-6">
+        <h2 className="font-heading text-sm font-semibold uppercase tracking-[0.12em] text-brand-text">
+          {copy.filtersDetailHeading}
+        </h2>
+        <p className="mt-2 text-xs leading-relaxed text-brand-muted">{copy.filterPriceNote}</p>
+
+        <form key={filterFormKey} method="get" action="/propiedades" className="mt-6 space-y-6">
+          {locale === "en" ? <input type="hidden" name="lang" value="en" /> : null}
+          {(filters.tipo === "rent" || filters.tipo === "sale") ? (
+            <input type="hidden" name="tipo" value={filters.tipo} />
+          ) : null}
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="sm:col-span-2 lg:col-span-1">
+              <label htmlFor="filter-zone" className={fieldLabel}>
+                {copy.zoneLabel}
+              </label>
+              <select
+                id="filter-zone"
+                name="zone"
+                defaultValue={filters.zone ?? ""}
+                className={fieldInput}
+              >
+                <option value="">{copy.filterZoneAll}</option>
+                {zones.map((z) => (
+                  <option key={z} value={z}>
+                    {z}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="filter-m2min" className={fieldLabel}>
+                {copy.filterM2Min}
+              </label>
+              <input
+                id="filter-m2min"
+                name="m2Min"
+                type="number"
+                min={0}
+                step={1}
+                defaultValue={filters.m2Min ?? ""}
+                className={fieldInput}
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-m2max" className={fieldLabel}>
+                {copy.filterM2Max}
+              </label>
+              <input
+                id="filter-m2max"
+                name="m2Max"
+                type="number"
+                min={0}
+                step={1}
+                defaultValue={filters.m2Max ?? ""}
+                className={fieldInput}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="filter-recmin" className={fieldLabel}>
+                {copy.filterBedMin}
+              </label>
+              <input
+                id="filter-recmin"
+                name="recMin"
+                type="number"
+                min={0}
+                step={1}
+                defaultValue={filters.recMin ?? ""}
+                className={fieldInput}
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-recmax" className={fieldLabel}>
+                {copy.filterBedMax}
+              </label>
+              <input
+                id="filter-recmax"
+                name="recMax"
+                type="number"
+                min={0}
+                step={1}
+                defaultValue={filters.recMax ?? ""}
+                className={fieldInput}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="filter-banmin" className={fieldLabel}>
+                {copy.filterBathMin}
+              </label>
+              <input
+                id="filter-banmin"
+                name="banMin"
+                type="number"
+                min={0}
+                step={1}
+                defaultValue={filters.banMin ?? ""}
+                className={fieldInput}
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-banmax" className={fieldLabel}>
+                {copy.filterBathMax}
+              </label>
+              <input
+                id="filter-banmax"
+                name="banMax"
+                type="number"
+                min={0}
+                step={1}
+                defaultValue={filters.banMax ?? ""}
+                className={fieldInput}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="filter-preciomin" className={fieldLabel}>
+                {copy.filterPriceMin}
+              </label>
+              <input
+                id="filter-preciomin"
+                name="precioMin"
+                type="number"
+                min={0}
+                step="any"
+                defaultValue={filters.precioMin ?? ""}
+                className={fieldInput}
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-preciomax" className={fieldLabel}>
+                {copy.filterPriceMax}
+              </label>
+              <input
+                id="filter-preciomax"
+                name="precioMax"
+                type="number"
+                min={0}
+                step="any"
+                defaultValue={filters.precioMax ?? ""}
+                className={fieldInput}
+              />
+            </div>
+            <div>
+              <label htmlFor="filter-moneda" className={fieldLabel}>
+                {copy.filterCurrency}
+              </label>
+              <select
+                id="filter-moneda"
+                name="moneda"
+                defaultValue={filters.moneda ?? "MXN"}
+                className={fieldInput}
+              >
+                <option value="MXN">{copy.filterCurrencyMXN}</option>
+                <option value="USD">{copy.filterCurrencyUSD}</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 border-t border-brand-border/60 pt-5">
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-sm bg-brand-accent px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-brand-white transition hover:bg-brand-accent-strong"
+            >
+              {copy.filterApply}
+            </button>
+            <Link
+              href={catalogPageHref(locale, {})}
+              className="inline-flex items-center justify-center rounded-sm border border-brand-border px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-brand-text transition hover:border-brand-accent hover:text-brand-accent-strong"
+            >
+              {copy.filterReset}
+            </Link>
+          </div>
+        </form>
+      </section>
 
       {filtered.length === 0 ? (
         <p className="rounded-sm border border-dashed border-brand-border bg-brand-surface/80 px-6 py-10 text-center text-sm text-brand-muted">
@@ -90,6 +280,7 @@ export function PropiedadesCatalog({
         <ul className="grid gap-8 md:grid-cols-2">
           {filtered.map((p) => {
             const detailHref = catalogDetailHref(locale, p);
+            const cover = propertyCoverImage(p);
             return (
               <li key={p.id}>
                 <article className="flex h-full flex-col overflow-hidden rounded-sm border border-brand-border bg-brand-surface shadow-[0_1px_4px_rgba(0,0,0,0.12)]">
@@ -98,12 +289,12 @@ export function PropiedadesCatalog({
                     className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
                   >
                     <div className="relative aspect-[16/10] bg-gradient-to-br from-brand-bg to-brand-border/40">
-                      {p.imageSrc ? (
+                      {cover ? (
                         <Image
-                          src={p.imageSrc}
+                          src={cover}
                           alt={p.title}
                           fill
-                          unoptimized={p.imageSrc.startsWith("http")}
+                          unoptimized={cover.startsWith("http")}
                           className="object-cover transition duration-300 group-hover:scale-[1.02]"
                           sizes="(max-width: 768px) 100vw, 50vw"
                         />

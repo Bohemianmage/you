@@ -6,6 +6,8 @@ export type SectionFieldMeta = {
   label: string;
   multiline?: boolean;
   lines?: boolean;
+  /** Campo URL + botón subir imagen al repo Git. */
+  assetUpload?: { kind: "image"; subfolder: string };
 };
 
 export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionFieldMeta[] }> = {
@@ -18,7 +20,12 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
       { section: "hero", key: "primaryCta", label: "Botón principal" },
       { section: "hero", key: "secondaryCta", label: "Botón secundario" },
       { section: "hero", key: "imageBadge", label: "Badge imagen" },
-      { section: "hero", key: "imageSrc", label: "Imagen hero (/public/… o URL)" },
+      {
+        section: "hero",
+        key: "imageSrc",
+        label: "Poster del video (opcional, mientras carga)",
+        assetUpload: { kind: "image", subfolder: "hero" },
+      },
       { section: "modal", key: "title", label: "Modal · título" },
       { section: "modal", key: "message", label: "Modal · mensaje", multiline: true },
       { section: "modal", key: "close", label: "Modal · texto cerrar" },
@@ -72,7 +79,7 @@ export const SECTION_EDIT_META: Record<string, { title: string; fields: SectionF
     title: "Oficinas",
     fields: [
       { section: "offices", key: "imageLabel", label: "Etiqueta imagen (placeholder)" },
-      { section: "offices", key: "imageSrc", label: "Imagen oficinas (/public/… o URL)" },
+      { section: "offices", key: "imageSrc", label: "Imagen oficinas (/public/… o URL)", assetUpload: { kind: "image", subfolder: "offices" } },
       { section: "offices", key: "title", label: "Título" },
       { section: "offices", key: "description", label: "Descripción", multiline: true },
       { section: "offices", key: "supportText", label: "Texto apoyo", multiline: true },

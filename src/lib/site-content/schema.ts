@@ -10,6 +10,9 @@ const teamMemberSchema = z.object({
     en: z.string(),
   }),
   imageSrc: z.string().optional(),
+  email: z.string().optional(),
+  phoneDisplay: z.string().optional(),
+  phoneHref: z.string().optional(),
   social: z
     .object({
       facebook: z.string().optional(),
@@ -31,9 +34,22 @@ const catalogPropertySchema = z.object({
   status: z.string().optional(),
   description: z.string().optional(),
   imageSrc: z.string().optional(),
+  imageGallery: z.array(z.string()).optional(),
   tourUrl: z.string().optional(),
   ctaLabel: z.string().optional(),
   listingType: z.enum(["rent", "sale"]).optional(),
+  areaM2: z.number().nonnegative().optional(),
+  bedrooms: z.number().int().nonnegative().optional(),
+  bathrooms: z.number().nonnegative().optional(),
+  priceAmount: z.number().nonnegative().optional(),
+  priceCurrency: z.enum(["MXN", "USD"]).optional(),
+  neighborhood: z.string().optional(),
+  propertyType: z.string().optional(),
+  lotAreaM2: z.number().nonnegative().optional(),
+  gardenM2: z.number().nonnegative().optional(),
+  parkingSpots: z.number().int().nonnegative().optional(),
+  yearBuilt: z.number().int().optional(),
+  brochureUrl: z.string().optional(),
 });
 
 const clientLogoSchema = z.object({
@@ -60,6 +76,17 @@ const featuredPropertySchema = z.object({
   description: z.string().optional(),
   tourUrl: z.string().optional(),
   imageSrc: z.string().optional(),
+  imageGallery: z.array(z.string()).optional(),
+  neighborhood: z.string().optional(),
+  propertyType: z.string().optional(),
+  bedrooms: z.number().int().nonnegative().optional(),
+  bathrooms: z.number().nonnegative().optional(),
+  areaM2: z.number().nonnegative().optional(),
+  lotAreaM2: z.number().nonnegative().optional(),
+  gardenM2: z.number().nonnegative().optional(),
+  parkingSpots: z.number().int().nonnegative().optional(),
+  yearBuilt: z.number().int().optional(),
+  brochureUrl: z.string().optional(),
 });
 
 export const siteContentFileSchema = z
@@ -131,6 +158,9 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
     out.team = input.team.map((m) => ({
       ...m,
       imageSrc: m.imageSrc?.trim() || undefined,
+      email: m.email?.trim() || undefined,
+      phoneDisplay: m.phoneDisplay?.trim() || undefined,
+      phoneHref: m.phoneHref?.trim() || undefined,
       social:
         m.social && Object.values(m.social).some((u) => u && u.trim())
           ? {
@@ -146,13 +176,20 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
     out.featuredCatalogIds = input.featuredCatalogIds.map((id) => id.trim()).filter(Boolean);
   } else if (input.featuredByLocale !== undefined) {
     const stripFeatured = (arr: NonNullable<SiteContentFile["featuredByLocale"]>["es"] | undefined) =>
-      (arr ?? []).map((p) => ({
-        ...p,
-        slug: p.slug?.trim() || undefined,
-        description: p.description?.trim() || undefined,
-        tourUrl: p.tourUrl?.trim() || undefined,
-        imageSrc: p.imageSrc?.trim() || undefined,
-      }));
+      (arr ?? []).map((p) => {
+        const imageGallery = p.imageGallery?.map((u) => u.trim()).filter(Boolean);
+        return {
+          ...p,
+          slug: p.slug?.trim() || undefined,
+          description: p.description?.trim() || undefined,
+          tourUrl: p.tourUrl?.trim() || undefined,
+          imageSrc: p.imageSrc?.trim() || undefined,
+          imageGallery: imageGallery?.length ? imageGallery : undefined,
+          neighborhood: p.neighborhood?.trim() || undefined,
+          propertyType: p.propertyType?.trim() || undefined,
+          brochureUrl: p.brochureUrl?.trim() || undefined,
+        };
+      });
 
     out.featuredByLocale = {
       ...(input.featuredByLocale.es !== undefined ? { es: stripFeatured(input.featuredByLocale.es) } : {}),
@@ -161,18 +198,34 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
   }
 
   if (input.catalogProperties !== undefined) {
-    out.catalogProperties = input.catalogProperties.map((p) => ({
-      ...p,
-      active: p.active === false ? false : undefined,
-      slug: p.slug?.trim() || undefined,
-      address: p.address?.trim() || undefined,
-      status: p.status?.trim() || undefined,
-      description: p.description?.trim() || undefined,
-      imageSrc: p.imageSrc?.trim() || undefined,
-      tourUrl: p.tourUrl?.trim() || undefined,
-      ctaLabel: p.ctaLabel?.trim() || undefined,
-      listingType: p.listingType,
-    }));
+    out.catalogProperties = input.catalogProperties.map((p) => {
+      const imageGallery = p.imageGallery?.map((u) => u.trim()).filter(Boolean);
+      return {
+        ...p,
+        active: p.active === false ? false : undefined,
+        slug: p.slug?.trim() || undefined,
+        address: p.address?.trim() || undefined,
+        status: p.status?.trim() || undefined,
+        description: p.description?.trim() || undefined,
+        imageSrc: p.imageSrc?.trim() || undefined,
+        imageGallery: imageGallery?.length ? imageGallery : undefined,
+        tourUrl: p.tourUrl?.trim() || undefined,
+        ctaLabel: p.ctaLabel?.trim() || undefined,
+        listingType: p.listingType,
+        areaM2: p.areaM2,
+        bedrooms: p.bedrooms,
+        bathrooms: p.bathrooms,
+        priceAmount: p.priceAmount,
+        priceCurrency: p.priceCurrency,
+        neighborhood: p.neighborhood?.trim() || undefined,
+        propertyType: p.propertyType?.trim() || undefined,
+        lotAreaM2: p.lotAreaM2,
+        gardenM2: p.gardenM2,
+        parkingSpots: p.parkingSpots,
+        yearBuilt: p.yearBuilt,
+        brochureUrl: p.brochureUrl?.trim() || undefined,
+      };
+    });
   }
 
   if (input.clientLogos !== undefined) {

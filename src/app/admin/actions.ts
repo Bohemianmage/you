@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { ADMIN_SESSION_COOKIE, createAdminToken } from "@/lib/admin/auth";
+import { MARKETING_LOCALE_COOKIE } from "@/constants/marketing-locale";
 
 export async function loginAdmin(formData: FormData) {
   const pw = formData.get("password");
@@ -21,7 +22,9 @@ export async function loginAdmin(formData: FormData) {
     path: "/",
     maxAge: 60 * 60 * 8,
   });
-  redirect("/");
+  const jar = await cookies();
+  const pref = jar.get(MARKETING_LOCALE_COOKIE)?.value?.trim();
+  redirect(pref === "en" ? "/?lang=en" : "/");
 }
 
 export async function logoutAdmin() {

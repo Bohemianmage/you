@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, type ReactNode } from "react";
 
+import { EditableSection } from "@/components/admin/editable-section";
 import { useSiteContentEditOptional } from "@/components/admin/site-content-edit-provider";
 import { HashUrlSanitizer } from "@/components/layout/HashUrlSanitizer";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -10,6 +11,7 @@ import type { SiteContact } from "@/constants/site-contact";
 import type { HomeCopy } from "@/i18n/home";
 import { HOME_COPY, marketingNav } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
+import { MARKETING_LOCALE_COOKIE } from "@/constants/marketing-locale";
 import { mergeHomeCopy, mergeSiteContact } from "@/lib/site-content/merge-public";
 
 type LiveSiteValue = { homeCopy: HomeCopy; contact: SiteContact; locale: Locale };
@@ -33,9 +35,15 @@ export function MarketingPageFrame({
 }) {
   const edit = useSiteContentEditOptional();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     edit?.setMarketingLocale(locale);
   }, [edit, locale]);
+
+  /** Persiste idioma para login/logout y enlaces sin `?lang=`. */
+  useEffect(() => {
+    const maxAge = 60 * 60 * 24 * 365;
+    document.cookie = `${MARKETING_LOCALE_COOKIE}=${locale};path=/;max-age=${maxAge};samesite=lax`;
+  }, [locale]);
 
   const live: LiveSiteValue = edit
     ? {
@@ -50,7 +58,9 @@ export function MarketingPageFrame({
       <HashUrlSanitizer />
       <SiteHeader locale={locale} navItems={marketingNav(locale)} />
       <main className="flex-1">{children}</main>
-      <SiteFooter navItems={marketingNav(locale)} footerCopy={live.homeCopy.footer} contact={live.contact} />
+      <EditableSection sectionId="footer" label="Editar pie">
+        <SiteFooter locale={locale} navItems={marketingNav(locale)} footerCopy={live.homeCopy.footer} contact={live.contact} />
+      </EditableSection>
     </LiveSiteContext.Provider>
   );
 }

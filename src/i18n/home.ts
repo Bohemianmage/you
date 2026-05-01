@@ -269,7 +269,16 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
   },
 };
 
-/** Resolves unknown language values to the default locale. */
-export function resolveLocale(lang?: string): Locale {
-  return lang === "en" ? "en" : "es";
+/**
+ * Resuelve locale: `lang=en` en query tiene prioridad; si no, cookie (`en` / `es`);
+ * por defecto español.
+ */
+export function resolveLocale(lang?: string, cookieLocale?: string | null): Locale {
+  const q = lang?.trim();
+  if (q === "en") return "en";
+  if (q === "es") return "es";
+  const c = cookieLocale?.trim();
+  if (c === "en") return "en";
+  if (c === "es") return "es";
+  return "es";
 }

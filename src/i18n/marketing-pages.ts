@@ -17,6 +17,22 @@ export const CATALOG_PAGE_COPY: Record<
     filterRent: string;
     filterSale: string;
     noResults: string;
+    filtersDetailHeading: string;
+    filterZoneAll: string;
+    filterM2Min: string;
+    filterM2Max: string;
+    filterBedMin: string;
+    filterBedMax: string;
+    filterBathMin: string;
+    filterBathMax: string;
+    filterPriceMin: string;
+    filterPriceMax: string;
+    filterCurrency: string;
+    filterCurrencyMXN: string;
+    filterCurrencyUSD: string;
+    filterApply: string;
+    filterReset: string;
+    filterPriceNote: string;
   }
 > = {
   es: {
@@ -33,6 +49,22 @@ export const CATALOG_PAGE_COPY: Record<
     filterRent: "En renta",
     filterSale: "En venta",
     noResults: "No hay propiedades que coincidan con estos filtros.",
+    filtersDetailHeading: "Más criterios",
+    filterZoneAll: "Todas las zonas",
+    filterM2Min: "m² mín.",
+    filterM2Max: "m² máx.",
+    filterBedMin: "Rec. mín.",
+    filterBedMax: "Rec. máx.",
+    filterBathMin: "Baños mín.",
+    filterBathMax: "Baños máx.",
+    filterPriceMin: "Precio mín.",
+    filterPriceMax: "Precio máx.",
+    filterCurrency: "Moneda (precio)",
+    filterCurrencyMXN: "MXN",
+    filterCurrencyUSD: "USD",
+    filterApply: "Aplicar filtros",
+    filterReset: "Limpiar todo",
+    filterPriceNote: "El filtro por precio usa la moneda indicada y los datos numéricos de cada propiedad.",
   },
   en: {
     title: "Properties",
@@ -48,6 +80,22 @@ export const CATALOG_PAGE_COPY: Record<
     filterRent: "For rent",
     filterSale: "For sale",
     noResults: "No listings match these filters.",
+    filtersDetailHeading: "More criteria",
+    filterZoneAll: "All areas",
+    filterM2Min: "Min m²",
+    filterM2Max: "Max m²",
+    filterBedMin: "Min beds",
+    filterBedMax: "Max beds",
+    filterBathMin: "Min baths",
+    filterBathMax: "Max baths",
+    filterPriceMin: "Min price",
+    filterPriceMax: "Max price",
+    filterCurrency: "Currency (price)",
+    filterCurrencyMXN: "MXN",
+    filterCurrencyUSD: "USD",
+    filterApply: "Apply filters",
+    filterReset: "Clear all",
+    filterPriceNote: "Price filtering uses the selected currency and each listing’s numeric amount.",
   },
 };
 
@@ -60,6 +108,21 @@ export const PROPERTY_DETAIL_COPY: Record<
     backCatalog: string;
     descriptionFallback: string;
     virtualTourCta: string;
+    detailsHeading: string;
+    typeLabel: string;
+    neighborhoodLabel: string;
+    bedroomsLabel: string;
+    bathroomsLabel: string;
+    builtLabel: string;
+    lotLabel: string;
+    gardenLabel: string;
+    parkingLabel: string;
+    yearLabel: string;
+    locationHeading: string;
+    openMaps: string;
+    brochureCta: string;
+    officeHeading: string;
+    contactFormCta: string;
   }
 > = {
   es: {
@@ -69,6 +132,21 @@ export const PROPERTY_DETAIL_COPY: Record<
     descriptionFallback:
       "Para más detalle y disponibilidad actual, escribinos o agenda una visita con un asesor YOU.",
     virtualTourCta: "Tour virtual",
+    detailsHeading: "Detalles de la propiedad",
+    typeLabel: "Tipo",
+    neighborhoodLabel: "Colonia / zona",
+    bedroomsLabel: "Recámaras",
+    bathroomsLabel: "Baños",
+    builtLabel: "Construcción",
+    lotLabel: "Terreno",
+    gardenLabel: "Jardín",
+    parkingLabel: "Estacionamiento",
+    yearLabel: "Año",
+    locationHeading: "Ubicación",
+    openMaps: "Ver en Google Maps",
+    brochureCta: "Descargar folleto",
+    officeHeading: "Oficina YOU",
+    contactFormCta: "Formulario de contacto",
   },
   en: {
     interestCta: "I’m interested",
@@ -77,6 +155,21 @@ export const PROPERTY_DETAIL_COPY: Record<
     descriptionFallback:
       "For availability and full detail, contact us or schedule a visit with a YOU advisor.",
     virtualTourCta: "Virtual tour",
+    detailsHeading: "Property details",
+    typeLabel: "Type",
+    neighborhoodLabel: "Neighborhood",
+    bedroomsLabel: "Bedrooms",
+    bathroomsLabel: "Bathrooms",
+    builtLabel: "Built area",
+    lotLabel: "Lot size",
+    gardenLabel: "Garden",
+    parkingLabel: "Parking",
+    yearLabel: "Year built",
+    locationHeading: "Location",
+    openMaps: "Open in Google Maps",
+    brochureCta: "Download brochure",
+    officeHeading: "YOU office",
+    contactFormCta: "Contact form",
   },
 };
 
