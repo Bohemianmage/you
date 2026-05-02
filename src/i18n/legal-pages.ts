@@ -43,7 +43,7 @@ export const LEGAL_PAGES_COPY: Record<
     ],
     privacyTitle: "Aviso de privacidad simplificado",
     privacyLead:
-      "YOU Soluciones Inmobiliarias (“YOU”), con domicilio en México, trata datos personales conforme a la LFPDPPP y normativa aplicable.",
+      "YOU Soluciones Inmobiliarias, en lo sucesivo YOU, con domicilio en México, trata datos personales conforme a la LFPDPPP y normativa aplicable.",
     privacySections: [
       {
         heading: "Responsable",
@@ -54,19 +54,19 @@ export const LEGAL_PAGES_COPY: Record<
       {
         heading: "Datos tratados",
         body: [
-          "Identificación de contacto (nombre, correo, teléfono), preferencias de propiedad y, cuando envías una solicitud de visita, la declaración sobre documentación que planeas presentar y notas opcionales.",
+          "Identificación de contacto: nombre, correo y teléfono; preferencias de propiedad y, cuando envías una solicitud de visita, la declaración sobre documentación que planeas presentar y notas opcionales.",
         ],
       },
       {
         heading: "Finalidades",
         body: [
-          "Responder consultas, coordinar visitas, mejorar el servicio y cumplir obligaciones legales. La información declarada para citas se conserva cifrada de forma temporal (aprox. 30 días) y luego se elimina automáticamente salvo obligación legal distinta.",
+          "Responder consultas, coordinar visitas, mejorar el servicio y cumplir obligaciones legales. La información declarada para citas se conserva cifrada de forma temporal, unos 30 días, y luego se elimina automáticamente salvo obligación legal distinta.",
         ],
       },
       {
         heading: "Transferencias",
         body: [
-          "Datos alojados en proveedores de infraestructura en la nube (por ejemplo almacenamiento y correo transaccional) bajo acuerdos de confidencialidad.",
+          "Datos alojados en proveedores de infraestructura en la nube, por ejemplo almacenamiento y correo transaccional, bajo acuerdos de confidencialidad.",
         ],
       },
       {
@@ -106,9 +106,9 @@ export const LEGAL_PAGES_COPY: Record<
         body: ["YOU may update these terms by publishing the new version on this page."],
       },
     ],
-    privacyTitle: "Privacy notice (summary)",
+    privacyTitle: "Privacy notice summary",
     privacyLead:
-      'YOU Soluciones Inmobiliarias ("YOU"), operating in Mexico, processes personal data under applicable privacy laws.',
+      "YOU Soluciones Inmobiliarias, hereinafter YOU, operating in Mexico, processes personal data under applicable privacy laws.",
     privacySections: [
       {
         heading: "Controller",
@@ -119,13 +119,13 @@ export const LEGAL_PAGES_COPY: Record<
       {
         heading: "Data processed",
         body: [
-          "Contact details (name, email, phone), property preferences, and—for visit requests—your declaration of documentation you plan to bring plus optional notes.",
+          "Contact details: name, email, and phone; property preferences; and for visit requests, your declaration of documentation you plan to bring plus optional notes.",
         ],
       },
       {
         heading: "Purposes",
         body: [
-          "Respond to enquiries, coordinate visits, improve service, and comply with legal duties. Visit-related declarations are stored encrypted temporarily (~30 days) and then deleted automatically unless law requires otherwise.",
+          "Respond to enquiries, coordinate visits, improve service, and comply with legal duties. Visit-related declarations are stored encrypted temporarily for about 30 days and then deleted automatically unless law requires otherwise.",
         ],
       },
       {

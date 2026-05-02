@@ -15,7 +15,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
     err === "auth"
       ? "Contraseña incorrecta."
       : err === "config"
-        ? "Falta configurar ADMIN_SESSION_SECRET (mín. 16 caracteres)."
+        ? "Falta configurar ADMIN_SESSION_SECRET: mínimo 16 caracteres."
         : null;
 
   return (

@@ -41,7 +41,7 @@ export function computeAgendaReadiness(input: {
     errors.push("Equipo: hace falta al menos un correo para agendar, avisar pendientes y recordatorios.");
   }
 
-  for (const [catalogId, advisorId] of Object.entries(map)) {
+  for (const [, advisorId] of Object.entries(map)) {
     const aid = advisorId?.trim();
     if (!aid) continue;
     const member = teamById.get(aid);

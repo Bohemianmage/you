@@ -14,14 +14,6 @@ export const getCachedSiteContent = unstable_cache(fetchSiteContent, ["site-cont
   tags: ["site-content"],
 });
 
-/** Alias histórico — mismo que contenido JSON local. */
-export const getCachedSiteSettingsPayload = getCachedSiteContent;
-
 export async function getSiteContentFresh(): Promise<SiteContentFile> {
   return fetchSiteContent();
-}
-
-/** @deprecated Usar getSiteContentFresh */
-export async function getSiteSettingsPayloadFresh(): Promise<SiteContentFile> {
-  return getSiteContentFresh();
 }

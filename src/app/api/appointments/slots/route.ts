@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { findCatalogPropertyBySegment } from "@/lib/property-routes";
-import { getAvailableSlotStartsForAdvisor, getAvailableSlotStartsUnionTeam } from "@/lib/appointments/availability";
+import { getPublicBookingSlotStartsForAdvisor, getPublicBookingSlotStartsUnionTeam } from "@/lib/appointments/public-offering";
 import { resolveAdvisorForCatalogProperty } from "@/lib/appointments/resolve-advisor";
 import { appointmentsRedisConfigured } from "@/lib/appointments/store";
 import { getCachedEasyBrokerCatalog } from "@/lib/easybroker/catalog-cache";
@@ -33,7 +33,7 @@ export async function GET(req: Request) {
   const resolved = resolveAdvisorForCatalogProperty(file, catalogId);
 
   if (resolved.ok) {
-    const slots = await getAvailableSlotStartsForAdvisor(resolved.advisor.id, file);
+    const slots = await getPublicBookingSlotStartsForAdvisor(resolved.advisor.id, file);
     return NextResponse.json({
       ok: true as const,
       slotsIso: slots.map((d) => d.toISOString()),
@@ -43,7 +43,7 @@ export async function GET(req: Request) {
     });
   }
 
-  const slots = await getAvailableSlotStartsUnionTeam(file);
+  const slots = await getPublicBookingSlotStartsUnionTeam(file);
   return NextResponse.json({
     ok: true as const,
     slotsIso: slots.map((d) => d.toISOString()),

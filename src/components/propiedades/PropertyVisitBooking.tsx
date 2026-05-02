@@ -159,8 +159,8 @@ export function PropertyVisitBooking({
   const timeFmt = useMemo(
     () =>
       new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-MX", {
-        hour: "2-digit",
-        minute: "2-digit",
+        hour: "numeric",
+        ...(locale === "en" ? { hour12: true } : { hour12: false }),
         timeZone: BOOKING_TZ,
       }),
     [locale],
@@ -310,7 +310,7 @@ export function PropertyVisitBooking({
           <div id="booking-days" className="space-y-5">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickDay}</p>
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] sm:flex-wrap sm:overflow-visible">
                 {slotsByDay.orderedKeys.map((key) => {
                   const firstIso = slotsByDay.byDay.get(key)?.[0];
                   const label = firstIso ? dateFmt.format(new Date(firstIso)) : key;
@@ -324,9 +324,9 @@ export function PropertyVisitBooking({
                         setPick(null);
                         setWizardStep(2);
                       }}
-                      className={`rounded-sm border px-3 py-2 text-left text-xs font-semibold transition ${
+                      className={`shrink-0 rounded-sm border px-4 py-2.5 text-left text-xs font-semibold transition sm:min-w-0 ${
                         active
-                          ? "border-brand-accent bg-brand-accent text-brand-white"
+                          ? "border-brand-accent bg-brand-accent text-brand-white shadow-sm"
                           : "border-brand-border bg-brand-bg text-brand-text hover:border-brand-accent/50"
                       }`}
                     >
@@ -362,7 +362,7 @@ export function PropertyVisitBooking({
                 <p className="mt-1.5 text-sm font-medium text-brand-text">{summaryDayLabel}</p>
               ) : null}
               <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-brand-muted">{copy.bookingPickSlot}</p>
-              <div className="mt-2 grid max-h-48 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4 md:grid-cols-5">
+              <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {timesForDay.map((iso) => {
                   const active = pick === iso;
                   const label = timeFmt.format(new Date(iso));

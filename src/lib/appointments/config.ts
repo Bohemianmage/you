@@ -4,8 +4,8 @@ import "server-only";
 export const BOOKING_TIMEZONE = "America/Mexico_City";
 
 export function bookingSlotMinutes(): number {
-  const n = Number(process.env.BOOKING_SLOT_MINUTES ?? "30");
-  return Number.isFinite(n) && n >= 15 && n <= 120 ? Math.floor(n) : 30;
+  const n = Number(process.env.BOOKING_SLOT_MINUTES ?? "60");
+  return Number.isFinite(n) && n >= 15 && n <= 120 ? Math.floor(n) : 60;
 }
 
 export function bookingDayStartHour(): number {

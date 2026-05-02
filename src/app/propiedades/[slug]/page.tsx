@@ -189,7 +189,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
                         {ebOperationTypeLabel(op.type, locale)}
                       </span>
                       <span className="text-lg font-semibold text-brand-text">{op.formatted_amount}</span>
-                      {periodNote ? <span className="text-xs text-brand-muted">({periodNote})</span> : null}
+                      {periodNote ? <span className="text-xs text-brand-muted"> · {periodNote}</span> : null}
                     </li>
                   );
                 })}
@@ -279,7 +279,8 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
                 {property.videoUrls.map((url, i) => (
                   <li key={`${url}-${i}`}>
                     <a href={url} target="_blank" rel="noopener noreferrer" className={`${TEXT_LINK_INLINE} text-sm font-semibold`}>
-                      {copy.videoOpenLabel} {property.videoUrls!.length > 1 ? `(${i + 1})` : ""}
+                      {copy.videoOpenLabel}
+                      {property.videoUrls!.length > 1 ? ` · ${i + 1}` : ""}
                     </a>
                   </li>
                 ))}
@@ -301,7 +302,7 @@ export default async function PropertyDetailPage({ params, searchParams }: Prope
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center rounded-sm border border-brand-border px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-brand-text transition hover:border-brand-accent hover:text-brand-accent-strong"
                   >
-                    {pdfDocuments.length > 1 ? `${copy.brochureCta} (${i + 1}/${pdfDocuments.length})` : copy.brochureCta}
+                    {pdfDocuments.length > 1 ? `${copy.brochureCta} · ${i + 1}/${pdfDocuments.length}` : copy.brochureCta}
                   </a>
                 ))}
               </div>

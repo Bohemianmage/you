@@ -220,7 +220,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
   en: {
     hero: {
       announcement:
-        "Looking for accommodation or your next real estate investment in México? Click here",
+        "Looking for a home or your next real estate investment in Mexico? Click here",
       title: "Find the perfect spot for YOU",
       subtitle: "Professional real estate service with a human approach",
       primaryCta: "View properties",
@@ -293,7 +293,7 @@ export const HOME_COPY: Record<Locale, HomeCopy> = {
       title: "Looking for an OFFICE?",
       description: "We help you find the perfect place for you and your team.",
       supportText:
-        "We have presence in the city's most requested corporate areas.",
+        "We cover the city's most in-demand corporate districts.",
       cta: "Let's find your next office",
     },
     downloadables: {

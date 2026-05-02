@@ -150,7 +150,6 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
         featuredCatalogIds: normalizedFeatured,
         downloadablesByLocale: { es: downloadablesEs, en: downloadablesEn },
       };
-      delete next.featuredByLocale;
       if (Object.keys(normalizedAdvisors).length > 0) {
         next.propertyAdvisorByCatalogId = normalizedAdvisors;
       } else {
@@ -230,13 +229,13 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
         className="rounded-sm border border-brand-border bg-brand-bg px-4 py-4 shadow-sm"
         aria-label="Validación agenda en sitio"
       >
-        <h2 className="font-heading text-sm font-semibold text-brand-text">Agenda en el sitio (contenido)</h2>
+        <h2 className="font-heading text-sm font-semibold text-brand-text">Contenido de la agenda en el sitio</h2>
         <p className="mt-1 text-xs leading-relaxed text-brand-muted">
-          Comprobación sobre Equipo, destacadas y mapa de asesores. Redis, correo transaccional y cifrado de documentos se configuran en el servidor / Vercel (ver también{" "}
+          Comprobación sobre Equipo, destacadas y mapa de asesores. Redis, correo transaccional y cifrado de documentos se configuran en el servidor o en Vercel. Consulta también{" "}
           <a href="/admin/calendario" className="font-semibold text-brand-accent underline-offset-2 hover:underline">
             Calendario
           </a>
-          ).
+          .
         </p>
         {agendaReadiness.errors.length > 0 ? (
           <ul className="mt-3 list-inside list-disc space-y-1.5 text-sm text-brand-accent-strong">
@@ -345,15 +344,15 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
                     <input type="text" value={member.name} onChange={(e) => updateTeam(i, { name: e.target.value })} className={inputClass} />
                   </label>
                   <label className={labelClass}>
-                    Rol (ES)
+                    Rol en español
                     <input type="text" value={member.role.es} onChange={(e) => updateTeamRole(i, "es", e.target.value)} className={inputClass} />
                   </label>
                   <label className={labelClass}>
-                    Rol (EN)
+                    Rol en inglés
                     <input type="text" value={member.role.en} onChange={(e) => updateTeamRole(i, "en", e.target.value)} className={inputClass} />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
-                    Imagen (ruta bajo /public, opcional)
+                    Ruta de imagen bajo /public, opcional
                     <input
                       type="text"
                       value={member.imageSrc ?? ""}
@@ -384,7 +383,7 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
                     />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
-                    Teléfono enlace (tel:)
+                    Enlace telefónico, formato tel:
                     <input
                       type="text"
                       value={member.phoneHref ?? ""}
@@ -474,7 +473,7 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
                       }
                       title={
                         <span className="min-w-0">
-                          <span className="block truncate font-medium text-brand-text">{prop?.title ?? `(sin catálogo: ${id})`}</span>
+                          <span className="block truncate font-medium text-brand-text">{prop?.title ?? `Sin catálogo · ${id}`}</span>
                           <span className="block truncate text-xs text-brand-muted">{id}</span>
                         </span>
                       }
@@ -528,8 +527,8 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
       {tab === "advisors" ? (
         <div className="space-y-6">
           <p className="text-sm text-brand-muted">
-            Asigna un miembro del <strong className="text-brand-text">Equipo</strong> a cada propiedad del catálogo EasyBroker para activar la agenda en la ficha
-            y el envío de correos al asesor (necesita <strong className="text-brand-text">correo</strong> en su ficha).
+            Asigna un miembro del <strong className="text-brand-text">Equipo</strong> a cada propiedad del catálogo EasyBroker para activar la agenda en la ficha y el envío de correos al asesor.
+            El miembro debe tener <strong className="text-brand-text">correo</strong> en su ficha.
           </p>
           <label className={labelClass}>
             Buscar en catálogo
@@ -573,7 +572,7 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
           </ul>
 
           <div className="rounded-sm border border-brand-border/80 bg-brand-bg px-4 py-5">
-            <h3 className="font-heading text-sm font-semibold text-brand-text">Fin de semana (agenda)</h3>
+            <h3 className="font-heading text-sm font-semibold text-brand-text">Disponibilidad en fin de semana</h3>
             <p className="mt-2 text-xs leading-relaxed text-brand-muted">
               Por defecto los horarios incluyen sábado y domingo. Desmarca a quien solo atiende entre semana.
             </p>
@@ -705,7 +704,7 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
                     <textarea rows={3} value={item.description} onChange={(e) => updateDownloadable(idx, { description: e.target.value })} className={inputClass} />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
-                    URL archivo (PDF, etc.)
+                    URL del archivo
                     <input
                       type="text"
                       value={item.fileUrl ?? ""}
@@ -716,7 +715,7 @@ export function AdminListsEditor({ seed }: { seed: AdminEditorSeed }) {
                     <SiteAssetUploadButton kind="pdf" subfolder="downloadables" onUploaded={(url) => updateDownloadable(idx, { fileUrl: url })} />
                   </label>
                   <label className={`${labelClass} sm:col-span-2`}>
-                    Imagen tarjeta (opcional)
+                    Imagen de tarjeta opcional
                     <input
                       type="text"
                       value={item.imageSrc ?? ""}

@@ -73,30 +73,6 @@ const downloadableItemSchema = z.object({
   imageSrc: z.string().optional(),
 });
 
-const featuredPropertySchema = z.object({
-  id: z.string().min(1),
-  slug: z.string().optional(),
-  title: z.string().min(1),
-  price: z.string().min(1),
-  address: z.string().min(1),
-  status: z.string().min(1),
-  ctaLabel: z.string().min(1),
-  description: z.string().optional(),
-  tourUrl: z.string().optional(),
-  imageSrc: z.string().optional(),
-  imageGallery: z.array(z.string()).optional(),
-  neighborhood: z.string().optional(),
-  propertyType: z.string().optional(),
-  bedrooms: z.number().int().nonnegative().optional(),
-  bathrooms: z.number().nonnegative().optional(),
-  areaM2: z.number().nonnegative().optional(),
-  lotAreaM2: z.number().nonnegative().optional(),
-  gardenM2: z.number().nonnegative().optional(),
-  parkingSpots: z.number().int().nonnegative().optional(),
-  yearBuilt: z.number().int().optional(),
-  brochureUrl: z.string().optional(),
-});
-
 export const siteContentFileSchema = z
   .object({
     version: z.literal(1).optional(),
@@ -123,12 +99,6 @@ export const siteContentFileSchema = z
       .optional(),
     team: z.array(teamMemberSchema).optional(),
     featuredCatalogIds: z.array(z.string().min(1)).optional(),
-    featuredByLocale: z
-      .object({
-        es: z.array(featuredPropertySchema).optional(),
-        en: z.array(featuredPropertySchema).optional(),
-      })
-      .optional(),
     catalogProperties: z.array(catalogPropertySchema).optional(),
     clientLogos: z.array(clientLogoSchema).optional(),
     downloadablesByLocale: z
@@ -140,8 +110,7 @@ export const siteContentFileSchema = z
     homeCopyByLocale: z.any().optional(),
     propertyAdvisorByCatalogId: z.record(z.string(), z.string()).optional(),
     advisorNoWeekendAvailability: z.array(z.string().min(1)).optional(),
-  })
-  .strict();
+  });
 
 export function parseSiteContentFile(raw: unknown): SiteContentFile {
   const parsed = siteContentFileSchema.parse(raw);
@@ -189,27 +158,6 @@ function pruneSiteContent(input: z.infer<typeof siteContentFileSchema>): SiteCon
 
   if (input.featuredCatalogIds !== undefined) {
     out.featuredCatalogIds = input.featuredCatalogIds.map((id) => id.trim()).filter(Boolean);
-  } else if (input.featuredByLocale !== undefined) {
-    const stripFeatured = (arr: NonNullable<SiteContentFile["featuredByLocale"]>["es"] | undefined) =>
-      (arr ?? []).map((p) => {
-        const imageGallery = p.imageGallery?.map((u) => u.trim()).filter(Boolean);
-        return {
-          ...p,
-          slug: p.slug?.trim() || undefined,
-          description: p.description?.trim() || undefined,
-          tourUrl: p.tourUrl?.trim() || undefined,
-          imageSrc: p.imageSrc?.trim() || undefined,
-          imageGallery: imageGallery?.length ? imageGallery : undefined,
-          neighborhood: p.neighborhood?.trim() || undefined,
-          propertyType: p.propertyType?.trim() || undefined,
-          brochureUrl: p.brochureUrl?.trim() || undefined,
-        };
-      });
-
-    out.featuredByLocale = {
-      ...(input.featuredByLocale.es !== undefined ? { es: stripFeatured(input.featuredByLocale.es) } : {}),
-      ...(input.featuredByLocale.en !== undefined ? { en: stripFeatured(input.featuredByLocale.en) } : {}),
-    };
   }
 
   if (input.catalogProperties !== undefined) {

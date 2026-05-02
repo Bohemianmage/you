@@ -7,7 +7,9 @@ import type { SiteContentFile } from "./types";
 
 function contentPath(): string {
   const override = process.env.SITE_CONTENT_PATH?.trim();
-  if (override) return path.isAbsolute(override) ? override : path.join(/* turbopackIgnore: true */ process.cwd(), override);
+  if (override) {
+    return path.isAbsolute(override) ? override : path.join(/* turbopackIgnore: true */ process.cwd(), override);
+  }
   return path.join(/* turbopackIgnore: true */ process.cwd(), "content", "site-content.json");
 }
 

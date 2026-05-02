@@ -61,7 +61,6 @@ function pickImg(chunk) {
 }
 
 function parsePrice(raw, plainChunk) {
-  const hasUsdLabel = /USD|US\$/i.test(plainChunk);
   let currency = "MXN";
   let display = raw;
 

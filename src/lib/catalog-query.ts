@@ -66,21 +66,6 @@ function parseNonNegNumber(v: string | undefined): number | undefined {
   return Number.isFinite(n) && n >= 0 ? n : undefined;
 }
 
-/** Migra query legacy `region` / `area` a una sola `zone` para el modelo plano. */
-function migrateLegacyZone(params: {
-  zone?: string | string[];
-  region?: string | string[];
-  area?: string | string[];
-}): string | undefined {
-  const zoneDirect = spFirst(params.zone)?.trim();
-  if (zoneDirect) return zoneDirect;
-  const area = spFirst(params.area)?.trim();
-  if (area) return area;
-  const region = spFirst(params.region)?.trim();
-  if (region) return region;
-  return undefined;
-}
-
 function dedupePreserveOrder(values: string[]): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
@@ -95,8 +80,6 @@ function dedupePreserveOrder(values: string[]): string[] {
 
 /** Lee query string de Next (`searchParams`) hacia estado de filtros. */
 export function parseCatalogFiltersFromSearchParams(params: {
-  region?: string | string[];
-  area?: string | string[];
   zone?: string | string[];
   feat?: string | string[];
   tipo?: string | string[];
@@ -119,7 +102,7 @@ export function parseCatalogFiltersFromSearchParams(params: {
   /** `precioMin=0` no debe activar el filtro de precio (equivale a sin mínimo). */
   const precioMin = precioMinRaw === 0 ? undefined : precioMinRaw;
   const wantsPrice = precioMin != null || precioMaxRaw != null;
-  const zone = migrateLegacyZone(params);
+  const zone = spFirst(params.zone)?.trim() || undefined;
   const featRaw = spAllStrings(params.feat);
   return {
     zone: zone || undefined,

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { catalogPropertySegment, findCatalogPropertyBySegment } from "@/lib/property-routes";
 import { UNASSIGNED_ADVISOR_ID } from "@/lib/appointments/constants";
 import { bookingSlotMinutes } from "@/lib/appointments/config";
-import { getAvailableSlotStartsForAdvisor, getAvailableSlotStartsUnionTeam } from "@/lib/appointments/availability";
+import { getPublicBookingSlotStartsForAdvisor, getPublicBookingSlotStartsUnionTeam } from "@/lib/appointments/public-offering";
 import { bookingDocsEncryptionConfigured } from "@/lib/appointments/doc-vault";
 import { saveEncryptedBookingDocs } from "@/lib/appointments/docs-store";
 import {
@@ -88,10 +88,10 @@ export async function POST(req: Request) {
 
   if (resolved.ok) {
     advisorId = resolved.advisor.id;
-    slotStarts = await getAvailableSlotStartsForAdvisor(resolved.advisor.id, file);
+    slotStarts = await getPublicBookingSlotStartsForAdvisor(resolved.advisor.id, file);
   } else {
     advisorId = UNASSIGNED_ADVISOR_ID;
-    slotStarts = await getAvailableSlotStartsUnionTeam(file);
+    slotStarts = await getPublicBookingSlotStartsUnionTeam(file);
   }
 
   const allowed = slotStarts.some((d) => d.getTime() === startMs);

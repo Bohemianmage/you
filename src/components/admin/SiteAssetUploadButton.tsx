@@ -56,7 +56,7 @@ export function SiteAssetUploadButton({
         onClick={() => inputRef.current?.click()}
         className="rounded-sm border border-brand-border bg-brand-surface px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-brand-accent transition hover:border-brand-accent hover:bg-brand-accent/10 disabled:opacity-45"
       >
-        {pending ? "Subiendo…" : label ?? (kind === "pdf" ? "Subir PDF (Git)" : "Subir imagen (Git)")}
+        {pending ? "Subiendo…" : label ?? (kind === "pdf" ? "Subir PDF a Git" : "Subir imagen a Git")}
       </button>
       {message ? (
         <span

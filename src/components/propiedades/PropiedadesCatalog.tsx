@@ -91,6 +91,7 @@ export function PropiedadesCatalog({
   const [live, setLive] = useState<CatalogQueryFilters>(filters);
   useEffect(() => {
     setLive(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deps deliberadas: contenido vía filtersKeyFromUrl
   }, [filtersKeyFromUrl]);
 
   useEffect(() => {

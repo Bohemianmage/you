@@ -1,6 +1,5 @@
 import type { CatalogProperty } from "@/data/catalog-properties";
 import type { DownloadableItem } from "@/data/downloadables";
-import type { FeaturedProperty } from "@/data/properties";
 import type { TeamMember } from "@/data/team";
 import type { HomeCopy } from "@/i18n/home";
 import type { Locale } from "@/i18n/types";
@@ -21,13 +20,8 @@ export type DeepPartial<T> = {
 export type SiteContentFile = SiteSettingsPayload & {
   version?: 1;
   team?: TeamMember[];
-  /**
-   * Orden de IDs del catálogo mostrados como destacados en el inicio (mismo orden para todos los idiomas).
-   * Si está definido (incluso `[]`), sustituye a `featuredByLocale` en runtime.
-   */
+  /** Orden de IDs del catálogo mostrados como destacados en el inicio (mismo orden para todos los idiomas). */
   featuredCatalogIds?: string[];
-  /** @deprecated Preferir `featuredCatalogIds`; se mantiene para JSON antiguos. */
-  featuredByLocale?: Partial<Record<Locale, FeaturedProperty[]>>;
   /** Catálogo `/propiedades` y fichas detalle. */
   catalogProperties?: CatalogProperty[];
   /** Logos en bloque “Clientes” (sobre nosotros). */

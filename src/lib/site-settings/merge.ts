@@ -68,7 +68,7 @@ export async function getMergedDownloadablesForLocale(locale: Locale): Promise<D
   return mergeDownloadablesFromFile(locale, file);
 }
 
-/** Ficha interna: catálogo EasyBroker enriquecido con GET detalle; compatibilidad con destacados legacy. */
+/** Ficha interna: catálogo EasyBroker enriquecido con GET detalle. */
 export async function getMergedPropertyDetailBySlug(locale: Locale, slug: string): Promise<FeaturedProperty | null> {
   const file = await getCachedSiteContent();
   const catalog = await getCachedEasyBrokerCatalog(locale);
@@ -92,15 +92,10 @@ export async function getMergedSiteContact(): Promise<SiteContact> {
 function deriveFeaturedCatalogIdsForAdmin(file: SiteContentFile, ebCatalog: readonly CatalogProperty[]): string[] {
   if (file.featuredCatalogIds !== undefined) return [...file.featuredCatalogIds];
   const catalogIds = new Set(ebCatalog.map((c) => c.id));
-  const legacy = file.featuredByLocale?.es;
-  if (legacy?.length) {
-    const ids = legacy.map((p) => p.id).filter((id) => catalogIds.has(id));
-    if (ids.length) return ids;
-  }
-  const fromDefaults = mergeFeaturedFromFile("es", file, ebCatalog)
+  const fromMerged = mergeFeaturedFromFile("es", file, ebCatalog)
     .map((p) => p.id)
     .filter((id) => catalogIds.has(id));
-  if (fromDefaults.length) return fromDefaults;
+  if (fromMerged.length) return fromMerged;
   const active = ebCatalog.filter((c) => c.active !== false);
   return active.slice(0, 6).map((c) => c.id);
 }

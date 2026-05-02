@@ -82,7 +82,7 @@ export function AdminCalendarView({
         if (data.error === "advisor_required") alert("Elegí un asesor del equipo antes de confirmar.");
         else if (data.error === "invalid_advisor") alert("Ese asesor no tiene correo en Equipo; revisá la configuración.");
         else if (data.error === "slot_conflict") alert("Ese asesor ya tiene cita en ese horario. Elegí otro miembro u otro momento.");
-        else alert("No se pudo confirmar (¿ya estaba confirmada?).");
+        else alert("No se pudo confirmar. ¿Quizá ya estaba confirmada?");
         return;
       }
       router.refresh();
@@ -134,7 +134,7 @@ export function AdminCalendarView({
       {docJson ? (
         <div className="rounded-sm border border-brand-border bg-brand-bg p-4">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">Documentación declarada (descifrada)</p>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-brand-muted">Documentación declarada, descifrada</p>
             <button type="button" className="text-xs font-semibold text-brand-accent hover:underline" onClick={() => setDocJson(null)}>
               Cerrar
             </button>

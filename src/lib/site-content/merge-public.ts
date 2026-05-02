@@ -95,9 +95,6 @@ export function mergeFeaturedFromFile(
       .map((c) => catalogAsFeaturedDetail(c, locale));
   }
 
-  const list = file.featuredByLocale?.[locale];
-  if (list !== undefined) return [...list];
-
   const active = ebCatalog.filter((c) => c.active !== false);
   if (active.length) return active.slice(0, 6).map((c) => catalogAsFeaturedDetail(c, locale));
 

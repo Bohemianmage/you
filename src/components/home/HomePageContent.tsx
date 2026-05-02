@@ -90,7 +90,7 @@ export function HomePageContent({
           {edit ? (
             <p className="mx-auto mb-3 max-w-6xl px-4 text-center text-xs text-brand-muted sm:px-6 lg:px-8">
               <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
-                Catálogo y orden de destacados
+                {locale === "en" ? "Catalog and featured order" : "Catálogo y orden de destacados"}
               </Link>
               .
             </p>
@@ -116,7 +116,7 @@ export function HomePageContent({
           {edit ? (
             <p className="mx-auto mb-3 max-w-6xl px-4 text-center text-xs text-brand-muted sm:px-6 lg:px-8">
               <Link href="/admin/listas" className="font-semibold text-brand-accent no-underline hover:underline">
-                Archivos PDF e imágenes de tarjetas
+                {locale === "en" ? "PDF files and card images" : "Archivos PDF e imágenes de tarjetas"}
               </Link>
               .
             </p>

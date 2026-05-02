@@ -224,7 +224,10 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
               : "pointer-events-none -translate-y-full opacity-0"
           }`}
         >
-          <nav className="px-4 pb-2 pt-4 sm:px-5 sm:pt-5" aria-label="Principal móvil">
+          <nav
+            className="px-4 pb-2 pt-4 sm:px-5 sm:pt-5"
+            aria-label={locale === "en" ? "Mobile primary navigation" : "Navegación principal en móvil"}
+          >
             <ul className="space-y-1">
               {navItems.map((item) => {
                 const active = isNavItemActive(item);
@@ -297,7 +300,10 @@ export function SiteHeader({ locale, navItems }: SiteHeaderProps) {
           />
         </Link>
 
-        <nav className="hidden lg:flex lg:flex-1 lg:justify-center" aria-label="Principal">
+        <nav
+          className="hidden lg:flex lg:flex-1 lg:justify-center"
+          aria-label={locale === "en" ? "Primary navigation" : "Navegación principal"}
+        >
           <ul className="flex items-center gap-1 rounded-full bg-brand-surface/95 px-1 py-1 shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-brand-border/55">
             {navItems.map((item) => {
               const active = isNavItemActive(item);

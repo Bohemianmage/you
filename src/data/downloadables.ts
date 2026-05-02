@@ -61,6 +61,3 @@ export const DOWNLOADABLE_ITEMS_BY_LOCALE: Record<Locale, readonly DownloadableI
   es: DOWNLOADABLE_ITEMS_ES,
   en: DOWNLOADABLE_ITEMS_EN,
 };
-
-/** @deprecated Use DOWNLOADABLE_ITEMS_BY_LOCALE["es"] */
-export const DOWNLOADABLE_ITEMS = DOWNLOADABLE_ITEMS_ES;
